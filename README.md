@@ -3,4 +3,7 @@
 ## Folder Info
 ### Example Codes
 - Coding examples for experiments
+- Subfolders
+    - Arduino: Tactile
+    - PsychoPy: Testing
 - Source: Celine Honekamp
