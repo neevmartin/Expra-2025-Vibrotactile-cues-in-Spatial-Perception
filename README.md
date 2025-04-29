@@ -8,4 +8,6 @@
     - PsychoPy: Testing
 - Source: Celine Honekamp
 ### Literature
-- Recommended Papers
+- Recommended papers
+### Slides
+- Course slides
