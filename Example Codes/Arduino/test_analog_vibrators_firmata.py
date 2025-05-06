@@ -14,19 +14,14 @@ import keyboard
 
 #####
 # Set these:
-<<<<<<< HEAD:test_analog_vibrators.py
-WIN_COM = 9 # number is corresponding to the internal number of your USB-port (displayed in the Arduino IDE at the top after connecting your arduino via USB)
-VIB_PINS = [10, 11] # pins from which the vibrators are connected to 
-=======
-WIN_COM = 6 # number is corresponding to the internal number of your USB-port (displayed in the Arduino IDE at the top after connecting your arduino via USB)
-VIB_PINS = [5, 6] # pins from which the vibrators are connected to 
->>>>>>> caf16aaafcd5bb5ad3089ed72e6ac387db427be6:test_analog_vibrators_firmata.py
+WIN_COM = 3 # number is corresponding to the internal number of your USB-port (displayed in the Arduino IDE at the top after connecting your arduino via USB)
+VIB_PINS = [10] # pin from which the vibrators are connected to
 #####
 
 MAX_VOLT = 3 # maximum voltage allowed for the specific vibrator used - can be found in data sheet of corresponding vibrator
 POWER_SOURCE = 5 # power source we are using 
 
-voltage_scalar = MAX_VOLT / POWER_SOURCE # maxmimum value allowed
+voltage_scalar = MAX_VOLT / POWER_SOURCE # maximum value allowed (0.6)
 
 
 def main():
@@ -52,12 +47,12 @@ def main():
     while True:
         try:
             for pin_id in range(len(vib_pins)):
-                if keyboard.is_pressed(str(pin_id+1)):
+                if keyboard.is_pressed(str(pin_id+1)): # Press "1" on keyboard to start & stop vibration
                     print(f"Setting pin {pin_id}")
                     intensities[pin_id] = (1. - intensities[pin_id])
 
                 # set between 0 and 1
-
+    
                 vib_pins[pin_id].write(intensities[pin_id] * voltage_scalar) # this is where the intensity is set for the specified  vibrator, values between 0 and maximum possible value (scaled by voltage_scalar)
 
             time.sleep(0.1)
