@@ -27,10 +27,11 @@ def trialStructure(mode):
         distance = trial["distance"]
         intensity = trial["intensity"]
 
-        print(
-            f"Trial {trial_num:03d} | Phase: {phase} | Task: {task} | "
-            f"Block: {block} | Rep: {rep} | Distance: {distance} | Intensity: {intensity}"
-        )
+        print(config.get_current_trial())
+        # print(
+        #     f"Trial {trial_num:03d} | Phase: {phase} | Task: {task} | "
+        #     f"Block: {block} | Rep: {rep} | Distance: {distance} | Intensity: {intensity}"
+        # )
         #print(trial)
         trial_num += 1
 

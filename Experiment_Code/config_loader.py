@@ -84,6 +84,7 @@ class ExperimentConfig:
             mapping (str): Mapping type ('direct' or 'reversed').
             config_dir (str): Path to the directory containing YAML config files.
         """
+
         self.mode = mode.lower()
         self.mapping = mapping.lower()
         self.config_path = os.path.join(config_dir, f"{self.mode}.yaml")
@@ -226,9 +227,9 @@ class ExperimentConfig:
         Return the current trial (most recently returned by get_next_trial).
         Returns None if get_next_trial hasn't been called yet.
         """
-        if self.current_index == 0:
+        if self._trial_index == 0:
             return None
-        return self.trial_sequence[self.current_index - 1]
+        return self.trial_sequence[self._trial_index - 1]
 
     def get_all_trials(self):
         """
@@ -240,19 +241,19 @@ class ExperimentConfig:
         """
         Return the list of completed trials (up to the current index).
         """
-        return self.trial_sequence[:self.current_index]
+        return self.trial_sequence[:self._trial_index]
 
     def get_remaining_trials(self):
         """
         Return the list of trials yet to be completed.
         """
-        return self.trial_sequence[self.current_index:]
+        return self.trial_sequence[self._trial_index:]
 
     def get_trial_index(self):
         """
         Return the current index (next trial number to be fetched).
         """
-        return self.current_index
+        return self._trial_index
 
     def reset_trials(self):
         """Reset the trial index to the beginning (e.g., for a rerun or test)."""
