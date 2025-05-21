@@ -1,0 +1,64 @@
+target_values:
+  distances: [9.1, 18.2, 27.3, 36.4, 45.5, 54.5, 63.6, 72.7, 81.8, 90.9, 100]
+  intensities: [9.1, 18.2, 27.3, 36.4, 45.5, 54.5, 63.6, 72.7, 81.8, 90.9, 100]
+
+subgroups:
+  direct:
+    mapping_type: "direct"
+    phases:
+      - name: "Pre-Test"
+        task: "avoiding"
+        blocks: 1
+        repetitions: 8
+      - name: "Pre-Test"
+        task: "reaching"
+        blocks: 1
+        repetitions: 8
+      - name: "Training"
+        task: "avoiding"
+        blocks: 5
+        target_distances: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
+        intensity_levels: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
+        repetitions: 10
+      - name: "Post-Test"
+        task: "avoiding"
+        blocks: 1
+        repetitions: 8
+      - name: "Post-Test"
+        task: "reaching"
+        blocks: 1
+        repetitions: 8
+      - name: "Mini-Post-Test"
+        task: "avoiding"
+        blocks: 1
+        repetitions: 2
+
+  reversed:
+    mapping_type: "reversed"
+    phases:
+      - name: "Pre-Test"
+        task: "avoiding"
+        blocks: 1
+        repetitions: 8
+      - name: "Pre-Test"
+        task: "reaching"
+        blocks: 1
+        repetitions: 8
+      - name: "Training"
+        task: "avoiding"
+        blocks: 5
+        target_distances: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
+        intensity_levels: [ 90.9, 72.7, 54.5, 36.4, 18.2 ] #Reversed
+        repetitions: 10
+      - name: "Post-Test"
+        task: "avoiding"
+        blocks: 1
+        repetitions: 8
+      - name: "Post-Test"
+        task: "reaching"
+        blocks: 1
+        repetitions: 8
+      - name: "Mini-Post-Test"
+        task: "avoiding"
+        blocks: 1
+        repetitions: 2
