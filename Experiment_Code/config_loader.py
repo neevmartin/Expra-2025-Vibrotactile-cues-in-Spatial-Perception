@@ -8,10 +8,71 @@ class ExperimentConfig:
     for psychophysical reaching/avoiding tasks following vibration stimulus.
 
     It supports two mapping types:
-      - 'direct': intensity increases with distance
-      - 'reversed': intensity decreases with distance
+      - 'direct': vibration intensity increases with distance
+      - 'reversed': vibration intensity decreases with distance
 
     The configuration is stored in a YAML file per mode (e.g., 'reaching.yaml', 'avoiding.yaml').
+
+    Structure:
+    ----------
+    self.trial_sequence: List[Dict]
+        A flat list containing all trials in the experiment.
+        Each trial is a dictionary with the following structure:
+
+        {
+            "phase": str,        # e.g., "Pre-Test", "Training", "Post-Test"
+
+            "task": str,         # e.g., "reaching" or "avoiding"
+
+            "block": int,        # Block number (1-indexed)
+
+            "repetition": int,   # Repetition number within the block (1-indexed)
+
+            "distance": float,   # Target distance value (e.g., 54.5)
+
+            "intensity": float   # Corresponding intensity (depends on mapping)
+
+        }
+
+    Example trial:
+    --------------
+        {
+            "phase": "Training",
+
+            "task": "avoiding",
+
+            "block": 2,
+
+            "repetition": 5,
+
+            "distance": 63.6,
+
+            "intensity": 36.4  # If mapping is reversed
+        }
+
+    Accessing trial parameters:
+    ---------------------------
+    You can access a trial using `get_next_trial()` or similar methods, and extract parameters like this:
+
+
+    trial = config.get_next_trial()
+
+    if trial:
+        - phase = trial["phase"]
+        - task = trial["task"]
+        - block = trial["block"]
+        - repetition = trial["repetition"]
+        - distance = trial["distance"]
+        - intensity = trial["intensity"]
+
+    Other access options:
+    ---------------------
+    - Current trial:        config.get_current_trial()
+    - All trials:           config.get_all_trials()
+    - Completed trials:     config.get_completed_trials()
+    - Remaining trials:     config.get_remaining_trials()
+    - Trial index:          config.get_trial_index()
+    - Current phase/task:   config.get_current_phase(), config.get_current_task()
     """
 
     def __init__(self, mode: str, mapping: str, config_dir: str = "configs"):
@@ -45,29 +106,47 @@ class ExperimentConfig:
 
     def _generate_trial_sequence(self):
         """
-        Generate the complete randomized trial sequence.
+    Generate the complete randomized trial sequence.
+    ----------
         Trials are randomized within each repetition of each block.
+
+        This method loops through each phase (e.g., Pre-Test, Training, Post-Test),
+        retrieves the number of blocks and repetitions, and generates trial dictionaries
+        combining distance and intensity levels.
+
+        For each repetition in a block, it creates a full list of trials by zipping
+        the target distances and intensities, then shuffles the order of those trials
+        to avoid order effects. All trials are then accumulated into a master sequence.
         """
         self.trial_sequence = []
 
+        # Get the mapping type: either 'direct' or 'reversed'
         mapping_type = self.get_mapping_type()
+
+        # Get global default distances and intensities
         default_distances = self.get_target_distances()
         default_intensities = self.get_target_intensities()
 
+        # If reversed mapping is used, reverse the intensity list
         if mapping_type == "reversed":
             default_intensities = list(reversed(default_intensities))
 
+        # Loop over each phase in the config (e.g., Pre-Test, Training, etc.)
         for phase in self.get_phases():
             task = phase["task"]
             phase_name = phase["name"]
             blocks = phase["blocks"]
             repetitions = phase["repetitions"]
+
+            # Use phase-specific values if provided, otherwise fall back to defaults
             d_list = phase.get("target_distances", default_distances)
             i_list = phase.get("intensity_levels", default_intensities)
 
+            # Iterate over blocks in this phase
             for b in range(blocks):
+                # Iterate over repetitions within the block
                 for r in range(repetitions):
-                    # Create trials for this repetition
+                    # Create a list of trial dictionaries by pairing distance & intensity
                     repetition_trials = [
                         {
                             "phase": phase_name,
@@ -79,8 +158,11 @@ class ExperimentConfig:
                         }
                         for d, i in zip(d_list, i_list)
                     ]
-                    # Shuffle order within this repetition
+
+                    # Randomize the order of trials for this repetition to prevent bias
                     random.shuffle(repetition_trials)
+
+                    # Add randomized trials to the overall sequence
                     self.trial_sequence.extend(repetition_trials)
 
     def get_target_distances(self):

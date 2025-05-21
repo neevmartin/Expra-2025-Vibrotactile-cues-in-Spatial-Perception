@@ -31,6 +31,7 @@ def trialStructure(mode):
             f"Trial {trial_num:03d} | Phase: {phase} | Task: {task} | "
             f"Block: {block} | Rep: {rep} | Distance: {distance} | Intensity: {intensity}"
         )
+        #print(trial)
         trial_num += 1
 
 
