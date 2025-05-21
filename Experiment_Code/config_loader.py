@@ -1,6 +1,81 @@
+"""
+Experiment Configuration Manager for Psychophysical Tasks
+========================================================
+
+This module provides the `ExperimentConfig` class, which loads and manages
+trial configurations for psychophysical experiments involving reaching or
+avoiding tasks following vibration stimuli.
+
+Configurations are loaded from YAML files and define randomized trial sequences
+based on experiment mode (e.g., 'reaching', 'avoiding') and mapping (e.g., 'direct', 'reversed').
+
+Example:
+    config = ExperimentConfig(mode="avoiding", mapping="reversed")
+
+    trial = config.get_next_trial()
+
+    print(trial["distance"], trial["intensity"])
+
+Attributes:
+    trial_sequence (List[Dict]): List of generated trials. Each trial has keys:
+        - phase (str)
+        - task (str)
+        - block (int)
+        - repetition (int)
+        - distance (float)
+        - intensity (float)
+
+Typical Trial Structure:
+    {
+        "phase": "Training",
+        "task": "avoiding",
+        "block": 2,
+        "repetition": 5,
+        "distance": 63.6,
+        "intensity": 36.4
+    }
+
+YAML Configuration Format:
+    target_values:
+        distances: [float, float, ...]
+
+        intensities: [float, float, ...]
+    subgroups:
+        direct:
+            mapping_type: "direct"
+
+            phases:
+                - name: "Training"
+                - task: "reaching"
+                - blocks: 2
+                - repetitions: 3
+        reversed:
+            mapping_type: "reversed"
+
+            phases:
+                ...
+
+Access Methods:
+    - get_next_trial(): Get the next trial and advance index
+    - get_current_trial(): Most recently returned trial
+    - get_current_phase(): Phase of the upcoming trial
+    - get_current_task(): Task of the upcoming trial
+    - get_all_trials(): Return all generated trials
+    - get_completed_trials(): Return trials already completed
+    - get_remaining_trials(): Return trials yet to run
+    - get_trial_index(): Return index of next trial
+    - reset_trials(): Reset index to rerun trials from start
+
+Author:
+-------
+Martin Neev, TU Darmstadt/Expra 2025 Vibrotactile Cues in Spatial Perception
+
+Date: 21.05.2025
+"""
 import yaml
 import os
 import random
+
 
 class ExperimentConfig:
     """
@@ -258,4 +333,3 @@ class ExperimentConfig:
     def reset_trials(self):
         """Reset the trial index to the beginning (e.g., for a rerun or test)."""
         self._trial_index = 0
-
