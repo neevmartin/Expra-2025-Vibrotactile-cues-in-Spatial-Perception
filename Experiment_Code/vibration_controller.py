@@ -11,6 +11,7 @@ class VibrationController:
     intensity and duration on specified pins, and manage resources safely.
 
     Attributes:
+        testing (bool): If True, skips the Arduino connection process for testing purposes.
         vib_pins (List[int]): PWM-capable pin numbers for vibrators.
         max_volt (float): Maximum voltage allowed for the vibrator.
         power_source (float): Voltage of the power supply.
@@ -23,7 +24,8 @@ class VibrationController:
         self,
         vib_pins: Optional[List[int]] = None,
         max_volt: float = 3,
-        power_source: float = 5
+        power_source: float = 5,
+        testing: bool = False
     ) -> None:
         """
         Initialize the VibrationController controller.
@@ -33,19 +35,24 @@ class VibrationController:
                 If None, defaults to [3, 5, 6, 9, 10, 11] (All PWN capable pins on the board).
             max_volt (float): Maximum voltage allowed for the vibrator (per datasheet). Defaults to 3.
             power_source (float): Voltage of the power source used to drive the vibrators. Defaults to 5.
+            testing (bool): If True, skips the Arduino connection process for testing purposes. Defaults to False.
 
         Raises:
             IOError: If no Arduino device is found among the connected serial ports.
             Exception: If the Arduino connection fails.
         """
         
+        self.testing = testing
         self.vib_pins: List[int] = vib_pins if vib_pins is not None else [3, 5, 6, 9, 10, 11]
         self.max_volt: float = max_volt 
         self.power_source: float = power_source 
         self.voltage_scalar: float = self.max_volt / self.power_source # maximum value allowed (0.6)
         self.board: Arduino = None
         self.pwm_objects: Dict[int, Any] = {}
-        self._initialize() # Initialize the board and PWM objects
+        if not self.testing: 
+            self._initialize() # Initialize the board and PWM objects
+        else:
+            print("[TEST MODE] VibrationController initialized without hardware.")
 
     def _identify_arduino_port(self) -> str:
         """
@@ -104,6 +111,10 @@ class VibrationController:
             intensity = intensity / 100
         intensity = max(0.0, min(intensity, 1.0)) # Makes sure intensity is between 0.0 and 1.0
         # Activate vibration
+        if self.testing:
+            print(f"[TEST MODE] Vibrate pins {pins} at intensity {intensity} for {duration_sec} seconds.")
+            time.sleep(duration_sec) # Simulate vibration duration
+            return
         for pin in pins:
             if pin in self.pwm_objects:
                 self.pwm_objects[pin].write(intensity * self.voltage_scalar) # Set intensity of the vibration
@@ -123,6 +134,9 @@ class VibrationController:
         the exit process, it is silently ignored. After closing, the board reference is set to None.
         """
         
+        if self.testing:
+            print("[TEST MODE] Closing VibrationController (no hardware).")
+            return
         if self.board:
             try:
                 self.board.exit()
@@ -164,10 +178,10 @@ class VibrationController:
 # Example usage:
 if __name__ == "__main__":
     # Context manager ensures cleanup:
-    with VibrationController() as vibrator:
+    with VibrationController(testing=True) as vibrator:
         vibrator.vibrate(0.8, 2)
     # Alternatively you can just use the normal method:
-    vibrator = VibrationController()
+    vibrator = VibrationController(testing=True)
     vibrator.vibrate(0.8, 2)
     vibrator.close()
 # TODO: Test with the actual Arduino board
