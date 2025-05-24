@@ -1,15 +1,15 @@
 from psychopy import visual, event, core
 import numpy as np
 
-def draw_instruction_text(win: visual.Window, text: str):
+def draw_centered_text(win: visual.Window, text: str):
     """
-    Displays the instruction text on the screen and waits for the user to press Enter
+    Displays centered text on the screen.
     Args:
         win: the window we are working on
         text: the text to display
     """
-    instruction = visual.TextStim(win, text=text, pos=(0, 0))
-    instruction.draw()
+    text = visual.TextStim(win, text=text, pos=(0, 0))
+    text.draw()
 
 def draw_debug_screen(win: visual.Window, trajectory: list):
     """
@@ -18,7 +18,8 @@ def draw_debug_screen(win: visual.Window, trajectory: list):
         win: the window we are working on
         trajectory: the list of past cursor positions to draw as a line
     """
-    cursor_pos = trajectory[-1] # The last position of the cursor
+    last_cursor_data = trajectory[-1] # The last info of the cursor
+    cursor_pos = [last_cursor_data[-1][2], last_cursor_data[-1][3]] # The last position of the cursor
     my_cursor = visual.Circle(win, pos=cursor_pos, radius=10, fillColor='red', lineColor='red')
 
     # The positions and size of the rails TO BE CHANGED LATER
