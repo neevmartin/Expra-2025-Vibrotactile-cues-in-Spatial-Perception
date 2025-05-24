@@ -3,10 +3,6 @@ import random
 
 from config_loader import ExperimentConfig
 
-
-
-
-
 def trialStructure(mode):
     mapping = random.choice(["direct", "reversed"])
     config = ExperimentConfig(mode=mode, mapping=mapping)
