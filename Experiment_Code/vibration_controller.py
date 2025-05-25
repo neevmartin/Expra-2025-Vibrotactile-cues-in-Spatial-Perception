@@ -1,5 +1,6 @@
-from pyfirmata2 import Arduino
+from pyfirmata2 import Arduino, Pin
 import time
+from typing import Optional, List
 
 class VibrationController:
     """
@@ -9,18 +10,21 @@ class VibrationController:
     intensity and duration on specified pins, and manage resources safely.
 
     Attributes:
+        verbose (bool): If True, prints debug information to the console.
         testing (bool): If True, skips the Arduino connection process for testing purposes.
         max_volt (float): Maximum voltage allowed for the vibrator.
         power_source (float): Voltage of the power supply.
         voltage_scalar (float): Ratio of max_volt to power_source for PWM scaling.
-        board (Arduino): The pyFirmata2 Arduino board instance.
+        board (Optional[Arduino]): The pyFirmata2 Arduino board instance or None if testing.
+        pins (List[Pin]): List of PWM-capable pins on the board.
     """
     
     def __init__(
         self,
         max_volt: float = 3,
         power_source: float = 5,
-        testing: bool = False
+        testing: bool = False,
+        verbose: bool = True,
     ) -> None:
         """
         Initialize the VibrationController controller.
@@ -31,12 +35,22 @@ class VibrationController:
             testing (bool): If True, skips the Arduino connection process for testing purposes. Defaults to False.
         """
         
-        self.testing = testing
+        self._closed = False
+        
+        self.verbose: bool = verbose
+        self.testing: bool = testing
         self.max_volt: float = max_volt 
         self.power_source: float = power_source 
         self.voltage_scalar: float = self.max_volt / self.power_source # maximum value allowed (0.6)
-        self.board: Arduino = Arduino(Arduino.AUTODETECT, debug=True) if not testing else None
-        print(f"Connected board: {self.board.name if not self.testing else None}.")
+        self.board: Optional[Arduino] = Arduino(Arduino.AUTODETECT) if not self.testing else None
+        self.pins: List[Pin] = [pin for pin in self.board.digital if pin.PWM_CAPABLE] if not self.testing else None  # Get all PWM-capable pins
+        if not self.testing:
+            for pin in self.pins:
+                pin.mode = 3 # Set pin mode to PWM (3)
+                
+        if self.verbose:
+            print(f"VibrationController {self.board.name if not self.testing else None} initialized with max_volt={self.max_volt}, power_source={self.power_source}, voltage_scalar={self.voltage_scalar}.")
+
 
     def vibrate(
         self,
@@ -54,34 +68,38 @@ class VibrationController:
             - Intensity is clamped between 0.0 and 1.0.
             - After the specified duration, vibration is stopped by setting intensity to 0.
         """
+        if self._closed:
+            raise RuntimeError("VibrationController is closed. Cannot vibrate.")
         
-        pins = [pin for pin in self.board.digital if pin.PWM_CAPABLE] if not self.testing else []  # Get all PWM-capable pins
-        print(f"VibrationController: Found {len(pins)} PWM-capable pins.")
         if intensity > 1:
             intensity = intensity / 100
         intensity = max(0.0, min(intensity, 1.0)) # Makes sure intensity is between 0.0 and 1.0
         # Activate vibration
-        if self.testing:
-            print(f"[TEST MODE] Vibrate at intensity {intensity} for {duration_sec} seconds.")
-            time.sleep(duration_sec) # Simulate vibration duration
-            return
-        for pin in pins:
+        if self.testing or self.verbose:
+            print(f"Vibrate at intensity {intensity} for {duration_sec} seconds.")
+            if self.testing:
+                time.sleep(duration_sec) # Simulate vibration duration
+                return
+        for pin in self.pins:
             pin.write(intensity * self.voltage_scalar) # Set intensity of the vibration
         time.sleep(duration_sec)
         # Deactivate vibration 
-        for pin in pins:
+        for pin in self.pins:
             pin.write(0) # Stop vibration
 
     def close(self) -> None:
         """
         Close the connection to the board if it exists.
-
         Attempts to safely exit and clean up the board resource. If an exception occurs during
         the exit process, it is silently ignored. After closing, the board reference is set to None.
         """
-        
+        if getattr(self, "_closed", False):
+            return  # Already closed, do nothing
+
+        self._closed = True  # Mark as closed
+
         if self.testing:
-            print("[TEST MODE] Closing VibrationController (no hardware).")
+            print("Closing VibrationController (no hardware).")
             return
         if self.board:
             try:
@@ -126,9 +144,9 @@ class VibrationController:
 if __name__ == "__main__":
     # Context manager ensures cleanup:
     with VibrationController(testing=True) as vibrator:
-        vibrator.vibrate(0.8, 2)
+        vibrator.vibrate(0.2, 2)
     # Alternatively you can just use the normal method:
     vibrator = VibrationController(testing=True)
-    vibrator.vibrate(0.8, 2)
+    vibrator.vibrate(1, 2)
     vibrator.close()
 # TODO: Test with the actual Arduino board
