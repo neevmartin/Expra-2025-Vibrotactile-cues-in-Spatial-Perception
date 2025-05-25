@@ -13,7 +13,7 @@ class VibrationController:
         max_volt (float): Maximum voltage allowed for the vibrator.
         power_source (float): Voltage of the power supply.
         voltage_scalar (float): Ratio of max_volt to power_source for PWM scaling.
-        board: The pyFirmata Arduino board instance.
+        board (Arduino): The pyFirmata2 Arduino board instance.
     """
     
     def __init__(
@@ -29,10 +29,6 @@ class VibrationController:
             max_volt (float): Maximum voltage allowed for the vibrator (per datasheet). Defaults to 3.
             power_source (float): Voltage of the power source used to drive the vibrators. Defaults to 5.
             testing (bool): If True, skips the Arduino connection process for testing purposes. Defaults to False.
-
-        Raises:
-            IOError: If no Arduino device is found among the connected serial ports.
-            Exception: If the Arduino connection fails.
         """
         
         self.testing = testing
