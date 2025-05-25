@@ -65,3 +65,9 @@ def get_trajectory():
         Each tuple contains (timestamp, x, y, left, middle, right).
     """
     return _trajectory
+
+def get_mouse() -> Mouse:
+    """
+        Returns the shared PsychoPy mouse instance used for input tracking.
+    """
+    return _mouse

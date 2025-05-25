@@ -461,7 +461,7 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             bool: True if the trial is confirmed, False otherwise.
         """
-        mouse_pressed = tablet._mouse.getPressed()[0]
+        mouse_pressed = tablet.get_mouse().getPressed()[0]
 
         if self.trial_confirmed:
             # Trial is running and participant must release the mouse button.
@@ -581,7 +581,7 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        mouse_pos = tablet._mouse.getPos()
+        mouse_pos = tablet.get_mouse().getPos()
         trajectory = tablet.get_trajectory() if self.trial_confirmation else []
         gui.draw_debug_screen(
             win=self.window, 
