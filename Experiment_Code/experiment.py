@@ -455,16 +455,24 @@ class VibrotactileCueExperiment(Experiment):
         """
         Checks whether the trial confirmation condition has been met.
 
-        Returns True when the participant releases the mouse button,
-        indicating confirmation to proceed or end the trial.
+        Returns True when the participant presses the mouse button in case they have not confirmed the trial yet.
+                If they have confirmed the trial method returns true if they release the mouse button again.
 
         Returns:
             bool: True if the trial is confirmed, False otherwise.
         """
-        mouse_pressed = tablet._mouse.getPressed()[0] # We avoid putting this logic inside another function since it is simple enough to put here.
-        mouse_released = self.mouse_pressed_last_frame and not mouse_pressed
+        mouse_pressed = tablet._mouse.getPressed()[0]
+
+        if self.trial_confirmed:
+            # Trial is running and participant must release the mouse button.
+            confirmed = self.mouse_pressed_last_frame and not mouse_pressed
+        else:
+            # Trial needs to be confirmed with a button press by the participant.
+            confirmed = mouse_pressed and not self.mouse_pressed_last_frame
+
         self.mouse_pressed_last_frame = mouse_pressed
-        return mouse_released
+
+        return confirmed
 
     def update_trial(self) -> None:
         """
