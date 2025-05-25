@@ -149,4 +149,12 @@ if __name__ == "__main__":
     vibrator = VibrationController(testing=True)
     vibrator.vibrate(1, 2)
     vibrator.close()
+    # Note: Caching the vibrationcontroller instance imo makes more sense in our case
+    # as wrapping everything in a context manager is not that great of an idea. 
+    # Additionally, using the context manager individually for each vibration 
+    # would be very inefficient as it would need to reinitialize the board each time,
+    # which takes about 5 seconds to ensure the board is ready.
+    # However, if you think the context manager is a better approach,
+    # feel free to use it. (That's why I implemented it in the first place.)
+    # TL:DR: Initializing the VibrationController once and caching it as an attribute might be the best approach for our use case.
 # TODO: Test with the actual Arduino board
