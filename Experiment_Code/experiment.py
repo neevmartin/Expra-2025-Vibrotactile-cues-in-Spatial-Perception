@@ -264,6 +264,39 @@ class VibrotactileCueExperiment(Experiment):
     # Meta control flow
     # ------------------------------------------------------------------------------
 
+    def handle_keys(self):
+        """
+        Handles key inputs for the experiment.
+
+        All key events should be processed through this method to ensure consistent
+        experiment control, e.g. quitting (Q/Escape) and confirming text prompts (Return).
+
+        For safety call this method whenever you have a while loop for control flow somewhere.
+
+        Returns:
+            None
+        """
+        keys = event.getKeys()
+
+        for key in keys:
+            if key == "q" or key == "escape":
+                self.exit()
+            if key == "return":
+                self.text_confirmed = True
+
+    def wait_confirm(self) -> None:
+        """
+        Waits until the participant confirms by pressing the designated confirmation key.
+
+        Has side effects and ensures global integration of key handler.
+
+        Returns:
+            None
+        """
+        self.text_confirmed = False
+        while not self.text_confirmed:
+            self.handle_keys()
+
     def run_introduction(self):
         gui.draw_centered_text(
             self.window, 
@@ -278,7 +311,7 @@ class VibrotactileCueExperiment(Experiment):
             'Press ENTER to continue.'
         )
         self.window.flip()
-        event.waitKeys(keyList=['return'])
+        self.wait_confirm()
 
     def run_experiment(self) -> None:
         """
@@ -337,28 +370,7 @@ class VibrotactileCueExperiment(Experiment):
            'Press ENTER to close the experiment window.'
         )
         self.window.flip()
-        event.waitKeys(keyList=['return'])
-
-    def handle_keys(self):
-        """
-        Handles key inputs for the experiment.
-
-        All key events should be processed through this method to ensure consistent
-        experiment control, e.g. quitting (Q/Escape) and confirming text prompts (Return).
-
-        For safety call this method whenever you have a while loop for control flow somewhere.
-
-        Returns:
-            None
-        """
-        keys = event.getKeys()
-
-        for key in keys:
-            if key == "q" or key == "escape":
-                self.exit()
-            if key == "return":
-                if self.state['explanation'] or self.state['break']:
-                    self.text_confirmed = True
+        self.wait_confirm()
 
     def update_state(self, previous_trial: dict, current_trial: dict) -> None:
         """
@@ -532,8 +544,6 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        self.text_confirmed = False
-
         if task == 'avoiding':
             gui.draw_centered_text(self.window, 'Explanation for avoiding. \n Press ENTER to continue.')
         elif task == 'reaching':
@@ -541,9 +551,7 @@ class VibrotactileCueExperiment(Experiment):
         else:
             gui.draw_centered_text(self.window, f'Explanation for {task}. \n Press ENTER to continue.')
         self.window.flip()
-
-        while not self.text_confirmed:
-            self.handle_keys()
+        self.wait_confirm()
             
 
     def give_break(self) -> None:
@@ -556,13 +564,9 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        self.text_confirmed = False
-
         gui.draw_centered_text(self.window, 'Eile mit Weile. \n Press ENTER to continue.')
         self.window.flip()
-
-        while not self.text_confirmed:
-            self.handle_keys()
+        self.wait_confirm()
 
     # ------------------------------------------------------------------------------
     # Debug functions
