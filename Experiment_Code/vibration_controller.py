@@ -1,4 +1,4 @@
-from pyfirmata2 import Arduino, Pin
+from pyfirmata2 import Arduino, Pin, PWM
 import time
 from typing import Optional, List
 
@@ -42,14 +42,14 @@ class VibrationController:
         self.max_volt: float = max_volt 
         self.power_source: float = power_source 
         self.voltage_scalar: float = self.max_volt / self.power_source # maximum value allowed (0.6)
-        self.board: Optional[Arduino] = Arduino(Arduino.AUTODETECT) if not self.testing else None
-        self.pins: List[Pin] = [pin for pin in self.board.digital if pin.PWM_CAPABLE] if not self.testing else None  # Get all PWM-capable pins
+        self.board: Optional[Arduino] = Arduino(Arduino.AUTODETECT, debug = verbose) if not self.testing else None
+        self.pins: List[Pin] = [pin for pin in self.board.digital if pin.PWM_CAPABLE] if not self.testing else [] # type: ignore # Get all PWM-capable pins
         if not self.testing:
             for pin in self.pins:
-                pin.mode = 3 # Set pin mode to PWM (3)
+                pin.mode = PWM 
                 
         if self.verbose:
-            print(f"VibrationController {self.board.name if not self.testing else None} initialized with max_volt={self.max_volt}, power_source={self.power_source}, voltage_scalar={self.voltage_scalar}.")
+            print(f"VibrationController {self.board.name if not self.testing else None} ({len(self.pins)} PWM pins) initialized with max_volt={self.max_volt}, power_source={self.power_source}, voltage_scalar={self.voltage_scalar} (Testing mode: {self.testing})") # type: ignore
 
 
     def vibrate(
@@ -58,7 +58,7 @@ class VibrationController:
         duration_sec: float = 1.0,
     ) -> None:
         """
-        Activate vibration on specified pins with given intensity and duration.
+        Activate vibration on all PWM pins with given intensity and duration.
 
         Args:
             intensity (float): Strength of vibration (0.0–1.0 or 0–100%). Values above 1 are treated as percentages.
@@ -103,6 +103,8 @@ class VibrationController:
             return
         if self.board:
             try:
+                if self.verbose:
+                    print(f"Closing VibrationController {self.board.name}")
                 self.board.exit()
             except Exception:
                 pass
@@ -129,7 +131,7 @@ class VibrationController:
         
         return self
     
-    def __exit__(self, exc_type, exc_value, traceback) -> None:
+    def __exit__(self, exc_type, exc_value, traceback) -> None: 
         """
         Exit the runtime context and close any resources.
 
@@ -143,11 +145,11 @@ class VibrationController:
 # Example usage:
 if __name__ == "__main__":
     # Context manager ensures cleanup:
-    with VibrationController(testing=True) as vibrator:
-        vibrator.vibrate(0.2, 2)
+    with VibrationController(testing=False) as vibrator:
+        vibrator.vibrate(0.5, 2) # Vibrate at 50% intensity for 2 seconds
     # Alternatively you can just use the normal method:
-    vibrator = VibrationController(testing=True)
-    vibrator.vibrate(1, 2)
+    vibrator = VibrationController(testing=False)
+    vibrator.vibrate(0.5, 2)  # Vibrate at 50% intensity for 2 seconds
     vibrator.close()
     # Note: Caching the vibrationcontroller instance imo makes more sense in our case
     # as wrapping everything in a context manager is not that great of an idea. 
@@ -157,4 +159,3 @@ if __name__ == "__main__":
     # However, if you think the context manager is a better approach,
     # feel free to use it. (That's why I implemented it in the first place.)
     # TL:DR: Initializing the VibrationController once and caching it as an attribute might be the best approach for our use case.
-# TODO: Test with the actual Arduino board
