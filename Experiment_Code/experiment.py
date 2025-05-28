@@ -8,6 +8,9 @@ from psychopy import core
 from psychopy import event
 from psychopy.visual import Window
 
+import os
+import pandas as pd
+
 class Experiment:
     """
     Base class for psychophysical experiments using PsychoPy.
@@ -490,19 +493,73 @@ class VibrotactileCueExperiment(Experiment):
         """
         Updates trial data from the tablet and checks for trial completion.
 
+        Exports the trajectory data to a CSV file, including relevant trial metadata.
+
+        Exports:
+            participant ID (str),
+            trial index (int),
+            task (str),
+            phase (str),
+            block (int),
+            target_pos_x (float),
+            target_pos_y (float),
+            timestamp (float),
+            current_pos_x (float),
+            current_pos_y (float),
+            left_button_pressed (int),
+            middle_button_pressed (int), 
+            right_button_pressed (int)   
+
         Stops the trial if the confirmation condition is met 
         (e.g., participant releases the mouse button or presses a key).
 
-        TODO: 
-            Add output stream. Needs to be either updated continuously or once in the end.
-            A pandas dataframe has been shown to improve time complexity in private testing for the latter.
-            More to this later if desired.
 
         Returns:
             None
         """
         tablet.update_stream(self.window)
-        ### TODO: Output
+        # Save trajectory and trial info to csv
+        trajectory = tablet.get_trajectory()
+        # Convert numpy types in trajectory and target_pos to native Python types for easier analysis
+        def to_native(val):
+            if hasattr(val, "item"):
+                return val.item()
+            elif isinstance(val, (list, tuple)):
+                return [to_native(v) for v in val]
+            return val
+
+        # Convert trajectory: list of tuples/lists (possibly with np types) to list of lists of native types
+        trajectory_native = [[to_native(x) for x in point] for point in trajectory]
+        target_pos_native = [to_native(x) for x in self.target_pos]
+
+        trial_data = {
+            'participant_id': str(self.participant.get('participantID')),
+            'trial_index': int(self.current_trial.get('trial_index')) if self.current_trial.get('trial_index') is not None else -1,
+            'task': str(self.current_trial.get('task')),
+            'phase': str(self.current_trial.get('phase')),
+            'block': int(self.current_trial.get('block')),
+            'target_pos_x': round(float(target_pos_native[0]), 2),
+            'target_pos_y': round(float(target_pos_native[1]), 2),
+            'timestamp': round(float(trajectory_native[-1][0]), 2),
+            'current_pos_x': round(float(trajectory_native[-1][1]), 2),
+            'current_pos_y': round(float(trajectory_native[-1][2]), 2),
+            'left_button_pressed': int(trajectory_native[-1][3]),
+            'middle_button_pressed': int(trajectory_native[-1][4]), #probably not used
+            'right_button_pressed': int(trajectory_native[-1][5]), #probably not used
+        }
+        # Save to CSV
+        df = pd.DataFrame([trial_data])
+        
+        # Assumes output folder already exists
+        output_path = self.participant.get('participant_dir', '.') + '/trial_results.csv'
+        # Check if the output file exists to determine whether to write headers
+        # and write mode.
+        if not hasattr(self, '_output_initialized'):
+            df.to_csv(output_path, mode='w', header=True, index=False)
+            self._output_initialized = True
+        # Otherwise append to the existing file.
+        else:
+            df.to_csv(output_path, mode='a', header=False, index=False)
         if self.trial_confirmation():
             self.trial_running = False
 
