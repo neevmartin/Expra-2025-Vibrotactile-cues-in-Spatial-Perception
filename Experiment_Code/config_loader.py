@@ -160,6 +160,9 @@ class ExperimentConfig:
             config_dir (str): Path to the directory containing YAML config files.
         """
 
+        location = os.path.dirname(os.path.abspath(__file__))
+        config_dir = os.path.join(location, config_dir)
+        
         self.mode = mode.lower()
         self.mapping = mapping.lower()
         self.config_path = os.path.join(config_dir, f"{self.mode}.yaml")

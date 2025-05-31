@@ -7,6 +7,7 @@ from config_loader import ExperimentConfig
 from psychopy import core
 from psychopy import event
 from psychopy.visual import Window
+from psychopy.clock import Clock
 
 import os
 import pandas as pd
@@ -186,8 +187,26 @@ class VibrotactileCueExperiment(Experiment):
         state (dict): 
             A dict tracking current phase flags (e.g., explanation, break).
 
+        clock (Clock):
+            The clock keeps track of the time that has passed 
+            since the start of the experiment / run_experiment has been called.
+
+        last_trial_time (float):
+            Time since last task phase has started.
+            Is used to determine the length of the 
+            trial and keeping track of the 10ms we 
+            collect the data.
+
+        OUTPUT_INTERVAL (float):
+            The interval in seconds after which we record the new output data
+            that is the mouse position and time as well as metadata.
+
         FEEDBACK_DELAY (float):
             Delay in seconds how long the feedback text should be shown.
+
+        ITI (float):
+            The inter trial interval in seconds.
+            Is used after feedback has been given.
 
         text_confirmed (bool): 
             Tracks whether the participant has acknowledged a text screen.
@@ -228,7 +247,11 @@ class VibrotactileCueExperiment(Experiment):
 
     state: dict
 
+    clock: Clock
+    last_trial_time: float
+    OUTPUT_INTERVAL: float
     FEEDBACK_DELAY: float
+    ITI: float
 
     text_confirmed: bool
     trial_confirmed: bool
@@ -253,7 +276,10 @@ class VibrotactileCueExperiment(Experiment):
         self.current_trial = None
         self.previous_trial = None
 
+        self.clock = Clock()
+        self.OUTPUT_INTERVAL = 0.01 # s
         self.FEEDBACK_DELAY = 2
+        self.ITI =  0.2 # s
 
         self.mouse_pressed_last_frame = False
 
@@ -320,6 +346,8 @@ class VibrotactileCueExperiment(Experiment):
         """
         Runs the main experiment.
 
+        Starts the clock in the beginning of the experiment.
+
         Iterates through all remaining trials in the configuration, managing
         task-specific initialization, explanations, breaks, and feedback phases.
         Each trial is initialized and executed, with state updates between trials.
@@ -331,9 +359,13 @@ class VibrotactileCueExperiment(Experiment):
         The initialization of task hyperparameters for circle position is lazy
         evaluated such that those only change when the task changes.
 
+        One trial follows structure:
+        Cue | Confirmation | Task | ITI
+
         Returns:
             None
         """
+        self.clock.reset()
         while len(self.config.get_remaining_trials()) > 0:
             self.current_trial = self.config.get_next_trial()
 
@@ -363,6 +395,8 @@ class VibrotactileCueExperiment(Experiment):
 
             if self.state['feedback'] == True:
                 self.give_feedback()
+
+            self.inter_trial_interval()
             
             self.previous_trial = self.current_trial
 
@@ -434,7 +468,7 @@ class VibrotactileCueExperiment(Experiment):
         to start the trial and starting data recording stream. During this phase,
         input is monitored and debug info can be drawn if enabled.
 
-        2. **Trial running phase** (`while self.trial_running`):
+        2. **Task phase** (`while self.trial_running`):
         Runs the active trial, continuously updating trial data and handling input 
         until the trial ends. Trajectory is drawn if debug mode is active.
         The participant has to confirm once more when they think they reached their destination.
@@ -455,6 +489,8 @@ class VibrotactileCueExperiment(Experiment):
                 self.draw_debug() # In confirmation phase we only draw setup and not trajectory.
 
             self.window.flip()
+
+        self.last_trial_time = self.clock.getTime() # use this for output intervals every 10 ms
         
         while self.trial_running:
             self.handle_keys()
@@ -509,6 +545,7 @@ class VibrotactileCueExperiment(Experiment):
                 
             self.trial_running = False
 
+<<<<<<< Experiment_Code/experiment.py
     def export_trial_data_last_only(self) -> None:
         """
         Exports the most recent data point from the current trial's trajectory to a CSV file.
@@ -615,6 +652,21 @@ class VibrotactileCueExperiment(Experiment):
                     entry[5],             # right_button_pressed
                 ]
                 f.write(','.join(str(value) for value in row) + '\n')
+
+    def inter_trial_interval(self) -> None:
+        """
+        Waits for the duration of the inter-trial interval (ITI), updating the display
+        and handling keypresses during the wait. Window gets flipped one time.
+
+        Returns:
+            None
+
+        """
+        t = self.clock.getTime() # We can use get time here because we are only concerned with the time interval!
+        self.window.flip()
+        while self.clock.getTime() - t < self.ITI:
+            self.handle_keys()
+
     # ------------------------------------------------------------------------------
     # Interruption control methods
     # ------------------------------------------------------------------------------
