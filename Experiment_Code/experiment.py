@@ -380,9 +380,6 @@ class VibrotactileCueExperiment(Experiment):
             Function automatically closes connected Arduino board
             when all trials are done.
 
-        One trial follows structure:
-        Cue | Confirmation | Task | ITI
-
         Returns:
             None
         """
@@ -392,7 +389,7 @@ class VibrotactileCueExperiment(Experiment):
         while len(self.config.get_remaining_trials()) > 0:
             self.current_trial = self.config.get_next_trial()
 
-            ### Trial flow
+            ### Phase control
 
             self.update_state(self.previous_trial, self.current_trial)
 
@@ -415,11 +412,6 @@ class VibrotactileCueExperiment(Experiment):
             self.init_trial()
             self.run_trial()
             # End of streams here.
-
-            if self.state['feedback'] == True:
-                self.give_feedback()
-
-            self.inter_trial_interval()
             
             self.previous_trial = self.current_trial
         # Clean up
@@ -502,33 +494,41 @@ class VibrotactileCueExperiment(Experiment):
 
         The PsychoPy window is updated (`window.flip()`) each iteration to reflect changes.
 
+        **One trial follows structure: <br/>
+        Cue | Confirmation | Task | (Feedback) | ITI**
+
         Returns:
             None
         """
-        self.vibrotactile_cue() # Give cue
+        self.vibrotactile_cue() # CUE
 
-        while not self.trial_confirmed: # Confirmation phase
+        while not self.trial_confirmed: # CONFIRMATION
             self.handle_keys()
 
             if self.trial_confirmation():
-                self.trial_confirmed = True # e.g. Mouse click
+                self.trial_confirmed = True
 
             if self.debug:
-                self.draw_debug() # In confirmation phase we only draw setup and not trajectory.
+                self.draw_debug()
 
             self.window.flip()
 
         self.last_trial_time = self.clock.getTime() # use this for output intervals every 10 ms
         
-        while self.trial_running: # Task phase
+        while self.trial_running: # TASK
             self.handle_keys()
 
-            self.update_trial() # Data stream and output
+            self.update_trial()
 
             if self.debug:
-                self.draw_debug() # Draw trajectory and setup.
+                self.draw_debug()
 
             self.window.flip()
+
+        if self.state['feedback'] == True: # FEEDBACK
+                self.give_feedback()
+
+        self.inter_trial_interval() # ITI
 
     def vibrotactile_cue(self):
         """
