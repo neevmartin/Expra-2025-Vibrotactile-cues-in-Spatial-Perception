@@ -1,5 +1,6 @@
 from experiment import VibrotactileCueExperiment
 from config_loader import ExperimentConfig
+from vibration_controller import VibrationController
 
 def create_participant_folder():
     ...
@@ -68,10 +69,21 @@ def main():
         'participant_dir'
     ]}
 
+    # Use when Arduino board is connected. 
+    #
+    # vibration_controller = VibrationController(testing=False)
+    # experiment = VibrotactileCueExperiment(
+    #     win_config=win_config,
+    #     experiment_config=experiment_config,
+    #     participant=participant,
+    #     vibration_controller=vibration_controller
+    #     debug = params['debug']
+    # )
+
     experiment = VibrotactileCueExperiment(
+        win_config=win_config,
         experiment_config=experiment_config,
         participant=participant,
-        win_config=win_config,
         debug = params['debug']
     )
 

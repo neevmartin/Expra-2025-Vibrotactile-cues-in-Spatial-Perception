@@ -1,8 +1,10 @@
 from typing import Literal, Any
+from warnings import warn
 
 import tablet_input as tablet
 import gui
 from config_loader import ExperimentConfig
+from vibration_controller import VibrationController
 
 from psychopy import core
 from psychopy import event
@@ -156,6 +158,9 @@ class VibrotactileCueExperiment(Experiment):
         participant (dict): 
             Participant-specific metadata or conditions.
 
+        vibrator (VibrationController):
+            Controller for the arduino board. Used for playing cues and closing Arduino.
+
         RADIUS (int): 
             Radius of visual target dots, consistent across trials.
 
@@ -194,12 +199,16 @@ class VibrotactileCueExperiment(Experiment):
             trial and keeping track of the 10ms we 
             collect the data.
 
+        CUE_INTERVAL (float):
+            Specifies the time for each vibrotactile cue.
+            Timing is (roughly) specified to match the participant's JND.
+
         OUTPUT_INTERVAL (float):
             The interval in seconds after which we record the new output data
             that is the mouse position and time as well as metadata.
 
-        FEEDBACK_DELAY (float):
-            Delay in seconds how long the feedback text should be shown.
+        FEEDBACK_INTERVAL(float):
+            Interval in seconds how long the feedback text should be shown.
 
         ITI (float):
             The inter trial interval in seconds.
@@ -224,6 +233,7 @@ class VibrotactileCueExperiment(Experiment):
     """
     config: ExperimentConfig
     participant: dict
+    vibrator: VibrationController
 
     RADIUS: int # TODO: Should the circles be sized differently?
 
@@ -246,8 +256,9 @@ class VibrotactileCueExperiment(Experiment):
 
     clock: Clock
     last_trial_time: float
+    CUE_INTERVAL: float
     OUTPUT_INTERVAL: float
-    FEEDBACK_DELAY: float
+    FEEDBACK_INTERVAL: float
     ITI: float
 
     text_confirmed: bool
@@ -256,7 +267,13 @@ class VibrotactileCueExperiment(Experiment):
 
     trial_running: bool
 
-    def __init__(self, win_config: dict, experiment_config: ExperimentConfig, participant: dict[str, Any], debug: bool = False):
+    def __init__(
+            self, win_config: dict, 
+            experiment_config: ExperimentConfig, 
+            participant: dict[str, Any], 
+            vibration_controller: VibrationController = None, 
+            debug: bool = False
+        ):
         """
         experiment_config is an `ExperimentConfig` instance managing trial definitions,
             phases, tasks, and parameters loaded from YAML config files. See `config_loader.py` for more info.
@@ -268,15 +285,18 @@ class VibrotactileCueExperiment(Experiment):
         super().__init__(win_config, debug)
 
         self.config = experiment_config
+        self.vibrator = vibration_controller
         self.participant = participant
 
         self.current_trial = None
         self.previous_trial = None
 
         self.clock = Clock()
-        self.OUTPUT_INTERVAL = 0.01 # s
-        self.FEEDBACK_DELAY = 2
-        self.ITI =  0.2 # s
+        # Time in seconds
+        self.CUE_INTERVAL = 0.2 # as suggested by literature
+        self.OUTPUT_INTERVAL = 0.01
+        self.FEEDBACK_INTERVAL = 2.
+        self.ITI =  0.2
 
         self.mouse_pressed_last_frame = False
 
@@ -356,13 +376,19 @@ class VibrotactileCueExperiment(Experiment):
         The initialization of task hyperparameters for circle position is lazy
         evaluated such that those only change when the task changes.
 
+        Important side-effect:
+            Function automatically closes connected Arduino board
+            when all trials are done.
+
         One trial follows structure:
         Cue | Confirmation | Task | ITI
 
         Returns:
             None
         """
+        # Init
         self.clock.reset()
+        # Trial sequence
         while len(self.config.get_remaining_trials()) > 0:
             self.current_trial = self.config.get_next_trial()
 
@@ -396,6 +422,9 @@ class VibrotactileCueExperiment(Experiment):
             self.inter_trial_interval()
             
             self.previous_trial = self.current_trial
+        # Clean up
+        if self.vibrator != None:
+            self.vibrator.close()
 
     def run_outro(self):
         gui.draw_centered_text(
@@ -476,6 +505,8 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
+        self.vibrotactile_cue() # Give cue
+
         while not self.trial_confirmed: # Confirmation phase
             self.handle_keys()
 
@@ -489,7 +520,7 @@ class VibrotactileCueExperiment(Experiment):
 
         self.last_trial_time = self.clock.getTime() # use this for output intervals every 10 ms
         
-        while self.trial_running:
+        while self.trial_running: # Task phase
             self.handle_keys()
 
             self.update_trial() # Data stream and output
@@ -498,6 +529,37 @@ class VibrotactileCueExperiment(Experiment):
                 self.draw_debug() # Draw trajectory and setup.
 
             self.window.flip()
+
+    def vibrotactile_cue(self):
+        """
+        Gives vibrotactile cue and safely waits until the cue ends.
+
+        Displays a cue message on the window, 
+        activates the vibrator at the current trial's specified intensity for the cue interval, 
+        and waits for the cue to end while monitoring for key presses.
+
+        If no vibrator exists, a warning is issued.
+
+        Raises:
+            RuntimeWarning: If no Arduino board is detected and the cue cannot be given.
+        """
+        
+        # Cue message (optional)
+        gui.draw_centered_text(win=self.window, text='Cue playing...')
+        self.window.flip()
+
+        # Vibration should succeed before drawing so timing lines up
+        intensity_proportion = 0.01 * self.current_trial['intensity']
+        if self.vibrator != None:
+            self.vibrator.vibrate(intensity=intensity_proportion, duration_sec=self.CUE_INTERVAL)
+        else:
+            warn('No Arduino board detected - cue suppressed.', category=RuntimeWarning)
+
+        # Safely wait for cue to end
+        t = self.clock.getTime()
+        while self.clock.getTime() - t < self.CUE_INTERVAL:
+            self.handle_keys()
+
 
     def trial_confirmation(self) -> bool:
         """
@@ -578,7 +640,7 @@ class VibrotactileCueExperiment(Experiment):
         self.window.flip()
 
         start_time = core.getTime()
-        while core.getTime() - start_time < self.FEEDBACK_DELAY:
+        while core.getTime() - start_time < self.FEEDBACK_INTERVAL:
             self.handle_keys()
 
     def give_explanation(self, task: Literal['avoiding', 'reaching']) -> None:
