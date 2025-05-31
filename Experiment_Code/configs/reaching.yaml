@@ -2,8 +2,8 @@
 # Reaching Experiment Configuration
 # ==================================
 target_values: # Global target values used across all phases unless overridden in a phase
-  distances: [9.1, 18.2, 27.3, 36.4, 45.5, 54.5, 63.6, 72.7, 81.8, 90.9, 100]   # Default distances (%)
-  intensities: [9.1, 18.2, 27.3, 36.4, 45.5, 54.5, 63.6, 72.7, 81.8, 90.9, 100] # Intensity values (%) — reverse of distance if mapping is reversed
+  distances: [ 9.1, 12.4, 18.2, 27.3, 36.4, 45.5, 54.5, 63.6, 72.7, 81.8, 90.9, 95.3, 100 ]   # Default distances (%)
+  intensities: [ 9.1, 12.4, 18.2, 27.3, 36.4, 45.5, 54.5, 63.6, 72.7, 81.8, 90.9, 95.3, 100 ] # Intensity values (%) — reverse of distance if mapping is reversed
 
 # ==================
 # Mapping Subgroups
@@ -20,11 +20,11 @@ subgroups:
       - name: "Pre-Test" # Phase name shown in trial metadata
         task: "avoiding" # Task type: "reaching" or "avoiding"
         blocks: 1        # Number of blocks in this phase
-        repetitions: 8   # Number of repetitions per block
+        repetitions: 8   # Number of repetitions per target
        # Optional: override default target values (not used here)
 
       - name: "Pre-Test"
-        task: "avoiding"
+        task: "reaching"
         blocks: 1
         repetitions: 8
 
@@ -32,8 +32,8 @@ subgroups:
         task: "reaching"
         blocks: 5
         # Overriding default target and intensity values for the training phase
-        target_distances: [18.2, 36.4, 54.5, 72.7, 90.9]
-        intensity_levels: [18.2, 36.4, 54.5, 72.7, 90.9]
+        target_distances: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
+        intensity_levels: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
         repetitions: 10
 
       - name: "Post-Test"
@@ -41,15 +41,18 @@ subgroups:
         blocks: 1
         repetitions: 8
 
+      - name: "Training"
+        task: "reaching"
+        blocks: 1
+        target_distances: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
+        intensity_levels: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
+        repetitions: 10
+
       - name: "Post-Test"
         task: "avoiding"
         blocks: 1
         repetitions: 8
 
-      - name: "Mini-Post-Test"
-        task: "reaching"
-        blocks: 1
-        repetitions: 2
 
   # ---- Reversed Mapping ----
   reversed:
@@ -58,12 +61,12 @@ subgroups:
     # Ordered list of experiment phases in this mapping group
     phases:
       - name: "Pre-Test"
-        task: "reaching"
+        task: "avoiding"
         blocks: 1
         repetitions: 8
 
       - name: "Pre-Test"
-        task: "avoiding"
+        task: "reaching"
         blocks: 1
         repetitions: 8
 
@@ -71,8 +74,8 @@ subgroups:
         task: "reaching"
         blocks: 5
         # Overriding default target and intensity values for the training phase
-        target_distances: [18.2, 36.4, 54.5, 72.7, 90.9]
-        intensity_levels: [90.9, 72.7, 54.5, 36.4, 18.2] #Reversed
+        target_distances: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
+        intensity_levels: [ 90.9, 72.7, 54.5, 36.4, 18.2 ] #Reversed
         repetitions: 10
 
       - name: "Post-Test"
@@ -80,12 +83,14 @@ subgroups:
         blocks: 1
         repetitions: 8
 
+      - name: "Training"
+        task: "reaching"
+        blocks: 1
+        target_distances: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
+        intensity_levels: [ 90.9, 72.7, 54.5, 36.4, 18.2 ]
+        repetitions: 10
+
       - name: "Post-Test"
         task: "avoiding"
         blocks: 1
         repetitions: 8
-
-      - name: "Mini-Post-Test"
-        task: "reaching"
-        blocks: 1
-        repetitions: 2
