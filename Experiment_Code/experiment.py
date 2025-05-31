@@ -9,8 +9,6 @@ from psychopy import event
 from psychopy.visual import Window
 from psychopy.clock import Clock
 
-import os
-import pandas as pd
 
 class Experiment:
     """
@@ -545,7 +543,6 @@ class VibrotactileCueExperiment(Experiment):
                 
             self.trial_running = False
 
-<<<<<<< Experiment_Code/experiment.py
     def export_trial_data_last_only(self) -> None:
         """
         Exports the most recent data point from the current trial's trajectory to a CSV file.
