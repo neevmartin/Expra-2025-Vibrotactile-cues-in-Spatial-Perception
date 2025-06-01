@@ -11,6 +11,7 @@ from psychopy import event
 from psychopy.visual import Window
 from psychopy.clock import Clock
 
+
 class Experiment:
     """
     Base class for psychophysical experiments using PsychoPy.
@@ -588,21 +589,128 @@ class VibrotactileCueExperiment(Experiment):
         """
         Updates trial data from the tablet and checks for trial completion.
 
+        Calls function to export trial data to a CSV file and updates the tablet input stream.
+
         Stops the trial if the confirmation condition is met 
         (e.g., participant releases the mouse button or presses a key).
 
-        TODO: 
-            Add output stream. Needs to be either updated continuously or once in the end.
-            A pandas dataframe has been shown to improve time complexity in private testing for the latter.
-            More to this later if desired.
 
         Returns:
             None
         """
         tablet.update_stream(self.window)
-        ### TODO: Output
         if self.trial_confirmation():
+            #self.export_trial_data_last_only() # Export only the last data point of the trial.
+            self.export_trial_data_all() # Export all data points of the trial.
+                
             self.trial_running = False
+
+    def export_trial_data_last_only(self) -> None:
+        """
+        Exports the most recent data point from the current trial's trajectory to a CSV file.
+        This method retrieves the latest position and button press data from the tablet trajectory,
+        combines it with relevant trial and participant information, and appends it as a new row
+        to a CSV file named 'trial_results.csv' in the participant's directory. If the file does not
+        exist, it is created and a header row is written first.
+        The exported data includes:
+            - Participant ID
+            - Trial index, task, phase, and block
+            - Target position (x, y)
+            - Timestamp of the last trajectory point
+            - Current position (x, y) at the last trajectory point
+            - Button press states (left, middle, right) at the last trajectory point
+        Assumes that the output directory exists and that the trajectory data is available.
+        """
+        
+        # Save trajectory and trial info to csv
+        trajectory = tablet.get_trajectory()
+
+        trial_data = {
+            'participant_id': self.participant.get('participantID'),
+            'trial_index': self.current_trial.get('trial_index') if self.current_trial.get('trial_index') is not None else -1,
+            'task': self.current_trial.get('task'),
+            'phase': self.current_trial.get('phase'),
+            'block': self.current_trial.get('block'),
+            'target_pos_x': round(self.target_pos[0], 2), # probably won't deviate from 0
+            'target_pos_y': round(self.target_pos[1], 2),
+            'timestamp': round(trajectory[-1][0], 2),
+            'current_pos_x': trajectory[-1][1],
+            'current_pos_y': trajectory[-1][2],
+            'left_button_pressed': trajectory[-1][3],
+            'middle_button_pressed': trajectory[-1][4], #probably not used
+            'right_button_pressed': trajectory[-1][5], #probably not used
+        }
+        
+        # Save to CSV
+        # Assumes output folder already exists
+        output_path = self.participant.get('participant_dir', '.') + '/trial_results.csv'
+
+        # Create the output file if it does not exist yet and write the header.
+        if not hasattr(self, '_output_initialized'):
+            with open(output_path, 'w') as f:
+                row = ','.join(trial_data.keys())
+                f.write(row + '\n')
+            self._output_initialized = True
+        # Append the trial data to the output file.
+        with open(output_path, 'a') as f:
+            row = ','.join(str(value) for value in trial_data.values())
+            f.write(row + '\n')
+            
+    def export_trial_data_all(self) -> None:
+        """
+        Exports all trajectory data for the current trial to a CSV file.
+        This method retrieves the trajectory data from the tablet, prepares the output CSV file (including writing the header if the file is newly created), and appends all trajectory points for the current trial. Each row in the CSV contains participant and trial metadata, target position, timestamp, current position, and button press states.
+        The output file is named 'trial_results.csv' and is saved in the participant's directory as specified in `self.participant['participant_dir']`.
+        Returns:
+            None
+        """
+        
+        trajectory = tablet.get_trajectory()
+        # Prepare output path
+        output_path = self.participant.get('participant_dir', '.') + '/trial_results.csv'
+
+        # Prepare header
+        header = [
+            'participant_id',
+            'trial_index',
+            'task',
+            'phase',
+            'block',
+            'target_pos_x',
+            'target_pos_y',
+            'timestamp',
+            'current_pos_x',
+            'current_pos_y',
+            'left_button_pressed',
+            'middle_button_pressed',
+            'right_button_pressed'
+        ]
+
+        # Create the output file if it does not exist yet and write the header.
+        if not hasattr(self, '_output_initialized'):
+            with open(output_path, 'w') as f:
+                f.write(','.join(header) + '\n')
+            self._output_initialized = True
+
+        # Write all trajectory points for this trial
+        with open(output_path, 'a') as f:
+            for entry in trajectory:
+                row = [
+                    self.participant.get('participantID'),
+                    self.current_trial.get('trial_index') if self.current_trial.get('trial_index') is not None else -1,
+                    self.current_trial.get('task'),
+                    self.current_trial.get('phase'),
+                    self.current_trial.get('block'),
+                    round(self.target_pos[0], 2),
+                    round(self.target_pos[1], 2),
+                    round(entry[0], 2),   # timestamp
+                    entry[1],             # current_pos_x
+                    entry[2],             # current_pos_y
+                    entry[3],             # left_button_pressed
+                    entry[4],             # middle_button_pressed
+                    entry[5],             # right_button_pressed
+                ]
+                f.write(','.join(str(value) for value in row) + '\n')
 
     def inter_trial_interval(self) -> None:
         """
