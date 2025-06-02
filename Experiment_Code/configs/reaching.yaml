@@ -2,8 +2,8 @@
 # Reaching Experiment Configuration
 # ==================================
 target_values: # Global target values used across all phases unless overridden in a phase
-  distances: [ 9.1, 12.4, 18.2, 27.3, 36.4, 45.5, 54.5, 63.6, 72.7, 81.8, 90.9, 95.3, 100 ]   # Default distances (%)
-  intensities: [ 9.1, 12.4, 18.2, 27.3, 36.4, 45.5, 54.5, 63.6, 72.7, 81.8, 90.9, 95.3, 100 ] # Intensity values (%) — reverse of distance if mapping is reversed
+  distances: [ 30, 41.7, 53.3, 65, 76.7, 88.3, 100 ]   # Default distances (%)
+  intensities: [ 30, 41.7, 53.3, 65, 76.7, 88.3, 100 ] # Intensity values (%) — reverse of distance if mapping is reversed
 
 # ==================
 # Mapping Subgroups
@@ -32,8 +32,8 @@ subgroups:
         task: "reaching"
         blocks: 5
         # Overriding default target and intensity values for the training phase
-        target_distances: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
-        intensity_levels: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
+        target_distances: [ 41.7, 65, 88.3 ]
+        intensity_levels: [ 41.7, 65, 88.3 ]
         repetitions: 10
 
       - name: "Post-Test"
@@ -44,8 +44,8 @@ subgroups:
       - name: "Training"
         task: "reaching"
         blocks: 1
-        target_distances: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
-        intensity_levels: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
+        target_distances: [ 41.7, 65, 88.3 ]
+        intensity_levels: [ 41.7, 65, 88.3 ]
         repetitions: 10
 
       - name: "Post-Test"
@@ -74,8 +74,8 @@ subgroups:
         task: "reaching"
         blocks: 5
         # Overriding default target and intensity values for the training phase
-        target_distances: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
-        intensity_levels: [ 90.9, 72.7, 54.5, 36.4, 18.2 ] #Reversed
+        target_distances: [ 41.7, 65, 88.3 ]
+        intensity_levels: [ 88.3, 65, 41.7 ] #Reversed
         repetitions: 10
 
       - name: "Post-Test"
@@ -86,8 +86,8 @@ subgroups:
       - name: "Training"
         task: "reaching"
         blocks: 1
-        target_distances: [ 18.2, 36.4, 54.5, 72.7, 90.9 ]
-        intensity_levels: [ 90.9, 72.7, 54.5, 36.4, 18.2 ]
+        target_distances: [ 41.7, 65, 88.3 ]
+        intensity_levels: [ 88.3, 65, 41.7 ] #Reversed
         repetitions: 10
 
       - name: "Post-Test"
