@@ -447,7 +447,7 @@ class VibrotactileCueExperiment(Experiment):
             None
         """
         self.state['explanation'] = True if previous_trial == None or previous_trial.get('task') != current_trial.get('task')   else False  
-        self.state['feedback']    = True if current_trial.get('phase') == 'training' or self.debug                              else False  
+        self.state['feedback']    = True if current_trial.get('phase') == 'Training' or self.debug                              else False  
         self.state['break']       = True if previous_trial != None and previous_trial.get('block') < current_trial.get('block') else False
     
     # ------------------------------------------------------------------------------
@@ -529,7 +529,7 @@ class VibrotactileCueExperiment(Experiment):
             self.window.flip()
 
         if self.state['feedback'] == True: # FEEDBACK
-                self.give_feedback()
+            self.give_feedback()
 
         self.inter_trial_interval() # ITI
 
@@ -700,7 +700,7 @@ class VibrotactileCueExperiment(Experiment):
                     self.current_trial.get('block'),
                     round(self.target_pos[0], 2),
                     round(self.target_pos[1], 2),
-                    round(entry[0], 2),   # timestamp
+                    round(entry[0], 3),   # timestamp
                     entry[1],             # current_pos_x
                     entry[2],             # current_pos_y
                     entry[3],             # left_button_pressed

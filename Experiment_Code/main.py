@@ -3,7 +3,7 @@ from config_loader import ExperimentConfig
 from vibration_controller import VibrationController
 from Experimental_Setup import Experimental_Setup
 from psychopy.visual import Window
-import os
+import os, sys
 
 def create_participant_folder(participant_id: str) -> str:
     '''Function to create a participant folder.'''
@@ -18,7 +18,7 @@ def create_participant_folder(participant_id: str) -> str:
     
     return participant_dir
 
-def input_params(setup_data: dict) -> dict:
+def input_params(setup_data: dict, dev_mode=False) -> dict:
     params = {}
     
     params.update({
@@ -30,12 +30,12 @@ def input_params(setup_data: dict) -> dict:
         "mode": setup_data['mode'],
         "mapping": "direct",
         "config_dir": "configs",
-        "debug": True
+        "debug": dev_mode
     })
     
     return params
 
-def main():
+def main(dev_mode = False):
     '''Starts the experiment.'''
     #params =  input_params()
     window = Window(
@@ -49,8 +49,9 @@ def main():
     setup = Experimental_Setup(
         window
     )
+
     setup_params = setup.run()
-    params = input_params(setup_params)
+    params = input_params(setup_params, dev_mode)
     window.close()
 
     win_config = {key : params.get(key) for key in [
@@ -89,4 +90,5 @@ def main():
     experiment.run()
 
 if __name__ == '__main__':
-    main()
+    # use the -d flag to 
+    main("-d" in sys.argv[1:])
