@@ -100,11 +100,11 @@ class Experimental_Setup:
         Allows the participant to select the experiment mode by pressing
         the LEFT arrow (for Reaching) or RIGHT arrow (for Avoiding).
         """
-        prompt = visual.TextStim(self.win, text="Select Task Mode:\n\nLEFT = Reaching\nRIGHT = Avoiding", pos=(0, 100), height=26)
-        left_label = visual.TextStim(self.win, text="Reaching", pos=(-150, 0), height=22)
-        right_label = visual.TextStim(self.win, text="Avoiding", pos=(150, 0), height=22)
-        box_left = visual.Rect(self.win, width=200, height=100, pos=(-150, 0), fillColor="lightblue")
-        box_right = visual.Rect(self.win, width=200, height=100, pos=(150, 0), fillColor="lightgreen")
+        prompt = visual.TextStim(self.win, text="Select Task Mode:\n\nLeft Arrow = Reaching\nRight Arrow = Avoiding", pos=(0, 100), height=26)
+        left_label = visual.TextStim(self.win, text="Reaching", pos=(-150, -50), height=22)
+        right_label = visual.TextStim(self.win, text="Avoiding", pos=(150, -50), height=22)
+        box_left = visual.Rect(self.win, width=200, height=100, pos=(-150, -50), fillColor="lightblue")
+        box_right = visual.Rect(self.win, width=200, height=100, pos=(150, -50), fillColor="lightgreen")
 
         while self.mode is None:
             prompt.draw()
