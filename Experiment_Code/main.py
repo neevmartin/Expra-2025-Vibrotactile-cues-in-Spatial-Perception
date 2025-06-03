@@ -18,56 +18,7 @@ def create_participant_folder(participant_id: str) -> str:
     
     return participant_dir
 
-def input_params():
-    '''Function to handle param input.'''
-    params = {}
-
-    params.update({
-        'windowed'           : False,
-        'resolution'         : [1920, 1080],
-        'screenID'           : input('Screen: '),
-
-        'participantID'      : input('Participant ID: '),
-        #'participant_dir'    : create_participant_folder(),
-
-        'mode'               : input('Mode: '),
-        'mapping'            : input('Mapping: '),
-        'config_dir'         : 'configs',
-
-        'debug'              : input('Debug: ')
-    })
-    
-    participant_dir = create_participant_folder(params['participantID'])
-    params['participant_dir'] = participant_dir
-
-    return params
-
-def input_params_example():
-    '''
-    Method to handle dynamic params.
-    '''
-    params = {}
-
-    params.update({
-        'windowed'           : True,
-        'resolution'         : [1440, 900],
-        'screenID'           : 0,
-
-        'participantID'      : 'abc',
-        #'participant_dir'    : create_participant_folder(),
-
-        'mode'               : 'reaching',
-        'mapping'            : 'direct',
-        'config_dir'         : 'configs',
-
-        'debug'              : True
-    })
-    participant_dir = create_participant_folder(params['participantID'])
-    params['participant_dir'] = participant_dir
-
-    return params
-
-def new_input_params(setup_data: dict) -> dict:
+def input_params(setup_data: dict) -> dict:
     params = {}
     
     params.update({
@@ -99,7 +50,7 @@ def main():
         window
     )
     setup_params = setup.run()
-    params = new_input_params(setup_params)
+    params = input_params(setup_params)
     window.close()
 
     win_config = {key : params.get(key) for key in [

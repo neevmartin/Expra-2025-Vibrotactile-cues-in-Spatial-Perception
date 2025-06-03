@@ -1,3 +1,5 @@
+import os
+
 from typing import Literal, Any
 from warnings import warn
 
@@ -642,9 +644,9 @@ class VibrotactileCueExperiment(Experiment):
         }
         
         # Save to CSV
-        # Assumes output folder already exists
-        output_path = self.participant.get('participant_dir', '.') + '/trial_results.csv'
 
+        # Assumes output folder already exists
+        output_path = os.path.join(self.participant.get('participant_dir', '.'), self.__get_filename())
         # Create the output file if it does not exist yet and write the header.
         if not hasattr(self, '_output_initialized'):
             with open(output_path, 'w') as f:
@@ -667,7 +669,7 @@ class VibrotactileCueExperiment(Experiment):
         
         trajectory = tablet.get_trajectory()
         # Prepare output path
-        output_path = self.participant.get('participant_dir', '.') + '/trial_results.csv'
+        output_path = os.path.join(self.participant.get('participant_dir', '.'), self.__get_filename())
 
         # Prepare header
         header = [
@@ -686,18 +688,13 @@ class VibrotactileCueExperiment(Experiment):
             'right_button_pressed'
         ]
 
-        # Create the output file if it does not exist yet and write the header.
-        if not hasattr(self, '_output_initialized'):
-            with open(output_path, 'w') as f:
-                f.write(','.join(header) + '\n')
-            self._output_initialized = True
-
         # Write all trajectory points for this trial
-        with open(output_path, 'a') as f:
+        with open(output_path, 'w') as f:
+            f.write(','.join(header) + '\n')
             for entry in trajectory:
                 row = [
                     self.participant.get('participantID'),
-                    self.current_trial.get('trial_index') if self.current_trial.get('trial_index') is not None else -1,
+                    self.config.get_trial_index(),
                     self.current_trial.get('task'),
                     self.current_trial.get('phase'),
                     self.current_trial.get('block'),
@@ -893,3 +890,11 @@ class VibrotactileCueExperiment(Experiment):
 
         self.MIN_TARGETDIST = self.STARTPOS[1]
         self.MAX_TARGETDIST = self.STOPPOS[1] - self.STARTPOS[1]
+
+    def __get_filename(self) -> str:
+        """
+        Returns a filename concatinated from the participant id and trial number
+        e.g. haml_trial1.csv
+        """
+        return self.participant.get('participantID') + "_trial" + str(self.config.get_trial_index()) + ".csv"
+    
