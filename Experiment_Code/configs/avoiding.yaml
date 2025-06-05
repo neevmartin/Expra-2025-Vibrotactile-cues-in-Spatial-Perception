@@ -42,7 +42,7 @@ subgroups:
         blocks: 1
         repetitions: 8
 
-      - name: "Training"
+      - name: "Recap"
         task: "avoiding"
         blocks: 1
         target_distances: [14.29, 42.86, 71.43, 100]
@@ -83,7 +83,7 @@ subgroups:
         blocks: 1
         repetitions: 8
 
-      - name: "Training"
+      - name: "Recap"
         task: "avoiding"
         blocks: 1
         target_distances: [14.29, 42.86, 71.43, 100]
