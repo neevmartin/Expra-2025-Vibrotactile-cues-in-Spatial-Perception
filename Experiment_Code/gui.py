@@ -1,6 +1,38 @@
 from psychopy import visual, event, core
 import numpy as np
 
+def draw_centered_image(win, image_path):
+    """
+    Display an image centered on the screen, scaled to fit the window width
+    while keeping the original aspect ratio.
+
+    Parameters:
+    - win: the window we are working on
+    - image_path: path to the image file (e.g., 'images/photo.jpg')
+    """
+    win.color = 'white'
+    win.flip()
+
+    temp_image = visual.ImageStim(win, image=image_path, units='pix')
+    original_size = temp_image.size
+    image_aspect = original_size[1] / original_size[0]
+
+    win_width, win_height = win.size
+
+    scaled_width = win_width
+    scaled_height = scaled_width * image_aspect
+
+    image = visual.ImageStim(
+        win,
+        image=image_path,
+        units='pix',
+        size=(scaled_width/2, scaled_height/2),
+        pos=(0, 0)
+    )
+
+    image.draw()
+    win.flip()
+
 def draw_centered_text(win: visual.Window, text: str, text_color: tuple = (1, 1, 1)):
     """
     Displays centered text on the screen.
