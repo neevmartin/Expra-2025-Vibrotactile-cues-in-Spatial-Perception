@@ -2,7 +2,7 @@
 # Reaching Experiment Configuration
 # ==================================
 target_values: # Global target values used across all phases unless overridden in a phase
-  distances: [4/28*100, 8/28*100, 12/28*100, 16/28*100, 20/28*100, 24/28*100, 28/28*100]   # Default distances (%)
+  distances: [14.29, 28.57, 42.86, 57.14, 71.43, 86.71, 100]   # Default distances (%)
   intensities: [28, 40, 52, 64, 76, 88, 100] # Intensity values (%) — reverse of distance if mapping is reversed
 
 # ==================
@@ -32,7 +32,7 @@ subgroups:
         task: "reaching"
         blocks: 5
         # Overriding default target and intensity values for the training phase
-        target_distances: [4/28*100, 12/28*100, 20/28*100, 28/28*100]
+        target_distances: [14.29, 42.86, 71.43, 100]
         intensity_levels: [28, 52, 76, 100]
         repetitions: 10
 
@@ -44,7 +44,7 @@ subgroups:
       - name: "Training"
         task: "reaching"
         blocks: 1
-        target_distances: [4/28*100, 12/28*100, 20/28*100, 28/28*100]
+        target_distances: [14.29, 42.86, 71.43, 100]
         intensity_levels: [28, 52, 76, 100]
         repetitions: 10
 
@@ -74,7 +74,7 @@ subgroups:
         task: "reaching"
         blocks: 5
         # Overriding default target and intensity values for the training phase
-        target_distances: [4/28*100, 12/28*100, 20/28*100, 28/28*100]
+        target_distances: [14.29, 42.86, 71.43, 100]
         intensity_levels: [100, 76, 52, 28] #Reversed
         repetitions: 10
 
@@ -86,7 +86,7 @@ subgroups:
       - name: "Training"
         task: "reaching"
         blocks: 1
-        target_distances: [4/28*100, 12/28*100, 20/28*100, 28/28*100]
+        target_distances: [14.29, 42.86, 71.43, 100]
         intensity_levels: [100, 76, 52, 28] #Reversed
         repetitions: 10
 
