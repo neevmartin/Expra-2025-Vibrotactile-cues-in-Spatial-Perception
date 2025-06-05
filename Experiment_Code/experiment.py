@@ -7,6 +7,7 @@ import tablet_input as tablet
 import gui
 from config_loader import ExperimentConfig
 from vibration_controller import VibrationController
+from explanation import Explanation
 
 from psychopy import core
 from psychopy import event
@@ -237,6 +238,11 @@ class VibrotactileCueExperiment(Experiment):
         TUTORIAL_TRIAL_NUMBER (int):
             Represents the number of tutorial trials we show 
             the participants in the beginning of the experiment.
+
+        break_index (int):
+            The index for the current break number.
+            Is used to iterate through possible break
+            messages.
     """
     config: ExperimentConfig
     participant: dict
@@ -275,6 +281,8 @@ class VibrotactileCueExperiment(Experiment):
     trial_running: bool
     TUTORIAL_TRIAL_NUMBER: int
 
+    break_index: int
+
     def __init__(
             self, win_config: dict, 
             experiment_config: ExperimentConfig, 
@@ -299,11 +307,14 @@ class VibrotactileCueExperiment(Experiment):
         self.current_trial = None
         self.previous_trial = None
 
+        # During the whole experiement the standard mouse-cursor is invisible
+        event.Mouse().setVisible(False)
+
         self.clock = Clock()
         # Time in seconds
         self.CUE_INTERVAL = 0.2 # as suggested by literature
         self.OUTPUT_INTERVAL = 0.01
-        self.FEEDBACK_INTERVAL = 2.
+        self.FEEDBACK_INTERVAL = .8
         self.ITI =  0.2
 
         self.text_confirmed = False
@@ -311,6 +322,8 @@ class VibrotactileCueExperiment(Experiment):
         self.mouse_pressed_last_frame = False
 
         self.TUTORIAL_TRIAL_NUMBER = 10
+
+        self.break_index = 0
 
         self.state = {
             'explanation': False,
@@ -374,18 +387,27 @@ class VibrotactileCueExperiment(Experiment):
         self.window.flip()
         self.wait_confirm()
 
-    def run_introduction(self):
-        self.show_text_prompt(
-            'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, ' \
-            'sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, ' \
-            'sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. ' \
-            'Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. ' \
-            'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ' \
-            'ut labore et dolore magna aliquyam erat, sed diam voluptua. ' \
-            'At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, ' \
-            'no sea takimata sanctus est Lorem ipsum dolor sit amet. \n' \
-            'Press ENTER to continue.'
+    def show_image_prompt(self, image_path: str) -> None:
+        """
+        Shows an image in the middle of the screen.
+        Waits for participant to confirm that image.
+        Window gets flipped.
+
+        TODO: This method needs to be adjusted to the later implementation 
+                of the show text which are images instead of TextStimuli objects.
+
+        Returns:
+            None
+        """
+        gui.draw_centered_image(
+            win=self.window, 
+            image_path=image_path
         )
+        self.window.flip()
+        self.wait_confirm()
+
+    def run_introduction(self):
+        self.run_explanation_sequence(Explanation.INTRODUCTION.value)
 
     def run_experiment(self) -> None:
         """
@@ -473,8 +495,8 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        self.state['explanation'] = True if previous_trial == None or previous_trial.get('task') != current_trial.get('task')   else False  
-        self.state['feedback']    = True if current_trial.get('phase') == 'Training' or self.debug                              else False  
+        self.state['explanation'] = True if previous_trial == None or previous_trial.get('task') != current_trial.get('task') or previous_trial.get('phase') != current_trial.get('phase')  else False  
+        self.state['feedback']    = True if current_trial.get('phase') == 'Training' or current_trial.get('phase') == 'Recap' or self.debug else False  
         self.state['break']       = True if previous_trial != None and previous_trial.get('block') < current_trial.get('block') else False
     
     def run_tutorial(self) -> None:
@@ -490,14 +512,7 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        tutorial_mouse = event.Mouse()
-        tutorial_mouse.setVisible(False)
-
-        self.show_text_prompt(
-            'Now you can try out the experiment. In 10 trials you will get to know the flow of the experiment. ' \
-            'Don\'t worry, data from these trials won\'t be collected. ' \
-            'Press ENTER to start.'
-        )
+        self.run_explanation_sequence(Explanation.TUTORIAL.value)
 
         for _ in range(10):
             self.run_tutorial_trial()
@@ -849,45 +864,60 @@ class VibrotactileCueExperiment(Experiment):
 
     def give_explanation(
             self, 
-            phase: Literal['pre-test', 'training', 'post-test'], 
+            phase: Literal['Pre-Test', 'Training', 'Post-Test', 'Recap'], 
             task: Literal['avoiding', 'reaching']
         ) -> None:
         """
-        Displays a task-specific explanation message and waits for participant confirmation.
+        Displays a task-specific explanation message sequence and waits for participant confirmation for each text slide.
 
         This is a control method that interrupts the normal experiment flow by entering a
         main loop that uses `handle_keys` to process input until the participant confirms.
 
         Args:
-            phase (Literal['pre-test', 'training', 'post-test]): The phase type for which to show the explanation.
+            phase (Literal['Pre-Test', 'Training', 'Post-Test', 'Recap']): The phase type for which to show the explanation.
             task (Literal['avoiding', 'reaching']): The task type for which to show the explanation.
-
-        TODO:
-            This will be changed later to call different explanations in a sequence.
 
         Returns:
             None
         """
-        phase_text: str
-        if phase == 'Pre-Test':
-            phase_text = 'Explanation for pre-test. \n Press ENTER to continue.'
-        elif phase == 'Training':
-            phase_text = 'Explanation for training. \n Press ENTER to continue.'
-        elif phase == 'Post-Test':
-            phase_text = 'Explanation for post-test. \n Press ENTER to continue.'
+        if self.config.mode == 'avoiding':
+            if phase == 'Pre-Test':
+                phase_slide_path = Explanation.PRETEST_AVOIDING2.value if task == 'avoiding' else Explanation.PRETEST_REACHING1.value
+            elif phase == 'Training':
+                phase_slide_path = Explanation.TRAINING_AVOIDING.value
+            elif phase == 'Post-Test':
+                phase_slide_path = Explanation.POSTTEST_AVOIDING1.value if task == 'avoiding' else Explanation.POSTTEST_REACHING1.value
+            elif phase == 'Recap':
+                phase_slide_path = Explanation.RECAP_AVOIDING.value
+        # Difference between Group1 & Group2 is the sequence of the tasks which makes the difference here
+        elif self.config.mode == 'reaching':
+            if phase == 'Pre-Test':
+                phase_slide_path = Explanation.PRETEST_AVOIDING1.value if task == 'avoiding' else Explanation.PRETEST_REACHING2.value
+            elif phase == 'Training':
+                phase_slide_path = Explanation.TRAINING_REACHING.value
+            elif phase == 'Post-Test':
+                phase_slide_path = Explanation.POSTTEST_AVOIDING1.value if task == 'avoiding' else Explanation.POSTTEST_REACHING1.value
+            elif phase == 'Recap':
+                phase_slide_path = Explanation.RECAP_REACHING.value
 
-        self.show_text_prompt(phase_text)
+        self.run_explanation_sequence(phase_slide_path)
 
-        task_text: str
-        if task == 'avoiding':
-            task_text = 'Explanation for avoiding. \n Press ENTER to continue.'
-        elif task == 'reaching':
-            task_text = 'Explanation for reaching. \n Press ENTER to continue.'
-        else:
-            task_text = f'Explanation for {task}. \n Press ENTER to continue.'
+    def run_explanation_sequence(self, image_paths: list) -> None:
+        """
+        Runs the explanation sequence for a list of image paths.
+
+        Iterates through the provided list of image file paths and displays 
+        each image then waits for the confirmation of the participant.
+
+        Args:
+            image_paths (list): A list of strings, where each string is the file path to an image.
+                                Here it should be an Explanation list value from the enum in `explanation.py`
         
-        self.show_text_prompt(task_text)
-            
+        Returns:
+            None
+        """
+        for p in image_paths:
+            self.show_image_prompt(image_path=p)
 
     def give_break(self) -> None:
         """
@@ -899,7 +929,9 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        self.show_text_prompt('Eile mit Weile. \n Press ENTER to continue.')
+        self.show_image_prompt(Explanation.BREAK.value[self.break_index % len(Explanation.BREAK.value)]) # Iterates through all images again and again
+        self.break_index += 1
+
     # ------------------------------------------------------------------------------
     # Debug functions
     # ------------------------------------------------------------------------------
@@ -932,7 +964,7 @@ class VibrotactileCueExperiment(Experiment):
     # Setup initilizations
     # ------------------------------------------------------------------------------
     
-    def init_target(self, percent_distance) -> None:
+    def init_target(self, percent_distance: float) -> None:
         """
         Initializes the target position based on a percentage distance.
 

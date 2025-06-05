@@ -10,9 +10,6 @@ def draw_centered_image(win, image_path):
     - win: the window we are working on
     - image_path: path to the image file (e.g., 'images/photo.jpg')
     """
-    win.color = 'white'
-    win.flip()
-
     temp_image = visual.ImageStim(win, image=image_path, units='pix')
     original_size = temp_image.size
     image_aspect = original_size[1] / original_size[0]
@@ -26,12 +23,12 @@ def draw_centered_image(win, image_path):
         win,
         image=image_path,
         units='pix',
-        size=(scaled_width/2, scaled_height/2),
-        pos=(0, 0)
+        size=(scaled_width, scaled_height),
+        pos=(0, 0),
+        interpolate=True
     )
 
     image.draw()
-    win.flip()
 
 def draw_centered_text(win: visual.Window, text: str, text_color: tuple = (1, 1, 1)):
     """
