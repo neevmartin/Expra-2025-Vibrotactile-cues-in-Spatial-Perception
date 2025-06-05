@@ -355,9 +355,27 @@ class VibrotactileCueExperiment(Experiment):
         while not self.text_confirmed:
             self.handle_keys()
 
-    def run_introduction(self):
+    def show_text_prompt(self, text: str) -> None:
+        """
+        Shows a text in the middle of the screen.
+        Waits for participant to confirm that text.
+        Window gets flipped.
+
+        TODO: This method needs to be adjusted to the later implementation 
+              of the show text which are images instead of TextStimuli objects.
+
+        Returns:
+            None
+        """
         gui.draw_centered_text(
-            self.window, 
+            win=self.window, 
+            text=text
+        )
+        self.window.flip()
+        self.wait_confirm()
+
+    def run_introduction(self):
+        self.show_text_prompt(
             'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, ' \
             'sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, ' \
             'sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. ' \
@@ -368,8 +386,6 @@ class VibrotactileCueExperiment(Experiment):
             'no sea takimata sanctus est Lorem ipsum dolor sit amet. \n' \
             'Press ENTER to continue.'
         )
-        self.window.flip()
-        self.wait_confirm()
 
     def run_experiment(self) -> None:
         """
@@ -408,13 +424,17 @@ class VibrotactileCueExperiment(Experiment):
 
             # In case task has changed: give an explanation for the upcoming task.
             # Lazy evaluation of task initialization.
-            if self.state['explanation'] == True: 
-                if self.current_trial.get('task') == 'avoiding':
+            if self.state['explanation'] == True:
+                current_task = self.current_trial.get('task')
+                current_phase = self.current_trial.get('phase')
+
+                if current_task == 'avoiding':
                     self.init_avoiding_task()
-                    self.give_explanation('avoiding')
-                elif self.current_trial.get('task') == 'reaching':
+                elif current_task == 'reaching':
                     self.init_reaching_task()
-                    self.give_explanation('reaching')
+
+                # We give a custom explanation sequence based on meta data
+                self.give_explanation(phase=current_phase, task=current_task) 
             # IMPORTANT: The elif ensures that there is no conflict at the end of a phase
             #            Imagine we switch to the training phase. We give an explanation 
             #            of the task and after that give a break. That would not be necessary.     
@@ -432,13 +452,10 @@ class VibrotactileCueExperiment(Experiment):
             self.vibrator.close()
 
     def run_outro(self):
-        gui.draw_centered_text(
-           self.window,
-           'Thank you for your participation in our study! \n' \
+        self.show_text_prompt(
+            'Thank you for your participation in our study! \n' \
            'Press ENTER to close the experiment window.'
         )
-        self.window.flip()
-        self.wait_confirm()
 
     def update_state(self, previous_trial: dict, current_trial: dict) -> None:
         """
@@ -476,19 +493,14 @@ class VibrotactileCueExperiment(Experiment):
         tutorial_mouse = event.Mouse()
         tutorial_mouse.setVisible(False)
 
-        gui.draw_centered_text(
-            self.window, 
+        self.show_text_prompt(
             'Now you can try out the experiment. In 10 trials you will get to know the flow of the experiment. ' \
             'Don\'t worry, data from these trials won\'t be collected. ' \
             'Press ENTER to start.'
         )
-        self.window.flip()
-
-        self.wait_confirm()
 
         for _ in range(10):
             self.run_tutorial_trial()
-
 
     # ------------------------------------------------------------------------------
     # Trial control
@@ -835,7 +847,11 @@ class VibrotactileCueExperiment(Experiment):
         while core.getTime() - start_time < self.FEEDBACK_INTERVAL:
             self.handle_keys()
 
-    def give_explanation(self, task: Literal['avoiding', 'reaching']) -> None:
+    def give_explanation(
+            self, 
+            phase: Literal['pre-test', 'training', 'post-test'], 
+            task: Literal['avoiding', 'reaching']
+        ) -> None:
         """
         Displays a task-specific explanation message and waits for participant confirmation.
 
@@ -843,19 +859,34 @@ class VibrotactileCueExperiment(Experiment):
         main loop that uses `handle_keys` to process input until the participant confirms.
 
         Args:
+            phase (Literal['pre-test', 'training', 'post-test]): The phase type for which to show the explanation.
             task (Literal['avoiding', 'reaching']): The task type for which to show the explanation.
+
+        TODO:
+            This will be changed later to call different explanations in a sequence.
 
         Returns:
             None
         """
+        phase_text: str
+        if phase == 'Pre-Test':
+            phase_text = 'Explanation for pre-test. \n Press ENTER to continue.'
+        elif phase == 'Training':
+            phase_text = 'Explanation for training. \n Press ENTER to continue.'
+        elif phase == 'Post-Test':
+            phase_text = 'Explanation for post-test. \n Press ENTER to continue.'
+
+        self.show_text_prompt(phase_text)
+
+        task_text: str
         if task == 'avoiding':
-            gui.draw_centered_text(self.window, 'Explanation for avoiding. \n Press ENTER to continue.')
+            task_text = 'Explanation for avoiding. \n Press ENTER to continue.'
         elif task == 'reaching':
-            gui.draw_centered_text(self.window, 'Explanation for reaching. \n Press ENTER to continue.')
+            task_text = 'Explanation for reaching. \n Press ENTER to continue.'
         else:
-            gui.draw_centered_text(self.window, f'Explanation for {task}. \n Press ENTER to continue.')
-        self.window.flip()
-        self.wait_confirm()
+            task_text = f'Explanation for {task}. \n Press ENTER to continue.'
+        
+        self.show_text_prompt(task_text)
             
 
     def give_break(self) -> None:
@@ -868,10 +899,7 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        gui.draw_centered_text(self.window, 'Eile mit Weile. \n Press ENTER to continue.')
-        self.window.flip()
-        self.wait_confirm()
-
+        self.show_text_prompt('Eile mit Weile. \n Press ENTER to continue.')
     # ------------------------------------------------------------------------------
     # Debug functions
     # ------------------------------------------------------------------------------
@@ -936,8 +964,7 @@ class VibrotactileCueExperiment(Experiment):
         and calculates minimum and maximum target distances along the Y-axis.
 
         TODO:
-            We should decide on a loader class for this info.
-            Possibly we could update the experiment config loader for this. 
+            Will possibly changed into one function with `init_avoiding_task`.
 
         Returns:
             None
@@ -961,8 +988,7 @@ class VibrotactileCueExperiment(Experiment):
         and calculates minimum and maximum target distances along the Y-axis.
 
         TODO:
-            We should decide on a loader class for this info.
-            Possibly we could update the experiment config loader for this. 
+            Will possibly changed into one function with `init_reaching_task`.
 
         Returns:
             None
