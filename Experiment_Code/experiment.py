@@ -233,6 +233,10 @@ class VibrotactileCueExperiment(Experiment):
 
         trial_running (bool): 
             Whether the current trial is actively running.
+
+        TUTORIAL_TRIAL_NUMBER (int):
+            Represents the number of tutorial trials we show 
+            the participants in the beginning of the experiment.
     """
     config: ExperimentConfig
     participant: dict
@@ -269,6 +273,7 @@ class VibrotactileCueExperiment(Experiment):
     mouse_pressed_last_frame: bool
 
     trial_running: bool
+    TUTORIAL_TRIAL_NUMBER: int
 
     def __init__(
             self, win_config: dict, 
@@ -301,7 +306,11 @@ class VibrotactileCueExperiment(Experiment):
         self.FEEDBACK_INTERVAL = 2.
         self.ITI =  0.2
 
+        self.text_confirmed = False
+        self.trial_confirmed = False
         self.mouse_pressed_last_frame = False
+
+        self.TUTORIAL_TRIAL_NUMBER = 10
 
         self.state = {
             'explanation': False,
@@ -386,6 +395,7 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
+        self.run_tutorial()
         # Init
         self.clock.reset()
         # Trial sequence
@@ -450,6 +460,36 @@ class VibrotactileCueExperiment(Experiment):
         self.state['feedback']    = True if current_trial.get('phase') == 'Training' or self.debug                              else False  
         self.state['break']       = True if previous_trial != None and previous_trial.get('block') < current_trial.get('block') else False
     
+    def run_tutorial(self) -> None:
+        """
+        Runs the interactive tutorial phase of the experiment.
+
+        Steps performed:
+            - Hides the mouse cursor.
+            - Draws centered instructional text on the experiment window.
+            - Waits for the participant to press ENTER to proceed.
+            - Executes 10 tutorial trials to familiarize the participant with the experiment flow.
+
+        Returns:
+            None
+        """
+        tutorial_mouse = event.Mouse()
+        tutorial_mouse.setVisible(False)
+
+        gui.draw_centered_text(
+            self.window, 
+            'Now you can try out the experiment. In 10 trials you will get to know the flow of the experiment. ' \
+            'Don\'t worry, data from these trials won\'t be collected. ' \
+            'Press ENTER to start.'
+        )
+        self.window.flip()
+
+        self.wait_confirm()
+
+        for _ in range(10):
+            self.run_tutorial_trial()
+
+
     # ------------------------------------------------------------------------------
     # Trial control
     # ------------------------------------------------------------------------------
@@ -533,7 +573,41 @@ class VibrotactileCueExperiment(Experiment):
 
         self.inter_trial_interval() # ITI
 
-    def vibrotactile_cue(self):
+    def run_tutorial_trial(self):
+        """
+        Executes a single tutorial trial, handling participant input and updating trial state.
+
+        The method is equivalent with `run_trial` though no data is collected and there is no debug mode.
+
+        **One trial follows structure: <br/>
+        Cue | Confirmation | Task | ITI**
+
+        Returns:
+            None
+        """
+        self.vibrotactile_cue(intensity_percentage=100) # CUE
+
+        while not self.trial_confirmed: # CONFIRMATION
+            self.handle_keys()
+
+            if self.trial_confirmation():
+                self.trial_confirmed = True
+
+            self.window.flip()
+        
+        self.trial_running = True
+
+        while self.trial_running: # TASK
+            self.handle_keys()
+
+            if self.trial_confirmation(): # We do not collect any data in this
+                self.trial_running = False
+
+            self.window.flip()
+
+        self.inter_trial_interval() # ITI
+
+    def vibrotactile_cue(self, intensity_percentage: int | float = None) -> None:
         """
         Gives vibrotactile cue and safely waits until the cue ends.
 
@@ -542,6 +616,12 @@ class VibrotactileCueExperiment(Experiment):
         and waits for the cue to end while monitoring for key presses.
 
         If no vibrator exists, a warning is issued.
+
+        Args:
+            intensity_percentage (int | float):
+                Optional. If argument is given will take this intensity instead of the current trial intensity.
+                As the name suggests this awaits percentages. Careful: values from 0-1 are treated as relative numbers.
+                Please just use values >1 for percentages.
 
         Raises:
             RuntimeWarning: If no Arduino board is detected and the cue cannot be given.
@@ -552,7 +632,11 @@ class VibrotactileCueExperiment(Experiment):
         self.window.flip()
 
         # Vibration should succeed before drawing so timing lines up
-        intensity_proportion = 0.01 * self.current_trial['intensity']
+        if intensity_percentage == None:
+            intensity_proportion = 0.01 * self.current_trial.get('intensity')
+        else:
+            intensity_proportion = 0.01 * intensity_percentage
+
         if self.vibrator != None:
             self.vibrator.vibrate(intensity=intensity_proportion, duration_sec=self.CUE_INTERVAL)
         else:
@@ -574,7 +658,10 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             bool: True if the trial is confirmed, False otherwise.
         """
-        mouse_pressed = tablet.get_mouse().getPressed()[0]
+        if tablet.get_mouse() != None: # if used before init trial
+            mouse_pressed = tablet.get_mouse().getPressed()[0]
+        else:
+            mouse_pressed = event.Mouse().getPressed()[0]
 
         if self.trial_confirmed:
             # Trial is running and participant must release the mouse button.
