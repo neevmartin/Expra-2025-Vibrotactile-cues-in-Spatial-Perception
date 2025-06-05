@@ -314,7 +314,7 @@ class VibrotactileCueExperiment(Experiment):
         # Time in seconds
         self.CUE_INTERVAL = 0.2 # as suggested by literature
         self.OUTPUT_INTERVAL = 0.01
-        self.FEEDBACK_INTERVAL = .8
+        self.FEEDBACK_INTERVAL = 0.7
         self.ITI =  0.2
 
         self.text_confirmed = False
