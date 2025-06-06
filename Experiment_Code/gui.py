@@ -53,17 +53,17 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
         target_pos: the target position
         radius: the radius of the circle representing the start, target, stop positions
     """
-    my_cursor = visual.Circle(win, pos=mouse_pos, radius=10, fillColor='red', lineColor='red')
+    my_cursor = visual.Circle(win, pos=mouse_pos, radius=10, fillColor='red', lineColor='red', colorSpace='rgb')
 
     # Only runs correctly with the monitor
-    rail_left = visual.Rect(win, width=0.5/31.1 * win.size[1], height=28/31.1 * win.size[1] , units="pix", pos=[-1/31.1 * win.size[1] , 0.5/31.1 * win.size[1]])
-    rail_right = visual.Rect(win, width=0.5/31.1 * win.size[1], height=28/31.1 * win.size[1], units="pix", pos=[1/31.1 * win.size[1], 0.5/31.1 * win.size[1]])
+    rail_left = visual.Rect(win, width=0.5/31.1 * win.size[1], height=28/31.1 * win.size[1] , units="pix", pos=[-1/31.1 * win.size[1] , 0.5/31.1 * win.size[1]], colorSpace='rgb')
+    rail_right = visual.Rect(win, width=0.5/31.1 * win.size[1], height=28/31.1 * win.size[1], units="pix", pos=[1/31.1 * win.size[1], 0.5/31.1 * win.size[1]], colorSpace='rgb')
 
-    start = visual.Circle(win, radius=radius, pos=start_pos, fillColor='black')
-    stop = visual.Circle(win, radius=radius, pos=stop_pos, fillColor='black')
+    start = visual.Circle(win, radius=radius, pos=start_pos, fillColor='black', colorSpace='rgb')
+    stop = visual.Circle(win, radius=radius, pos=stop_pos, fillColor='black', colorSpace='rgb')
 
     if obstacle:
-        obstacle = visual.Circle(win, radius=radius, pos=obstacle, fillColor='yellow')
+        obstacle = visual.Circle(win, radius=radius, pos=obstacle, fillColor='yellow', colorSpace='rgb')
         obstacle.draw()
 
     rail_left.draw()
@@ -74,7 +74,7 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
 
     if len(trajectory) > 0:
         drawn_line = [(x, y) for (_, x, y, _, _, _) in trajectory]
-        line = visual.ShapeStim(win, vertices=drawn_line, closeShape=False, lineColor='black', lineWidth=10)
+        line = visual.ShapeStim(win, vertices=drawn_line, closeShape=False, lineColor='black', lineWidth=10, colorSpace='rgb')
         line.draw()
 
     my_cursor.draw()

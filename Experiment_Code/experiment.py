@@ -256,6 +256,9 @@ class VibrotactileCueExperiment(Experiment):
 
     # Endpoint
     STOPPOS: list[int, int]
+
+    # Padding for start and end point distance to target
+    TARGET_PADDING: int
     
     # Reference point: 'reaching' -> targetpoint, 'avoiding' -> obstacle.
     MIN_TARGETDIST: list[int, int]
@@ -287,6 +290,8 @@ class VibrotactileCueExperiment(Experiment):
     AVOID_CONFIRM_RATIO: float
     MAX_CONFIRM_DISTANCE: int
 
+    TABLET_SIZE: float
+
     def __init__(
             self, win_config: dict, 
             experiment_config: ExperimentConfig, 
@@ -307,6 +312,9 @@ class VibrotactileCueExperiment(Experiment):
         self.config = experiment_config
         self.vibrator = vibration_controller
         self.participant = participant
+
+        self.TABLET_SIZE    = 31.1
+        self.TARGET_PADDING = int(2.5 / self.TABLET_SIZE * self.window.size[1])
 
         self.current_trial = None
         self.previous_trial = None
@@ -329,7 +337,7 @@ class VibrotactileCueExperiment(Experiment):
 
         self.break_index = 0
 
-        self.AVOID_CONFIRM_RATIO = 0.3
+        self.AVOID_CONFIRM_RATIO = 0.8
         self.MAX_CONFIRM_DISTANCE = 10
 
         self.state = {
@@ -624,7 +632,7 @@ class VibrotactileCueExperiment(Experiment):
         while not self.trial_confirmed: # CONFIRMATION
             self.handle_keys()
 
-            if self.trial_confirmation():
+            if self.tutorial_trial_confirmation():
                 self.trial_confirmed = True
 
             self.window.flip()
@@ -634,7 +642,7 @@ class VibrotactileCueExperiment(Experiment):
         while self.trial_running: # TASK
             self.handle_keys()
 
-            if self.trial_confirmation(): # We do not collect any data in this
+            if self.tutorial_trial_confirmation(): # We do not collect any data in this
                 self.trial_running = False
 
             self.window.flip()
@@ -706,8 +714,31 @@ class VibrotactileCueExperiment(Experiment):
             confirmed = self.mouse_pressed_last_frame and not mouse_pressed
         else:
             # Trial needs to be confirmed with a button press by the participant.
-            distance_from_start = np.sqrt((mouse_pos[0] - self.STARTPOS[0])**2 + (mouse_pos[1] - self.STARTPOS[1])**2)
+            distance_from_start = abs(mouse_pos[1] - self.STARTPOS[1])
             confirmed = mouse_pressed and not self.mouse_pressed_last_frame and distance_from_start < self.MAX_CONFIRM_DISTANCE
+
+        self.mouse_pressed_last_frame = mouse_pressed
+
+        return confirmed
+    
+    def tutorial_trial_confirmation(self) -> bool:
+        """
+        Checks whether the trial confirmation condition has been met.
+
+        Returns True when the participant presses the mouse button in case they have not confirmed the trial yet.
+                If they have confirmed the trial method returns true if they release the mouse button again.
+
+        Returns:
+            bool: True if the trial is confirmed, False otherwise.
+        """
+        mouse_pressed = event.Mouse().getPressed()[0]
+
+        if self.trial_confirmed:
+            # Trial is running and participant must release the mouse button.
+            confirmed = self.mouse_pressed_last_frame and not mouse_pressed
+        else:
+            # Trial needs to be confirmed with a button press by the participant.
+            confirmed = mouse_pressed and not self.mouse_pressed_last_frame
 
         self.mouse_pressed_last_frame = mouse_pressed
 
@@ -1020,7 +1051,7 @@ class VibrotactileCueExperiment(Experiment):
         """
 
         target_posX = self.STARTPOS[0]
-        target_posY = distance / 31.1 * self.window.size[1]
+        target_posY = distance / self.TABLET_SIZE * self.window.size[1] - self.window.size[1]/2
 
         self.target_pos = [target_posX, target_posY]
 
@@ -1042,11 +1073,11 @@ class VibrotactileCueExperiment(Experiment):
 
         self.RADIUS = 10
 
-        self.STARTPOS = [win_midX, -win_size[1]/4]
-        self.STOPPOS   = [win_midX, win_size[1]/4]
+        self.STARTPOS = [-0.75/self.TABLET_SIZE*self.window.size[0], -13.5/self.TABLET_SIZE*self.window.size[1]]
+        self.STOPPOS   = [0, 0] # Won´t be used
 
-        self.MIN_TARGETDIST = self.STARTPOS[1]
-        self.MAX_TARGETDIST = self.STOPPOS[1] - self.STARTPOS[1]
+        self.MIN_TARGETDIST = self.STARTPOS[1] + self.TARGET_PADDING
+        self.MAX_TARGETDIST = self.STOPPOS[1] - self.STARTPOS[1] - self.TARGET_PADDING
 
     def init_avoiding_task(self) -> None:
         """
@@ -1066,11 +1097,11 @@ class VibrotactileCueExperiment(Experiment):
 
         self.RADIUS = 10
 
-        self.STARTPOS = [win_midX, -win_size[1]/4]
-        self.STOPPOS   = [win_midX, win_size[1]/4]
+        self.STARTPOS = [-0.75/self.TABLET_SIZE*self.window.size[0], -13.5/self.TABLET_SIZE*self.window.size[1]]
+        self.STOPPOS   = [0.75/self.TABLET_SIZE*self.window.size[0], 14.5/self.TABLET_SIZE*self.window.size[1]]
 
-        self.MIN_TARGETDIST = self.STARTPOS[1]
-        self.MAX_TARGETDIST = self.STOPPOS[1] - self.STARTPOS[1]
+        self.MIN_TARGETDIST = self.STARTPOS[1] + self.TARGET_PADDING
+        self.MAX_TARGETDIST = self.STOPPOS[1] - self.STARTPOS[1] - self.TARGET_PADDING
 
     def __get_filename(self) -> str:
         """
