@@ -886,7 +886,7 @@ class VibrotactileCueExperiment(Experiment):
             current_distance = abs(self.STARTPOS[0] - x)
             threshold = abs(self.STARTPOS[0] - self.STOPPOS[0]) * self.AVOID_CONFIRM_RATIO
             if current_distance > threshold:
-                return x
+                return mouse_info
         return self.STOPPOS # returns end position if no point is found
 
     def give_explanation(
