@@ -42,7 +42,7 @@ def draw_centered_text(win: visual.Window, text: str, text_color: tuple = (1, 1,
     text.draw()
 
 def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
-                      start_pos: tuple, target_pos: tuple, radius: int):
+                      start_pos: tuple, target_pos: tuple, radius: int, end_pos: tuple = None):
     """
     Displays the rails, start position, target position, trajectory, mouse when in debug mode
     Args:
@@ -61,6 +61,10 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
 
     start = visual.Circle(win, radius=radius, pos=start_pos, fillColor='black')
     target = visual.Circle(win, radius=radius, pos=target_pos, fillColor='black')
+
+    if end_pos:
+        end = visual.Circle(win, radius=radius, pos=end_pos, fillcolor='yellow')
+        end.draw()
 
     rail_left.draw()
     rail_right.draw()
