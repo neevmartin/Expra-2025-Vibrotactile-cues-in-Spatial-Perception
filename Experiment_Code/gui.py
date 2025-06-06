@@ -56,9 +56,8 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
     my_cursor = visual.Circle(win, pos=mouse_pos, radius=10, fillColor='red', lineColor='red')
 
     # Use for monitor
-    rail_left = visual.Rect(win, width=1.5, height=28, units="cm", pos=[-1.5, 0.5])
-    rail_right = visual.Rect(win, width=1.5, height=28, units="cm", pos=[1.5, 0.5])
-
+    rail_left = visual.Rect(win, width=0.5/31.1 * win.size[1], height=28/31.1 * win.size[1] , units="pix", pos=[-1/31.1 * win.size[1] , 0.5/31.1 * win.size[1]])
+    rail_right = visual.Rect(win, width=0.5/31.1 * win.size[1], height=28/31.1 * win.size[1], units="pix", pos=[1/31.1 * win.size[1], 0.5/31.1 * win.size[1]])
     # Use at home
     # rail_left = visual.Rect(win, width=1.5, height=18, units="cm", pos=[-1.5, 0.5])
     # rail_right = visual.Rect(win, width=1.5, height=18, units="cm", pos=[1.5, 0.5])
@@ -90,26 +89,24 @@ def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple):
     off_point = np.abs(target_pos[1] - stop_pos[1])
 
     # Use for monitor
-    monitor_height_cm = 69.84
-    threshold_green = 1 * win.size[1] / monitor_height_cm
-    threshold_yellow = 4 * win.size[1] / monitor_height_cm
+    threshold_green = 0.5/31.1 * win.size[1]
+    threshold_yellow = 4/31.1 * win.size[1]
 
     # Use at home
-    # monitor_height_cm = 18.5
-    # threshold_green = 1 * win.size[1] / monitor_height_cm
-    # threshold_yellow = 4 * win.size[1] / monitor_height_cm
+    # threshold_green = 0.5/18.5 * win.size[1] 
+    # threshold_yellow = 4/18.5 * win.size[1]
 
     if off_point < threshold_green:
-        text = "You correctly reached the target!"
+        text = "You hit the target!"
         color = (-1, 1, -1)
     elif off_point < threshold_yellow and target_pos[1] > stop_pos[1]:
-        text = "You were slightly undershoot!"
+        text = "You slightly undershot the target!"
         color = (1, 1, -1)
     elif off_point < threshold_yellow and target_pos[1] < stop_pos[1]:
-        text = "You were slightly overshoot!"
+        text = "You slightly overshot the target!"
         color = (1, 1, -1)
     else:
-        text = "You were far away from the target!"
+        text = "You completely missed the target!"
         color = (1, -1, -1)
 
     draw_centered_text(win, text, color)

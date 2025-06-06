@@ -23,7 +23,7 @@ def input_params(setup_data: dict, dev_mode=False) -> dict:
     
     params.update({
         "windowed": False,
-        "resolution": [1440,900],
+        "resolution": [1080          ,1920],
         "screenID": 0,
         "participantID": setup_data['participantID'],
         "participant_dir": create_participant_folder(setup_data['participantID']),
@@ -43,7 +43,7 @@ def main(dev_mode = False):
         screen=0,
         fullscr=False,
         units='pix',
-        colorSpace='rgb255',
+        colorSpace='rgb255',           
         color=[128, 128, 128],
     )
     setup = Experimental_Setup(
@@ -52,6 +52,7 @@ def main(dev_mode = False):
 
     setup_params = setup.run()
     params = input_params(setup_params, dev_mode)
+    params['debug'] = True # TODO: change later!
     window.close()
 
     win_config = {key : params.get(key) for key in [
@@ -88,6 +89,7 @@ def main(dev_mode = False):
     # )
 
     experiment.run()
+    vibration_controller.__del__()
 
 if __name__ == '__main__':
     # use the -d flag to 

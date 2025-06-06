@@ -433,7 +433,7 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        self.run_tutorial()
+        #self.run_tutorial()
         # Init
         self.clock.reset()
         # Trial sequence

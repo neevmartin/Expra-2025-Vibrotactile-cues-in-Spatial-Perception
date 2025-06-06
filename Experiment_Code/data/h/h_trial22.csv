@@ -1,0 +1,9 @@
+participant_id,trial_index,task,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+h,22,avoiding,Pre-Test,1,0,480.0,0.261,287.0,171.0,1,0,0
+h,22,avoiding,Pre-Test,1,0,480.0,0.318,287.0,172.0,1,0,0
+h,22,avoiding,Pre-Test,1,0,480.0,0.375,286.0,185.0,1,0,0
+h,22,avoiding,Pre-Test,1,0,480.0,0.435,277.0,209.0,1,0,0
+h,22,avoiding,Pre-Test,1,0,480.0,0.493,265.0,247.0,1,0,0
+h,22,avoiding,Pre-Test,1,0,480.0,0.556,261.0,296.0,1,0,0
+h,22,avoiding,Pre-Test,1,0,480.0,0.615,265.0,313.0,1,0,0
+h,22,avoiding,Pre-Test,1,0,480.0,0.676,265.0,314.0,0,0,0
