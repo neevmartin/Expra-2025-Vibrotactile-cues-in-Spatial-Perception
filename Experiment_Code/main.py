@@ -3,6 +3,7 @@ from config_loader import ExperimentConfig
 from vibration_controller import VibrationController
 from Experimental_Setup import Experimental_Setup
 from psychopy.visual import Window
+from psychopy import logging
 import os, sys
 
 def create_participant_folder(participant_id: str) -> str:
@@ -88,8 +89,10 @@ def main(dev_mode = False):
     #     debug = params['debug']
     # )
 
+    logging.console.setLevel(logging.ERROR)  # Only show errors, not warnings
+
     experiment.run()
-    vibration_controller.close()
+    #vibration_controller.close()
 
 if __name__ == '__main__':
     # use the -d flag to 
