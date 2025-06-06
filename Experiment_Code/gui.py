@@ -42,7 +42,7 @@ def draw_centered_text(win: visual.Window, text: str, text_color: tuple = (1, 1,
     text.draw()
 
 def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
-                      start_pos: tuple, target_pos: tuple, radius: int, end_pos: tuple = None):
+                      start_pos: tuple, stop_pos: tuple, radius: int, obstacle: tuple = None):
     """
     Displays the rails, start position, target position, trajectory, mouse when in debug mode
     Args:
@@ -60,17 +60,17 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
     rail_right = visual.Rect(win, width=0.5/31.1 * win.size[1], height=28/31.1 * win.size[1], units="pix", pos=[1/31.1 * win.size[1], 0.5/31.1 * win.size[1]])
 
     start = visual.Circle(win, radius=radius, pos=start_pos, fillColor='black')
-    target = visual.Circle(win, radius=radius, pos=target_pos, fillColor='black')
+    stop = visual.Circle(win, radius=radius, pos=stop_pos, fillColor='black')
 
-    if end_pos:
-        end = visual.Circle(win, radius=radius, pos=end_pos, fillcolor='yellow')
-        end.draw()
+    if obstacle:
+        obstacle = visual.Circle(win, radius=radius, pos=obstacle, fillColor='yellow')
+        obstacle.draw()
 
     rail_left.draw()
     rail_right.draw()
 
     start.draw()
-    target.draw()
+    stop.draw()
 
     if len(trajectory) > 0:
         drawn_line = [(x, y) for (_, x, y, _, _, _) in trajectory]

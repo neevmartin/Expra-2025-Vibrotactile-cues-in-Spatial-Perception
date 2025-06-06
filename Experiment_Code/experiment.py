@@ -986,13 +986,15 @@ class VibrotactileCueExperiment(Experiment):
         """
         mouse_pos = tablet.get_mouse().getPos()
         trajectory = tablet.get_trajectory() if self.trial_confirmation else []
+        current_task = self.current_trial.get('task')
         gui.draw_debug_screen(
             win=self.window, 
             trajectory=trajectory, 
             mouse_pos=mouse_pos, 
             start_pos=self.STARTPOS, 
-            target_pos=self.target_pos, 
-            radius=self.RADIUS
+            stop_pos=self.STOPPOS if current_task == 'avoiding' else self.target_pos,
+            radius=self.RADIUS,
+            obstacle=self.target_pos if current_task == 'avoiding' else None
         )
     
     # ------------------------------------------------------------------------------
