@@ -3,7 +3,7 @@
 # ==================================
 
 target_values: # Global target values used across all phases unless overridden in a phase
-  distances: [6, 10, 14, 18, 22, 26, 30]   # Default distances (%)
+  distances: [6, 10, 14, 18, 22, 26, 30]   # Default distances (cm)
   intensities: [28, 40, 52, 64, 76, 88, 100] #reverse of distance if mapping is reversed
 
 # ==================
