@@ -283,6 +283,8 @@ class VibrotactileCueExperiment(Experiment):
 
     break_index: int
 
+    AVOID_CONFIRM_RATIO: float
+
     def __init__(
             self, win_config: dict, 
             experiment_config: ExperimentConfig, 
@@ -324,6 +326,8 @@ class VibrotactileCueExperiment(Experiment):
         self.TUTORIAL_TRIAL_NUMBER = 10
 
         self.break_index = 0
+
+        self.AVOID_CONFIRM_RATIO = 0.3
 
         self.state = {
             'explanation': False,
@@ -852,15 +856,38 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        last_mouse_info = tablet.get_trajectory()[-1]
-        last_mouse_pos  = [last_mouse_info[1], last_mouse_info[2]]
+        trajectory      = tablet.get_trajectory()
+        confirm_mouse_info = trajectory[-1] if self.current_trial.get('task') == 'reaching' else self.find_exceed_thresh_pos(trajectory)
+        confirm_mouse_pos  = [confirm_mouse_info[1], confirm_mouse_info[2]]
 
-        gui.draw_text_feedback(self.window, self.target_pos, last_mouse_pos)
+        gui.draw_text_feedback(self.window, self.target_pos, confirm_mouse_pos)
         self.window.flip()
 
         start_time = core.getTime()
         while core.getTime() - start_time < self.FEEDBACK_INTERVAL:
             self.handle_keys()
+
+    def find_exceed_thresh_pos(self, trajectory: list):
+        """
+        Finds the first x-position in the trajectory that falls below the specified threshold.
+
+        Iterates through trajectory points and returns the x-coordinate of the first point
+        where x is less than the threshold.
+        If no such point is found, returns STOPPOS.
+
+        Args:
+            trajectory (list): List of mouse info tuples/lists where x-coordinate is at index 1.
+
+        Returns:
+            float: The x-coordinate that meets the condition or STOPPOS if none found.
+        """
+        for mouse_info in trajectory:
+            x = mouse_info[1]
+            current_distance = abs(self.STARTPOS[0] - x)
+            threshold = abs(self.STARTPOS[0] - self.STOPPOS[0]) * self.AVOID_CONFIRM_RATIO
+            if current_distance > threshold:
+                return x
+        return self.STOPPOS # returns end position if no point is found
 
     def give_explanation(
             self, 
