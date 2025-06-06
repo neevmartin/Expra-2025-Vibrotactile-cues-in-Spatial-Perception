@@ -23,7 +23,7 @@ def input_params(setup_data: dict, dev_mode=False) -> dict:
     
     params.update({
         "windowed": False,
-        "resolution": [1080          ,1920],
+        "resolution": [1080, 1920],
         "screenID": 0,
         "participantID": setup_data['participantID'],
         "participant_dir": create_participant_folder(setup_data['participantID']),
@@ -89,7 +89,7 @@ def main(dev_mode = False):
     # )
 
     experiment.run()
-    vibration_controller.__del__()
+    vibration_controller.close()
 
 if __name__ == '__main__':
     # use the -d flag to 
