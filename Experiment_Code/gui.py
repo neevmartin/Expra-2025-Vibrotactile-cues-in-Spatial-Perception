@@ -10,9 +10,6 @@ def draw_centered_image(win, image_path):
     - win: the window we are working on
     - image_path: path to the image file (e.g., 'images/photo.jpg')
     """
-    win.color = 'white'
-    win.flip()
-
     temp_image = visual.ImageStim(win, image=image_path, units='pix')
     original_size = temp_image.size
     image_aspect = original_size[1] / original_size[0]
@@ -26,12 +23,12 @@ def draw_centered_image(win, image_path):
         win,
         image=image_path,
         units='pix',
-        size=(scaled_width/2, scaled_height/2),
-        pos=(0, 0)
+        size=(scaled_width, scaled_height),
+        pos=(0, 0),
+        interpolate=True
     )
 
     image.draw()
-    win.flip()
 
 def draw_centered_text(win: visual.Window, text: str, text_color: tuple = (1, 1, 1)):
     """
@@ -58,9 +55,13 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
     """
     my_cursor = visual.Circle(win, pos=mouse_pos, radius=10, fillColor='red', lineColor='red')
 
-    # The positions and size of the rails TO BE CHANGED LATER
-    rail_left = visual.Rect(win, width=30, height=200, units="pix", pos=[-50, 0])
-    rail_right = visual.Rect(win, width=30, height=200, units="pix", pos=[50, 0])
+    # Use for monitor
+    rail_left = visual.Rect(win, width=1.5, height=28, units="cm", pos=[-1.5, 0.5])
+    rail_right = visual.Rect(win, width=1.5, height=28, units="cm", pos=[1.5, 0.5])
+
+    # Use at home
+    # rail_left = visual.Rect(win, width=1.5, height=18, units="cm", pos=[-1.5, 0.5])
+    # rail_right = visual.Rect(win, width=1.5, height=18, units="cm", pos=[1.5, 0.5])
 
     start = visual.Circle(win, radius=radius, pos=start_pos, fillColor='black')
     target = visual.Circle(win, radius=radius, pos=target_pos, fillColor='black')
@@ -86,16 +87,29 @@ def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple):
         target_pos: the expected position of the target
         stop_pos: the actual position of the participant
     """
-    off_point = f"{np.abs(target_pos[1] - stop_pos[1]):.2f}"
+    off_point = np.abs(target_pos[1] - stop_pos[1])
 
-    if float(off_point) < 1: # Threshold to be changed later
+    # Use for monitor
+    monitor_height_cm = 69.84
+    threshold_green = 1 * win.size[1] / monitor_height_cm
+    threshold_yellow = 4 * win.size[1] / monitor_height_cm
+
+    # Use at home
+    # monitor_height_cm = 18.5
+    # threshold_green = 1 * win.size[1] / monitor_height_cm
+    # threshold_yellow = 4 * win.size[1] / monitor_height_cm
+
+    if off_point < threshold_green:
         text = "You correctly reached the target!"
         color = (-1, 1, -1)
-    elif target_pos[1] > stop_pos[1]:
-        text = "You were undershoot by distance = " + off_point
-        color = (1, -1, -1)
+    elif off_point < threshold_yellow and target_pos[1] > stop_pos[1]:
+        text = "You were slightly undershoot!"
+        color = (1, 1, -1)
+    elif off_point < threshold_yellow and target_pos[1] < stop_pos[1]:
+        text = "You were slightly overshoot!"
+        color = (1, 1, -1)
     else:
-        text = "You were overshoot by distance = " + off_point
+        text = "You were far away from the target!"
         color = (1, -1, -1)
 
     draw_centered_text(win, text, color)
