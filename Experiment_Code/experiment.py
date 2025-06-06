@@ -287,6 +287,8 @@ class VibrotactileCueExperiment(Experiment):
     AVOID_CONFIRM_RATIO: float
     MAX_CONFIRM_DISTANCE: int
 
+    TABLET_HEIGHT: float
+
     def __init__(
             self, win_config: dict, 
             experiment_config: ExperimentConfig, 
@@ -331,6 +333,8 @@ class VibrotactileCueExperiment(Experiment):
 
         self.AVOID_CONFIRM_RATIO = 0.3
         self.MAX_CONFIRM_DISTANCE = 10
+
+        self.TABLET_HEIGHT = 31.1 # cm
 
         self.state = {
             'explanation': False,
@@ -992,7 +996,8 @@ class VibrotactileCueExperiment(Experiment):
             mouse_pos=mouse_pos, 
             start_pos=self.STARTPOS, 
             target_pos=self.target_pos, 
-            radius=self.RADIUS
+            radius=self.RADIUS,
+            end_pos=self.STOPPOS
         )
     
     # ------------------------------------------------------------------------------
@@ -1018,7 +1023,7 @@ class VibrotactileCueExperiment(Experiment):
         """
 
         target_posX = self.STARTPOS[0]
-        target_posY = distance / 31.1 * self.window.size[1]
+        target_posY = distance / self.TABLET_HEIGHT * self.window.size[1]
 
         self.target_pos = [target_posX, target_posY]
 

@@ -63,7 +63,7 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
     target = visual.Circle(win, radius=radius, pos=target_pos, fillColor='black')
 
     if end_pos:
-        end = visual.Circle(win, radius=radius, pos=end_pos, fillcolor='yellow')
+        end = visual.Circle(win, radius=radius, pos=end_pos, fillColor='yellow')
         end.draw()
 
     rail_left.draw()
