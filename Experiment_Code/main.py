@@ -21,7 +21,7 @@ def create_participant_folder(participant_id: str) -> str:
 
 def input_params(setup_data: dict, dev_mode=False) -> dict:
     params = {}
-    
+     
     params.update({
         "windowed": False,
         "resolution": [1080, 1920],
@@ -53,7 +53,6 @@ def main(dev_mode = False):
 
     setup_params = setup.run()
     params = input_params(setup_params, dev_mode)
-    params['debug'] = True # TODO: change later!
     window.close()
 
     win_config = {key : params.get(key) for key in [
