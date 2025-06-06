@@ -9,6 +9,7 @@ from config_loader import ExperimentConfig
 from vibration_controller import VibrationController
 from explanation import Explanation
 
+import numpy as np
 from psychopy import core
 from psychopy import event
 from psychopy.visual import Window
@@ -284,6 +285,7 @@ class VibrotactileCueExperiment(Experiment):
     break_index: int
 
     AVOID_CONFIRM_RATIO: float
+    MAX_CONFIRM_DISTANCE: int
 
     def __init__(
             self, win_config: dict, 
@@ -328,6 +330,7 @@ class VibrotactileCueExperiment(Experiment):
         self.break_index = 0
 
         self.AVOID_CONFIRM_RATIO = 0.3
+        self.MAX_CONFIRM_DISTANCE = 10
 
         self.state = {
             'explanation': False,
@@ -690,16 +693,21 @@ class VibrotactileCueExperiment(Experiment):
             bool: True if the trial is confirmed, False otherwise.
         """
         if tablet.get_mouse() != None: # if used before init trial
-            mouse_pressed = tablet.get_mouse().getPressed()[0]
+            mouse_info = tablet.get_mouse()
+            mouse_pos = mouse_info.getPos()
+            mouse_pressed = mouse_info.getPressed()[0]
         else:
-            mouse_pressed = event.Mouse().getPressed()[0]
+            mouse_info = event.Mouse()
+            mouse_pos = mouse_info.getPos()
+            mouse_pressed = mouse_info.getPressed()[0]
 
         if self.trial_confirmed:
             # Trial is running and participant must release the mouse button.
             confirmed = self.mouse_pressed_last_frame and not mouse_pressed
         else:
             # Trial needs to be confirmed with a button press by the participant.
-            confirmed = mouse_pressed and not self.mouse_pressed_last_frame
+            distance_from_start = np.sqrt((mouse_pos[0] - self.STARTPOS[0])**2 + (mouse_pos[1] - self.STARTPOS[1])**2)
+            confirmed = mouse_pressed and not self.mouse_pressed_last_frame and distance_from_start < self.MAX_CONFIRM_DISTANCE
 
         self.mouse_pressed_last_frame = mouse_pressed
 
