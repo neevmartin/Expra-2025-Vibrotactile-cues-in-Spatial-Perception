@@ -55,12 +55,9 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
     """
     my_cursor = visual.Circle(win, pos=mouse_pos, radius=10, fillColor='red', lineColor='red')
 
-    # Use for monitor
+    # Only runs correctly with the monitor
     rail_left = visual.Rect(win, width=0.5/31.1 * win.size[1], height=28/31.1 * win.size[1] , units="pix", pos=[-1/31.1 * win.size[1] , 0.5/31.1 * win.size[1]])
     rail_right = visual.Rect(win, width=0.5/31.1 * win.size[1], height=28/31.1 * win.size[1], units="pix", pos=[1/31.1 * win.size[1], 0.5/31.1 * win.size[1]])
-    # Use at home
-    # rail_left = visual.Rect(win, width=1.5, height=18, units="cm", pos=[-1.5, 0.5])
-    # rail_right = visual.Rect(win, width=1.5, height=18, units="cm", pos=[1.5, 0.5])
 
     start = visual.Circle(win, radius=radius, pos=start_pos, fillColor='black')
     target = visual.Circle(win, radius=radius, pos=target_pos, fillColor='black')
@@ -88,13 +85,9 @@ def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple):
     """
     off_point = np.abs(target_pos[1] - stop_pos[1])
 
-    # Use for monitor
+    # Only runs correctly with the monitor
     threshold_green = 0.5/31.1 * win.size[1]
     threshold_yellow = 4/31.1 * win.size[1]
-
-    # Use at home
-    # threshold_green = 0.5/18.5 * win.size[1] 
-    # threshold_yellow = 4/18.5 * win.size[1]
 
     if off_point < threshold_green:
         text = "You hit the target!"

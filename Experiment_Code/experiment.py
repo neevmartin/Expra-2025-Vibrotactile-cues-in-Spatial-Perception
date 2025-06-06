@@ -991,7 +991,7 @@ class VibrotactileCueExperiment(Experiment):
     # Setup initilizations
     # ------------------------------------------------------------------------------
     
-    def init_target(self, percent_distance: float) -> None:
+    def init_target(self, distance: float) -> None:
         """
         Initializes the target position based on a percentage distance.
 
@@ -1003,15 +1003,14 @@ class VibrotactileCueExperiment(Experiment):
         As a reference we use the maximum and minimum target distance allowed.
 
         Args:
-            percent_distance (float): Target distance as a percentage (0–100).
+            distance (float): Target distance in cm.
 
         Returns:
             None
         """
-        relative_distance = percent_distance * .01
 
         target_posX = self.STARTPOS[0]
-        target_posY = self.MIN_TARGETDIST + self.MAX_TARGETDIST * relative_distance
+        target_posY = distance / 31.1 * self.window.size[1]
 
         self.target_pos = [target_posX, target_posY]
 
