@@ -1,4 +1,5 @@
 import os
+import time
 
 from typing import Literal, Any
 from warnings import warn
@@ -597,18 +598,23 @@ class VibrotactileCueExperiment(Experiment):
                 self.draw_debug()
 
             self.window.flip()
-
-        self.last_trial_time = self.clock.getTime() # use this for output intervals every 10 ms
         
+        self.last_trial_time = self.clock.getTime()
+
+        last_scan = self.clock.getTime()
         while self.trial_running: # TASK
             self.handle_keys()
-
             self.update_trial()
 
             if self.debug:
                 self.draw_debug()
+                self.window.flip()
 
-            self.window.flip()
+            delta_time = self.config.get_scan_time() - abs(self.clock.getTime() - last_scan)
+            if delta_time > 0:
+                time.sleep(delta_time)
+
+            last_scan = self.clock.getTime() # use this for output intervals every 10 ms
 
         if self.state['feedback'] == True: # FEEDBACK
             self.give_feedback()

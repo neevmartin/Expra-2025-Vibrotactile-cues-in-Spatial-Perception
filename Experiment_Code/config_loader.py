@@ -259,6 +259,9 @@ class ExperimentConfig:
     def get_phases(self):
         """Return the ordered list of phases for the selected mapping."""
         return self.config["subgroups"][self.mapping]["phases"]
+    
+    def get_scan_time(self) -> float:
+        return int(self.config["scan_time"])/1000.0
 
     def get_total_trials(self):
         """Return the total number of trials in the current trial sequence."""
