@@ -642,7 +642,8 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        self.vibrotactile_cue(intensity_percentage=100) # CUE
+        intensity_percentage = np.random.choice([50, 100]) # uniformly chosen intensities
+        self.vibrotactile_cue(intensity_percentage=intensity_percentage) # CUE
 
         while not self.trial_confirmed: # CONFIRMATION
             self.handle_keys()
