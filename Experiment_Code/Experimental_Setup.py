@@ -195,7 +195,7 @@ class Experimental_Setup:
         RIGHT arrow → "Inverse" mapping  
         ESC or Q exits the program.
         """
-        prompt = visual.TextStim(self.win, text="Select Mapping:\n\nLeft Arrow = Direct\nRight Arrow = Inverse", pos=(0, 200), height=26)
+        prompt = visual.TextStim(self.win, text="Select Mapping:\n\nLeft Arrow = Direct\nRight Arrow = Inverse", pos=(0, 100), height=26)
         left_label = visual.TextStim(self.win, text="Direct", pos=(-150, -50), height=22)
         right_label = visual.TextStim(self.win, text="Inverse", pos=(150, -50), height=22)
         box_left = visual.Rect(self.win, width=200, height=100, pos=(-150, -50), fillColor="lightblue")
