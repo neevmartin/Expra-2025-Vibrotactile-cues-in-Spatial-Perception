@@ -642,7 +642,7 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        intensity_percentage = np.random.choice([50, 100]) # uniformly chosen intensities
+        intensity_percentage = np.random.choice([30, 100]) # uniformly chosen intensities
         self.vibrotactile_cue(intensity_percentage=intensity_percentage) # CUE
 
         while not self.trial_confirmed: # CONFIRMATION
@@ -929,8 +929,9 @@ class VibrotactileCueExperiment(Experiment):
             None
         """
         trajectory      = tablet.get_trajectory()
-        confirm_mouse_info = trajectory[-1] if self.current_trial.get('task') == 'reaching' else self.find_exceed_thresh_pos(trajectory)
-        confirm_mouse_pos  = [confirm_mouse_info[1], confirm_mouse_info[2]]
+        last_mouse_pos = (trajectory[-1][1], trajectory[-1][2])
+        confirm_mouse_info = last_mouse_pos if self.current_trial.get('task') == 'reaching' else self.find_exceed_thresh_pos(trajectory)
+        confirm_mouse_pos  = [confirm_mouse_info[0], confirm_mouse_info[1]]
 
         gui.draw_text_feedback(self.window, self.target_pos, confirm_mouse_pos)
         self.window.flip()
@@ -953,13 +954,15 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             float: The x-coordinate that meets the condition or STOPPOS if none found.
         """
+        mouse_position = self.STOPPOS # returns end position if no point is found
         for mouse_info in trajectory:
             x = mouse_info[1]
             current_distance = abs(self.STARTPOS[0] - x)
             threshold = abs(self.STARTPOS[0] - self.STOPPOS[0]) * self.AVOID_CONFIRM_RATIO
             if current_distance > threshold:
-                return mouse_info
-        return self.STOPPOS # returns end position if no point is found
+                mouse_position = (mouse_info[1], mouse_info[2])
+                break
+        return mouse_position 
 
     def give_explanation(
             self, 
