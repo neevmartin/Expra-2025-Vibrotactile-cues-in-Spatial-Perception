@@ -1,0 +1,9 @@
+participant_id,trial_index,task,mappingphase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+denniz,9,avoiding,None,Pre-Test,1,-26.05,645.14,3.403,-37.0,-828.0,1,0,0
+denniz,9,avoiding,None,Pre-Test,1,-26.05,645.14,3.478,-37.0,-828.0,1,0,0
+denniz,9,avoiding,None,Pre-Test,1,-26.05,645.14,3.553,-37.0,-828.0,1,0,0
+denniz,9,avoiding,None,Pre-Test,1,-26.05,645.14,3.627,-37.0,-828.0,1,0,0
+denniz,9,avoiding,None,Pre-Test,1,-26.05,645.14,3.702,-36.0,-796.0,1,0,0
+denniz,9,avoiding,None,Pre-Test,1,-26.05,645.14,3.777,-36.0,-740.0,1,0,0
+denniz,9,avoiding,None,Pre-Test,1,-26.05,645.14,3.854,-36.0,-719.0,1,0,0
+denniz,9,avoiding,None,Pre-Test,1,-26.05,645.14,3.932,-36.0,-718.0,0,0,0

@@ -1,0 +1,2 @@
+participant_id,trial_index,task,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+lingyue3,20,reaching,Pre-Test,1,-26.05,892.09,1.487,-39.0,-829.0,0,0,0

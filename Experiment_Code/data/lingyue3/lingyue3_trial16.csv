@@ -1,0 +1,13 @@
+participant_id,trial_index,task,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+lingyue3,16,reaching,Pre-Test,1,-26.05,-589.58,1.773,-37.0,-830.0,1,0,0
+lingyue3,16,reaching,Pre-Test,1,-26.05,-589.58,1.832,-39.0,-829.0,1,0,0
+lingyue3,16,reaching,Pre-Test,1,-26.05,-589.58,1.892,-39.0,-804.0,1,0,0
+lingyue3,16,reaching,Pre-Test,1,-26.05,-589.58,1.951,-39.0,-781.0,1,0,0
+lingyue3,16,reaching,Pre-Test,1,-26.05,-589.58,2.011,-39.0,-747.0,1,0,0
+lingyue3,16,reaching,Pre-Test,1,-26.05,-589.58,2.071,-39.0,-716.0,1,0,0
+lingyue3,16,reaching,Pre-Test,1,-26.05,-589.58,2.131,-39.0,-695.0,1,0,0
+lingyue3,16,reaching,Pre-Test,1,-26.05,-589.58,2.2,-39.0,-671.0,1,0,0
+lingyue3,16,reaching,Pre-Test,1,-26.05,-589.58,2.259,-39.0,-668.0,1,0,0
+lingyue3,16,reaching,Pre-Test,1,-26.05,-589.58,2.317,-39.0,-668.0,1,0,0
+lingyue3,16,reaching,Pre-Test,1,-26.05,-589.58,2.374,-39.0,-668.0,1,0,0
+lingyue3,16,reaching,Pre-Test,1,-26.05,-589.58,2.433,-39.0,-663.0,0,0,0

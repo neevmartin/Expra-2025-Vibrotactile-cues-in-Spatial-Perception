@@ -1,0 +1,12 @@
+participant_id,trial_index,task,mappingphase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+deniz2,5,reaching,None,Pre-Test,1,-26.05,-95.69,1.393,-37.0,-826.0,1,0,0
+deniz2,5,reaching,None,Pre-Test,1,-26.05,-95.69,1.471,-37.0,-824.0,1,0,0
+deniz2,5,reaching,None,Pre-Test,1,-26.05,-95.69,1.552,-37.0,-745.0,1,0,0
+deniz2,5,reaching,None,Pre-Test,1,-26.05,-95.69,1.633,-37.0,-630.0,1,0,0
+deniz2,5,reaching,None,Pre-Test,1,-26.05,-95.69,1.715,-37.0,-499.0,1,0,0
+deniz2,5,reaching,None,Pre-Test,1,-26.05,-95.69,1.798,-37.0,-359.0,1,0,0
+deniz2,5,reaching,None,Pre-Test,1,-26.05,-95.69,1.884,-37.0,-240.0,1,0,0
+deniz2,5,reaching,None,Pre-Test,1,-26.05,-95.69,1.967,-36.0,-156.0,1,0,0
+deniz2,5,reaching,None,Pre-Test,1,-26.05,-95.69,2.051,-36.0,-116.0,1,0,0
+deniz2,5,reaching,None,Pre-Test,1,-26.05,-95.69,2.131,-36.0,-102.0,1,0,0
+deniz2,5,reaching,None,Pre-Test,1,-26.05,-95.69,2.214,-34.0,-101.0,0,0,0

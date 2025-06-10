@@ -1,0 +1,15 @@
+participant_id,trial_index,task,mappingphase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,1.876,-39.0,-834.0,1,0,0
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,1.934,-39.0,-834.0,1,0,0
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,1.991,-38.0,-830.0,1,0,0
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,2.049,-38.0,-790.0,1,0,0
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,2.106,-38.0,-717.0,1,0,0
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,2.163,-38.0,-646.0,1,0,0
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,2.22,-38.0,-574.0,1,0,0
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,2.277,-37.0,-502.0,1,0,0
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,2.333,-37.0,-493.0,1,0,0
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,2.391,-37.0,-493.0,1,0,0
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,2.448,-37.0,-493.0,1,0,0
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,2.504,-37.0,-493.0,1,0,0
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,2.561,-38.0,-493.0,1,0,0
+lkngyue5,2,reaching,None,Pre-Test,1,-26.05,-589.58,2.618,-39.0,-492.0,0,0,0
