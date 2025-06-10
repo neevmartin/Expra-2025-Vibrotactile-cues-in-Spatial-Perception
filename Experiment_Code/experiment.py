@@ -282,6 +282,7 @@ class VibrotactileCueExperiment(Experiment):
     text_confirmed: bool
     trial_confirmed: bool
     mouse_pressed_last_frame: bool
+    right_button_pressed_last_frame: bool
 
     trial_running: bool
     TUTORIAL_TRIAL_NUMBER: int
@@ -333,6 +334,7 @@ class VibrotactileCueExperiment(Experiment):
         self.text_confirmed = False
         self.trial_confirmed = False
         self.mouse_pressed_last_frame = False
+        self.right_button_pressed_last_frame = False
 
         self.TUTORIAL_TRIAL_NUMBER = 10
 
@@ -368,8 +370,9 @@ class VibrotactileCueExperiment(Experiment):
         for key in keys:
             if key == "q" or key == "escape":
                 self.exit()
-            if key == "return":
-                self.text_confirmed = True
+
+        if self.right_button_pressed():
+            self.text_confirmed = True
 
     def wait_confirm(self) -> None:
         """
@@ -726,6 +729,16 @@ class VibrotactileCueExperiment(Experiment):
         self.mouse_pressed_last_frame = mouse_pressed
 
         return confirmed
+    
+    def right_button_pressed(self):
+        mouse = event.Mouse()
+        right_button_pressed = mouse.getPressed()[2]
+
+        pressed = right_button_pressed and not self.right_button_pressed_last_frame
+
+        self.right_button_pressed_last_frame = right_button_pressed
+
+        return pressed
     
     def tutorial_trial_confirmation(self) -> bool:
         """
