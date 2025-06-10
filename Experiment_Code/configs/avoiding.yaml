@@ -3,7 +3,7 @@
 # ==================================
 
 target_values: # Global target values used across all phases unless overridden in a phase
-  distances: [6, 10, 14, 18, 22, 26, 30]   # Default distances (cm)
+  distances: [6.4, 10, 13.6, 17.2, 20.8, 24.6, 28]   # Default distances (cm)
   intensities: [28, 40, 52, 64, 76, 88, 100] #reverse of distance if mapping is reversed
 
 # Scan time refers to the time interval between probing of the display mouse position in ms
@@ -36,7 +36,7 @@ subgroups:
         task: "avoiding"
         blocks: 5
         # Overriding default target and intensity values for the training phase
-        target_distances: [6, 14, 22, 30]
+        target_distances: [6.4, 13.6, 20.8, 28]
         intensity_levels: [28, 52, 76, 100]
         repetitions: 10
 
@@ -48,7 +48,7 @@ subgroups:
       - name: "Recap"
         task: "avoiding"
         blocks: 1
-        target_distances: [6, 14, 22, 30]
+        target_distances: [6.4, 13.6, 20.8, 28]
         intensity_levels: [28, 52, 76, 100]
         repetitions: 10
 
@@ -77,7 +77,7 @@ subgroups:
         task: "avoiding"
         blocks: 5
         # Overriding default target and intensity values for the training phase
-        target_distances: [6, 14, 22, 30]
+        target_distances: [6.4, 13.6, 20.8, 28]
         intensity_levels: [100, 76, 52, 28] #Reversed
         repetitions: 10
 
@@ -89,7 +89,7 @@ subgroups:
       - name: "Recap"
         task: "avoiding"
         blocks: 1
-        target_distances: [6, 14, 22, 30]
+        target_distances: [6.4, 13.6, 20.8, 28]
         intensity_levels: [100, 76, 52, 28] #Reversed
         repetitions: 10
 
