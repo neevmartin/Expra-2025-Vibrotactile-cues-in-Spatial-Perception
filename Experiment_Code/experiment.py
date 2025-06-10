@@ -205,6 +205,10 @@ class VibrotactileCueExperiment(Experiment):
             trial and keeping track of the 10ms we 
             collect the data.
 
+        TRIAL_START_TEXT_INTERVAL (flaot):
+            Specifies the time for the 'Trial starts.' text shown in the
+            beginning of each trial in seconds. This is not the PTI!
+
         CUE_INTERVAL (float):
             Specifies the time for each vibrotactile cue.
             Timing is (roughly) specified to match the participant's JND.
@@ -278,6 +282,7 @@ class VibrotactileCueExperiment(Experiment):
 
     clock: Clock
     last_trial_time: float
+    TRIAL_START_TEXT_INTERVAL: float
     CUE_INTERVAL: float
     OUTPUT_INTERVAL: float
     FEEDBACK_INTERVAL: float
@@ -331,6 +336,7 @@ class VibrotactileCueExperiment(Experiment):
 
         self.clock = Clock()
         # Time in seconds
+        self.TRIAL_START_TEXT_INTERVAL = 0.3
         self.CUE_INTERVAL = 0.2 # as suggested by literature
         self.OUTPUT_INTERVAL = 0.01
         self.FEEDBACK_INTERVAL = 0.7
@@ -391,6 +397,22 @@ class VibrotactileCueExperiment(Experiment):
         """
         self.text_confirmed = False
         while not self.text_confirmed:
+            self.handle_keys()
+
+    def wait_time(self, time: float) -> None:
+        """
+        Waits until the given time in seconds is up.
+
+        Has side effects and ensures global integration of key handler.
+
+        Args:
+            time (float): The time to be waited for in seconds.
+
+        Returns:
+            None
+        """
+        t = self.clock.getTime()
+        while self.clock.getTime() - t < time:
             self.handle_keys()
 
     def show_text_prompt(self, text: str) -> None:
@@ -501,7 +523,7 @@ class VibrotactileCueExperiment(Experiment):
     def run_outro(self):
         self.show_text_prompt(
             'Thank you for your participation in our study! \n' \
-           'Press ENTER to close the experiment window.'
+           'Press the big pen button to close the experiment window.'
         )
 
     def update_state(self, previous_trial: dict, current_trial: dict) -> None:
@@ -687,11 +709,12 @@ class VibrotactileCueExperiment(Experiment):
         
         # Cue message (optional)
         gui.draw_centered_text(win=self.window, text='Trial starts.')
-        self.window.flip()
 
-        t = self.clock.getTime()
-        while self.clock.getTime() - t < self.PTI:
-            self.handle_keys()
+        self.window.flip()
+        self.wait_time(self.TRIAL_START_TEXT_INTERVAL)
+
+        self.window.flip() # time without text
+        self.wait_time(self.PTI)
 
         # Vibration should succeed before drawing so timing lines up
         if intensity_percentage == None:
@@ -705,9 +728,7 @@ class VibrotactileCueExperiment(Experiment):
             warn('No Arduino board detected - cue suppressed.', category=RuntimeWarning)
 
         # Safely wait for cue to end
-        t = self.clock.getTime()
-        while self.clock.getTime() - t < self.CUE_INTERVAL:
-            self.handle_keys()
+        self.wait_time(self.CUE_INTERVAL)
 
 
     def trial_confirmation(self) -> bool:
@@ -908,10 +929,8 @@ class VibrotactileCueExperiment(Experiment):
             None
 
         """
-        t = self.clock.getTime() # We can use get time here because we are only concerned with the time interval!
         self.window.flip()
-        while self.clock.getTime() - t < self.ITI:
-            self.handle_keys()
+        self.wait_time(self.ITI)
 
     # ------------------------------------------------------------------------------
     # Interruption control methods
@@ -936,9 +955,7 @@ class VibrotactileCueExperiment(Experiment):
         gui.draw_text_feedback(self.window, self.target_pos, confirm_mouse_pos)
         self.window.flip()
 
-        start_time = core.getTime()
-        while core.getTime() - start_time < self.FEEDBACK_INTERVAL:
-            self.handle_keys()
+        self.wait_time(self.FEEDBACK_INTERVAL)
 
     def find_exceed_thresh_pos(self, trajectory: list):
         """
