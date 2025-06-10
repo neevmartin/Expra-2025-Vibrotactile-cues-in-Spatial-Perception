@@ -216,6 +216,10 @@ class VibrotactileCueExperiment(Experiment):
         FEEDBACK_INTERVAL(float):
             Interval in seconds how long the feedback text should be shown.
 
+        PTI (float):
+            The pre trial interval in seconds.
+            Is used before cue is being played.    
+
         ITI (float):
             The inter trial interval in seconds.
             Is used after feedback has been given.
@@ -277,6 +281,7 @@ class VibrotactileCueExperiment(Experiment):
     CUE_INTERVAL: float
     OUTPUT_INTERVAL: float
     FEEDBACK_INTERVAL: float
+    PTI: float
     ITI: float
 
     text_confirmed: bool
@@ -329,6 +334,7 @@ class VibrotactileCueExperiment(Experiment):
         self.CUE_INTERVAL = 0.2 # as suggested by literature
         self.OUTPUT_INTERVAL = 0.01
         self.FEEDBACK_INTERVAL = 0.7
+        self.PTI = 0.5
         self.ITI =  0.2
 
         self.text_confirmed = False
@@ -452,7 +458,7 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        #self.run_tutorial()
+        self.run_tutorial()
         # Init
         self.clock.reset()
         # Trial sequence
@@ -679,8 +685,12 @@ class VibrotactileCueExperiment(Experiment):
         """
         
         # Cue message (optional)
-        gui.draw_centered_text(win=self.window, text='Cue playing...')
+        gui.draw_centered_text(win=self.window, text='Trial starts.')
         self.window.flip()
+
+        t = self.clock.getTime()
+        while self.clock.getTime() - t < self.PTI:
+            self.handle_keys()
 
         # Vibration should succeed before drawing so timing lines up
         if intensity_percentage == None:
