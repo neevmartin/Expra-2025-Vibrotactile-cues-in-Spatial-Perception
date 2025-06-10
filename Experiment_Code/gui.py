@@ -79,13 +79,14 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
 
     my_cursor.draw()
 
-def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple):
+def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple, task: str):
     """
     Calculates the distance to the expected target and displays this as a feedback
     Args:
         win: the window we are working on
         target_pos: the expected position of the target
         stop_pos: the actual position of the participant
+        task: the current task, avoiding or reaching
     """
     off_point = np.abs(target_pos[1] - stop_pos[1])
 
@@ -93,17 +94,33 @@ def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple):
     threshold_green = 0.5/31.1 * win.size[1]
     threshold_yellow = 4/31.1 * win.size[1]
 
-    if off_point < threshold_green:
-        text = "You hit the target!"
-        color = (-1, 1, -1)
-    elif off_point < threshold_yellow and target_pos[1] > stop_pos[1]:
-        text = "You slightly undershot the target!"
-        color = (1, 1, -1)
-    elif off_point < threshold_yellow and target_pos[1] < stop_pos[1]:
-        text = "You slightly overshot the target!"
-        color = (1, 1, -1)
+    if task == "reaching":
+        if off_point < threshold_green:
+            text = "You hit the target!"
+            color = (-1, 1, -1)
+        elif off_point < threshold_yellow and target_pos[1] > stop_pos[1]:
+            text = "You slightly undershot the target!"
+            color = (1, 1, -1)
+        elif off_point < threshold_yellow and target_pos[1] < stop_pos[1]:
+            text = "You slightly overshot the target!"
+            color = (1, 1, -1)
+        else:
+            text = "You completely missed the target!"
+            color = (1, -1, -1)
+            
     else:
-        text = "You completely missed the target!"
-        color = (1, -1, -1)
+        if off_point < threshold_green:
+            text = "You avoided the obstacle successfully!"
+            color = (-1, 1, -1)
+        elif off_point < threshold_yellow and target_pos[1] > stop_pos[1]:
+            text = "You avoided the obstacle too early!"
+            color = (1, 1, -1)
+        elif off_point > threshold_green and target_pos[1] < stop_pos[1]:
+            text = "You hit the obstacle!"
+            color = (1, -1, -1)
+        else:
+            text = "You avoided the obstacle way too early!"
+            color = (1, -1, -1)
+            
 
     draw_centered_text(win, text, color)

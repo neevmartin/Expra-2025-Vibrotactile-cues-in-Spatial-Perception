@@ -952,7 +952,7 @@ class VibrotactileCueExperiment(Experiment):
         confirm_mouse_info = last_mouse_pos if self.current_trial.get('task') == 'reaching' else self.find_exceed_thresh_pos(trajectory)
         confirm_mouse_pos  = [confirm_mouse_info[0], confirm_mouse_info[1]]
 
-        gui.draw_text_feedback(self.window, self.target_pos, confirm_mouse_pos)
+        gui.draw_text_feedback(self.window, self.target_pos, confirm_mouse_pos, self.current_trial.get("task"))
         self.window.flip()
 
         self.wait_time(self.FEEDBACK_INTERVAL)
