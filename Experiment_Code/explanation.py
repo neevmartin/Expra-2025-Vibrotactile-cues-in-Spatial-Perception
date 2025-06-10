@@ -1,7 +1,9 @@
 from enum import Enum
 class Explanation(Enum):
     INTRODUCTION = ["text_slides/Folie1.JPG", "text_slides/Folie2.JPG", "text_slides/Folie3.JPG"]
-    TUTORIAL = ["text_slides/Folie4.JPG"]
+
+    TUTORIAL_REACHING = ["text_slides/Folie4.JPG"]
+    TUTORIAL_AVOIDING = ["text_slides/Folie4.JPG"]
 
     PRETEST_REACHING1 = ["text_slides/Folie5.JPG"]
     PRETEST_REACHING2 = ["text_slides/Folie6.JPG"]

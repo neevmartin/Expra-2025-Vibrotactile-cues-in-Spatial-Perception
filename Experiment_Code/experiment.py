@@ -561,8 +561,17 @@ class VibrotactileCueExperiment(Experiment):
         """
         self.run_explanation_sequence(Explanation.TUTORIAL.value)
 
-        for _ in range(10):
+        explanation_seq1 = Explanation.TUTORIAL_AVOIDING.value if self.config.mode == 'avoiding' else Explanation.TUTORIAL_REACHING.value
+        explanation_seq2 = Explanation.TUTORIAL_REACHING.value if explanation_seq1 == Explanation.TUTORIAL_AVOIDING.value else Explanation.TUTORIAL_REACHING.value
+
+        self.run_explanation_sequence(explanation_seq1)
+        for _ in range(6):
             self.run_tutorial_trial()
+
+        self.run_explanation_sequence(explanation_seq2)
+        for _ in range(6):
+            self.run_tutorial_trial()
+        
 
     # ------------------------------------------------------------------------------
     # Trial control
