@@ -817,6 +817,7 @@ class VibrotactileCueExperiment(Experiment):
             'participant_id': self.participant.get('participantID'),
             'trial_index': self.current_trial.get('trial_index') if self.current_trial.get('trial_index') is not None else -1,
             'task': self.current_trial.get('task'),
+            'mapping': self.current_trial.get('mapping'),
             'phase': self.current_trial.get('phase'),
             'block': self.current_trial.get('block'),
             'target_pos_x': round(self.target_pos[0], 2), # probably won't deviate from 0
@@ -862,6 +863,7 @@ class VibrotactileCueExperiment(Experiment):
             'participant_id',
             'trial_index',
             'task',
+            'mapping'
             'phase',
             'block',
             'target_pos_x',
@@ -882,6 +884,7 @@ class VibrotactileCueExperiment(Experiment):
                     self.participant.get('participantID'),
                     self.config.get_trial_index(),
                     self.current_trial.get('task'),
+                    self.current_trial.get('mapping'),
                     self.current_trial.get('phase'),
                     self.current_trial.get('block'),
                     round(self.target_pos[0], 2),
