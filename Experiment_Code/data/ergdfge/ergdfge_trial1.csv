@@ -1,4 +1,0 @@
-participant_id,trial_index,task,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
-ergdfge,1,avoiding,Pre-Test,1,0,480.0,6.491,-61.0,-821.0,1,0,0
-ergdfge,1,avoiding,Pre-Test,1,0,480.0,6.549,-61.0,-821.0,1,0,0
-ergdfge,1,avoiding,Pre-Test,1,0,480.0,6.607,-62.0,-820.0,0,0,0

@@ -1,27 +1,27 @@
 from enum import Enum
 class Explanation(Enum):
-    INTRODUCTION = ["text_slides/Folie1.JPG", "text_slides/Folie2.JPG"]
+    INTRODUCTION = ["text_slides/preparation.JPG", "text_slides/overview.JPG"]
 
-    TUTORIAL = ["text_slides/Folie3.JPG"]
-    TUTORIAL_REACHING = ["text_slides/Folie5.JPG"]
-    TUTORIAL_AVOIDING = ["text_slides/Folie4.JPG"]
+    TUTORIAL = ["text_slides/tutorial.JPG"]
+    TUTORIAL_REACHING = ["text_slides/tutorial_reaching.JPG"]
+    TUTORIAL_AVOIDING = ["text_slides/tutorial_avoiding.JPG"]
 
-    PRETEST_REACHING1 = ["text_slides/Folie6.JPG"]
-    PRETEST_REACHING2 = ["text_slides/Folie7.JPG"]
+    PRETEST_REACHING1 = ["text_slides/pre_reaching1.JPG"]
+    PRETEST_REACHING2 = ["text_slides/pre_reaching2.JPG"]
 
-    TRAINING_REACHING = ["text_slides/Folie8.JPG"]
-    # Not change yet
-    POSTTEST_REACHING1 = ["text_slides/Folie8.JPG"]
-    RECAP_REACHING = ["text_slides/Folie9.JPG"]
-    POSTTEST_REACHING2 = ["text_slides/Folie10.JPG"]
+    TRAINING_REACHING = ["text_slides/train_reaching.JPG"]
 
-    PRETEST_AVOIDING1 = ["text_slides/Folie11.JPG"]
-    PRETEST_AVOIDING2 = ["text_slides/Folie12.JPG"]
+    POSTTEST_REACHING1 = ["text_slides/post_reaching1.png"]
+    RECAP_REACHING = ["text_slides/recap_reaching.png"]
+    POSTTEST_REACHING2 = ["text_slides/post_reaching2.png"]
 
-    TRAINING_AVOIDING = ["text_slides/Folie13.JPG"]
+    PRETEST_AVOIDING1 = ["text_slides/pre_avoiding1.JPG"]
+    PRETEST_AVOIDING2 = ["text_slides/pre_avoiding2.JPG"]
 
-    POSTTEST_AVOIDING1 = ["text_slides/Folie14.JPG"]
-    RECAP_AVOIDING = ["text_slides/Folie15.JPG"]
-    POSTTEST_AVOIDING2 = ["text_slides/Folie16.JPG"]
+    TRAINING_AVOIDING = ["text_slides/train_avoiding.JPG"]
 
-    BREAK = ["text_slides/Folie17.JPG", "text_slides/Folie18.JPG", "text_slides/Folie19.JPG", "text_slides/Folie20.JPG"]
+    POSTTEST_AVOIDING1 = ["text_slides/post_avoiding1.png"]
+    RECAP_AVOIDING = ["text_slides/recap_avoiding.png"]
+    POSTTEST_AVOIDING2 = ["text_slides/post_avoiding2.png"]
+
+    BREAK = ["text_slides/break.JPG"]

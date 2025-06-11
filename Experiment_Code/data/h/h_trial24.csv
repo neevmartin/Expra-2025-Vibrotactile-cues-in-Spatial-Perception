@@ -1,6 +1,0 @@
-participant_id,trial_index,task,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
-h,24,avoiding,Pre-Test,1,0,68.54,0.261,248.0,275.0,1,0,0
-h,24,avoiding,Pre-Test,1,0,68.54,0.319,248.0,276.0,1,0,0
-h,24,avoiding,Pre-Test,1,0,68.54,0.375,248.0,276.0,1,0,0
-h,24,avoiding,Pre-Test,1,0,68.54,0.436,248.0,276.0,1,0,0
-h,24,avoiding,Pre-Test,1,0,68.54,0.496,248.0,276.0,0,0,0
