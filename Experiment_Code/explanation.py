@@ -1,16 +1,16 @@
 from enum import Enum
 class Explanation(Enum):
-    INTRODUCTION = ["text_slides/Folie1.JPG", "text_slides/Folie2.JPG", "text_slides/Folie3.JPG"]
+    INTRODUCTION = ["text_slides/Folie1.JPG", "text_slides/Folie2.JPG"]
 
-    TUTORIAL = ["text_slides/Folie4.JPG"]
-    TUTORIAL_REACHING = ["text_slides/Folie4.JPG"]
+    TUTORIAL = ["text_slides/Folie3.JPG"]
+    TUTORIAL_REACHING = ["text_slides/Folie5.JPG"]
     TUTORIAL_AVOIDING = ["text_slides/Folie4.JPG"]
 
-    PRETEST_REACHING1 = ["text_slides/Folie5.JPG"]
-    PRETEST_REACHING2 = ["text_slides/Folie6.JPG"]
+    PRETEST_REACHING1 = ["text_slides/Folie6.JPG"]
+    PRETEST_REACHING2 = ["text_slides/Folie7.JPG"]
 
-    TRAINING_REACHING = ["text_slides/Folie7.JPG"]
-
+    TRAINING_REACHING = ["text_slides/Folie8.JPG"]
+    # Not change yet
     POSTTEST_REACHING1 = ["text_slides/Folie8.JPG"]
     RECAP_REACHING = ["text_slides/Folie9.JPG"]
     POSTTEST_REACHING2 = ["text_slides/Folie10.JPG"]
