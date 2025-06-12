@@ -446,8 +446,9 @@ class VibrotactileCueExperiment(Experiment):
         """
         self.run_explanation_sequence(self.slides["TUTORIAL"])
 
+        task1, task2 = ('avoiding', 'reaching') if self.config.mode == 'avoiding' else ('reaching', 'avoiding')
         explanation_seq1, explanation_seq2 = ((self.slides["TUTORIAL_AVOIDING"], self.slides["TUTORIAL_REACHING"])
-                                              if self.config.mode == 'avoiding' 
+                                              if task1 == 'avoiding' 
                                               else (self.slides["TUTORIAL_REACHING"], self.slides["TUTORIAL_AVOIDING"]))
 
         n = 6
@@ -456,10 +457,22 @@ class VibrotactileCueExperiment(Experiment):
         np.random.shuffle(intensity_list)
 
         self.run_explanation_sequence(explanation_seq1)
+
+        if task1 == 'avoiding':
+            self.init_avoiding_task()
+        else:
+            self.init_reaching_task()
+
         for i in range(n):
             self.run_tutorial_trial(intensity_list[i])
 
         self.run_explanation_sequence(explanation_seq2)
+
+        if task2 == 'avoiding':
+            self.init_avoiding_task()
+        else:
+            self.init_reaching_task()
+
         for i in range(n):
             self.run_tutorial_trial(intensity_list[i])
         
@@ -578,7 +591,7 @@ class VibrotactileCueExperiment(Experiment):
         while not self.trial_confirmed: # CONFIRMATION
             self.handle_keys()
 
-            if self.tutorial_trial_confirmation():
+            if self.trial_confirmation():
                 self.trial_confirmed = True
 
             gui.draw_rails(self.window, "white")
@@ -591,7 +604,7 @@ class VibrotactileCueExperiment(Experiment):
 
             
 
-            if self.tutorial_trial_confirmation(): # We do not collect any data in this
+            if self.trial_confirmation(): # We do not collect any data in this
                 self.trial_running = False
 
             gui.draw_rails(self.window, "green")
@@ -682,29 +695,6 @@ class VibrotactileCueExperiment(Experiment):
         self.right_button_pressed_last_frame = right_button_pressed
 
         return pressed
-    
-    def tutorial_trial_confirmation(self) -> bool:
-        """
-        Checks whether the trial confirmation condition has been met.
-
-        Returns True when the participant presses the mouse button in case they have not confirmed the trial yet.
-                If they have confirmed the trial method returns true if they release the mouse button again.
-
-        Returns:
-            bool: True if the trial is confirmed, False otherwise.
-        """
-        mouse_pressed = event.Mouse().getPressed()[0]
-
-        if self.trial_confirmed:
-            # Trial is running and participant must release the mouse button.
-            confirmed = self.mouse_pressed_last_frame and not mouse_pressed
-        else:
-            # Trial needs to be confirmed with a button press by the participant.
-            confirmed = mouse_pressed and not self.mouse_pressed_last_frame
-
-        self.mouse_pressed_last_frame = mouse_pressed
-
-        return confirmed
 
     def update_trial(self) -> None:
         """
