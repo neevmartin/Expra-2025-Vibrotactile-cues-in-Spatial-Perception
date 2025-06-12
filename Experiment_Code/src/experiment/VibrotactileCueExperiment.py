@@ -4,11 +4,11 @@ import time
 from typing import Literal, Any
 from warnings import warn
 
-import tablet_input as tablet
-import gui
-from config_loader import ExperimentConfig
-from vibration_controller import VibrationController
-from explanation import Explanation
+import src.io.tablet_input as tablet
+import src.io.gui as gui
+from src.config.config_loader import ExperimentConfig
+from src.io.vibration_controller import VibrationController
+from src.experiment.Experiment import Experiment
 
 import numpy as np
 from psychopy import core
@@ -17,127 +17,7 @@ from psychopy.visual import Window
 from psychopy.clock import Clock
 
 
-class Experiment:
-    """
-    Base class for psychophysical experiments using PsychoPy.
 
-    This class provides a general framework for running experiments that involve
-    a full experimental pipeline including introduction to experiment, main experiment logic,
-    and outro/acknowledgement. Further, it sets up the PsychoPy visual Windows.
-
-    Subclasses should override `run_introduction`, `run_experiment`, and 
-    `run_outro` methods to define specific experimental behavior.
-
-    Attributes:
-        window (Window): The PsychoPy visual window used for stimulus presentation.
-        debug (bool): Whether to run in debug mode (affects verbosity or behavior in subclasses).
-
-    Args:
-        win_config (dict): A dictionary containing window configuration parameters. Must include:
-            - 'screenID' (int): The screen number to display the window on.
-            - 'resolution' (tuple[int, int]): The resolution of the window in pixels.
-            - 'windowed' (bool): Whether to use windowed mode (as opposed to fullscreen).
-        debug (bool, optional): Flag to enable debug mode. Defaults to False.
-
-    Note:
-        A short delay (core.wait(0.1)) is added after window creation to ensure the
-        graphics context is fully initialized before use, avoiding platform-specific
-        rendering issues.
-    """
-
-    window: Window
-    debug: bool
-
-    def __init__(self, win_config: dict[str, Any], debug: bool = False):
-        """
-        win_config must contain:
-            - screenID (int)
-            - resolution (tuple[int, int])
-            - windowed (bool)
-        """
-        self.window = Window(
-            screen=win_config['screenID'],
-            size=win_config['resolution'],
-            units="pix",
-            colorSpace = "rgb255",
-            color = (128,128,128),
-            fullscr=not win_config['windowed'] # 'windowed' == True corresponds to a fullscreen which is counterintuitive
-        )
-        self.debug = debug
-
-        core.wait(0.1) # avoid rendering issues
-
-    def run(self) -> None:
-        """
-        Executes the full experiment lifecycle.
-
-        This method sequentially runs the introduction, main experiment routine, and 
-        outro phases of the experiment, followed by cleanup and termination. Each of 
-        these phases is implemented as a separate method, which can be overridden by 
-        subclasses to define custom behavior.
-
-        The default implementation assumes that:
-            - `run_introduction()` presents instructions or a welcome screen.
-            - `run_experiment()` runs the core trial logic or stimuli presentation as well as data collection.
-            - `run_outro()` provides final messages, feedback, or a debriefing.
-            - `exit()` handles window closing and quitting PsychoPy.
-
-        This method is the main entry point for executing the experiment from start to finish.
-
-        Returns:
-            None
-        """
-        self.run_introduction()
-        self.run_experiment()
-        self.run_outro()
-        self.exit()
-
-    def exit(self) -> None:
-        """
-        Closes the PsychoPy window and exits the experiment.
-
-        This method handles cleanup by closing the display window and terminating 
-        the PsychoPy core event loop.
-
-        Returns:
-            None
-        """
-        self.window.close()
-        core.quit()
-
-    def run_introduction(self) -> None:
-        """
-        Runs the introduction phase of the experiment.
-
-        Intended to be overridden by subclasses to provide experiment-specific instructions or setup.
-
-        Returns:
-            None
-        """
-        pass
-
-    def run_experiment(self) -> None:
-        """
-        Runs the main experimental procedure.
-
-        This method should be implemented by subclasses to execute the sequence of trials,
-        manage experiment flow, and handle any task-specific logic.
-
-        Returns:
-            None
-        """
-        pass
-    
-    def run_outro(self) -> None:
-        """
-        Runs the closing phase of the experiment.
-
-        Intended to be overridden by subclasses to provide experiment-specific debriefing or cleanup.
-
-        Returns:
-            None
-        """
-        pass
 
 class VibrotactileCueExperiment(Experiment):
     """
@@ -304,12 +184,15 @@ class VibrotactileCueExperiment(Experiment):
 
     TABLET_SIZE: float
 
+    slides: dict
+
     def __init__(
             self, win_config: dict, 
             experiment_config: ExperimentConfig, 
             participant: dict[str, Any], 
             vibration_controller: VibrationController = None, 
-            debug: bool = False
+            debug: bool = False,
+            slides: dict = None 
         ):
         """
         experiment_config is an `ExperimentConfig` instance managing trial definitions,
@@ -360,6 +243,8 @@ class VibrotactileCueExperiment(Experiment):
             'feedback'   : False,
             'break'      : False
         }
+
+        self.slides = slides
 
     # ------------------------------------------------------------------------------
     # Meta control flow
@@ -454,7 +339,7 @@ class VibrotactileCueExperiment(Experiment):
         self.wait_confirm()
 
     def run_introduction(self):
-        self.run_explanation_sequence(Explanation.INTRODUCTION.value)
+        self.run_explanation_sequence(self.slides["INTRODUCTION"])
 
     def run_experiment(self) -> None:
         """
@@ -559,10 +444,10 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        self.run_explanation_sequence(Explanation.TUTORIAL.value)
+        self.run_explanation_sequence(self.slides["TUTORIAL"])
 
-        explanation_seq1 = Explanation.TUTORIAL_AVOIDING.value if self.config.mode == 'avoiding' else Explanation.TUTORIAL_REACHING.value
-        explanation_seq2 = Explanation.TUTORIAL_REACHING.value if explanation_seq1 == Explanation.TUTORIAL_AVOIDING.value else Explanation.TUTORIAL_REACHING.value
+        explanation_seq1 = self.slides["TUTORIAL_AVOIDING"] if self.config.mode == 'avoiding' else self.slides["TUTORIAL_REACHING"]
+        explanation_seq2 = self.slides["TUTORIAL_REACHING"] if explanation_seq1 == self.slides["TUTORIAL_AVOIDING"] else self.slides["TUTORIAL_REACHING"]
 
         self.run_explanation_sequence(explanation_seq1)
         for _ in range(6):
@@ -647,6 +532,7 @@ class VibrotactileCueExperiment(Experiment):
             self.update_trial()
 
             if self.debug:
+                print("draw")
                 self.draw_debug()
                 self.window.flip()
 
@@ -696,7 +582,7 @@ class VibrotactileCueExperiment(Experiment):
 
         self.inter_trial_interval() # ITI
 
-    def vibrotactile_cue(self, intensity_percentage: int | float = None) -> None:
+    def vibrotactile_cue(self, intensity_percentage: float = None) -> None:
         """
         Gives vibrotactile cue and safely waits until the cue ends.
 
@@ -738,7 +624,6 @@ class VibrotactileCueExperiment(Experiment):
 
         # Safely wait for cue to end
         self.wait_time(self.CUE_INTERVAL)
-
 
     def trial_confirmation(self) -> bool:
         """
@@ -1010,23 +895,23 @@ class VibrotactileCueExperiment(Experiment):
         """
         if self.config.mode == 'avoiding':
             if phase == 'Pre-Test':
-                phase_slide_path = Explanation.PRETEST_AVOIDING2.value if task == 'avoiding' else Explanation.PRETEST_REACHING1.value
+                phase_slide_path = self.slides["PRETEST_AVOIDING2"] if task == 'avoiding' else self.slides["PRETEST_REACHING1"]
             elif phase == 'Training':
-                phase_slide_path = Explanation.TRAINING_AVOIDING.value
+                phase_slide_path = self.slides["TRAINING_AVOIDING"]
             elif phase == 'Post-Test':
-                phase_slide_path = Explanation.POSTTEST_AVOIDING1.value if task == 'avoiding' else Explanation.POSTTEST_REACHING1.value
+                phase_slide_path = self.slides["POSTTEST_AVOIDING1"] if task == 'avoiding' else self.slides["POSTTEST_REACHING1"]
             elif phase == 'Recap':
-                phase_slide_path = Explanation.RECAP_AVOIDING.value
+                phase_slide_path = self.slides["RECAP_AVOIDING"]
         # Difference between Group1 & Group2 is the sequence of the tasks which makes the difference here
         elif self.config.mode == 'reaching':
             if phase == 'Pre-Test':
-                phase_slide_path = Explanation.PRETEST_AVOIDING1.value if task == 'avoiding' else Explanation.PRETEST_REACHING2.value
+                phase_slide_path = self.slides["PRETEST_AVOIDING1"] if task == 'avoiding' else self.slides["PRETEST_REACHING2"]
             elif phase == 'Training':
-                phase_slide_path = Explanation.TRAINING_REACHING.value
+                phase_slide_path = self.slides["TRAINING_REACHING"]
             elif phase == 'Post-Test':
-                phase_slide_path = Explanation.POSTTEST_AVOIDING1.value if task == 'avoiding' else Explanation.POSTTEST_REACHING1.value
+                phase_slide_path = self.slides["POSTTEST_AVOIDING1"] if task == 'avoiding' else self.slides["POSTTEST_REACHING1"]
             elif phase == 'Recap':
-                phase_slide_path = Explanation.RECAP_REACHING.value
+                phase_slide_path = self.slides["RECAP_REACHING"]
 
         self.run_explanation_sequence(phase_slide_path)
 
@@ -1057,7 +942,7 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        self.show_image_prompt(Explanation.BREAK.value[self.break_index % len(Explanation.BREAK.value)]) # Iterates through all images again and again
+        self.show_image_prompt(self.slides["BREAK"][self.break_index % len(self.slides["BREAK"])]) # Iterates through all images again and again
         self.break_index += 1
 
     # ------------------------------------------------------------------------------
