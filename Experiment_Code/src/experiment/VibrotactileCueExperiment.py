@@ -339,7 +339,7 @@ class VibrotactileCueExperiment(Experiment):
         self.wait_confirm()
 
     def run_introduction(self):
-        self.run_explanation_sequence(self.slides["INTRODUCTION"])
+        self.run_explanation_sequence(self.slides.get("INTRODUCTION"))
 
     def run_experiment(self) -> None:
         """
@@ -446,16 +446,22 @@ class VibrotactileCueExperiment(Experiment):
         """
         self.run_explanation_sequence(self.slides["TUTORIAL"])
 
-        explanation_seq1 = self.slides["TUTORIAL_AVOIDING"] if self.config.mode == 'avoiding' else self.slides["TUTORIAL_REACHING"]
-        explanation_seq2 = self.slides["TUTORIAL_REACHING"] if explanation_seq1 == self.slides["TUTORIAL_AVOIDING"] else self.slides["TUTORIAL_REACHING"]
+        explanation_seq1, explanation_seq2 = ((self.slides["TUTORIAL_AVOIDING"], self.slides["TUTORIAL_REACHING"])
+                                              if self.config.mode == 'avoiding' 
+                                              else (self.slides["TUTORIAL_REACHING"], self.slides["TUTORIAL_AVOIDING"]))
+
+        n = 6
+        intensity_list = [30, 30, 30, 100, 100, 100] # in percentage
+        assert len(intensity_list) == n
+        np.random.shuffle(intensity_list)
 
         self.run_explanation_sequence(explanation_seq1)
-        for _ in range(6):
-            self.run_tutorial_trial()
+        for i in range(n):
+            self.run_tutorial_trial(intensity_list[i])
 
         self.run_explanation_sequence(explanation_seq2)
-        for _ in range(6):
-            self.run_tutorial_trial()
+        for i in range(n):
+            self.run_tutorial_trial(intensity_list[i])
         
 
     # ------------------------------------------------------------------------------
@@ -547,7 +553,7 @@ class VibrotactileCueExperiment(Experiment):
 
         self.inter_trial_interval() # ITI
 
-    def run_tutorial_trial(self):
+    def run_tutorial_trial(self, intensity_percentage: int):
         """
         Executes a single tutorial trial, handling participant input and updating trial state.
 
@@ -556,10 +562,13 @@ class VibrotactileCueExperiment(Experiment):
         **One trial follows structure: <br/>
         Cue | Confirmation | Task | ITI**
 
+        Args:
+            intensity_percentage (int): Intensity for the Arduino that should be played.
+
         Returns:
             None
         """
-        intensity_percentage = np.random.choice([30, 100]) # uniformly chosen intensities
+
         self.vibrotactile_cue(intensity_percentage=intensity_percentage) # CUE
 
         while not self.trial_confirmed: # CONFIRMATION
