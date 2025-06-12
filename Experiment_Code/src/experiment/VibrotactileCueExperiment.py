@@ -538,7 +538,6 @@ class VibrotactileCueExperiment(Experiment):
             self.update_trial()
 
             if self.debug:
-                print("draw")
                 self.draw_debug()
                 self.window.flip()
 
