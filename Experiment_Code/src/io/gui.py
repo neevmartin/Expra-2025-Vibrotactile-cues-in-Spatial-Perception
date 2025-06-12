@@ -116,7 +116,7 @@ def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple, t
             text = "You hit the target!"
             color = (-1, 1, -1)
         elif off_point < threshold_yellow:
-            if delta > 0:
+            if delta < 0:
                 text = "You slightly overshot the target!"
                 color = (1, 1, -1)
             else:
@@ -131,14 +131,14 @@ def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple, t
             text = "You avoided the obstacle successfully!"
             color = (-1, 1, -1)
         elif off_point < threshold_yellow:
-            if delta < 0:
+            if delta > 0:
                 text = "You avoided the obstacle too early!"
                 color = (1, 1, -1)
             else:
                 text = "You hit the obstacle!"
                 color = (1, 1, -1)
         else:
-            if delta < 0:
+            if delta > 0:
                 text = "You avoided the obstacle way too early!"
                 color = (1, -1, -1)
             else:
