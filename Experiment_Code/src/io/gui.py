@@ -115,9 +115,12 @@ def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple, t
         elif off_point < threshold_yellow and target_pos[1] > stop_pos[1]:
             text = "You avoided the obstacle too early!"
             color = (1, 1, -1)
+        elif off_point > threshold_yellow and target_pos[1] < stop_pos[1]:
+            text = "You hit the obstacle real bad!"
+            color = (1, -1, -1)
         elif off_point > threshold_green and target_pos[1] < stop_pos[1]:
             text = "You hit the obstacle!"
-            color = (1, -1, -1)
+            color = (1, 1, -1)
         else:
             text = "You avoided the obstacle way too early!"
             color = (1, -1, -1)
