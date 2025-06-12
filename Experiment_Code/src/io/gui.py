@@ -41,6 +41,26 @@ def draw_centered_text(win: visual.Window, text: str, text_color: tuple = (1, 1,
     text = visual.TextStim(win, text=text, pos=(0, 0), color=text_color)
     text.draw()
 
+def draw_rails(win: visual.Window, color: str):
+    """
+    Draw the two rails with the given color
+    Args:
+        win: the window we are working on
+        color: the color of the rails
+    """
+    # Only runs correctly with the monitor
+    tablet_size = 31.1
+    rail_left = visual.Rect(win, width=0.5 / tablet_size * win.size[1], height=28 / tablet_size * win.size[1],
+                            units="pix", pos=[-1 / tablet_size * win.size[1], 0.5 / tablet_size * win.size[1]],
+                            color=color, colorSpace='rgb')
+    rail_right = visual.Rect(win, width=0.5 / tablet_size * win.size[1], height=28 / tablet_size * win.size[1],
+                             units="pix", pos=[1 / tablet_size * win.size[1], 0.5 / tablet_size * win.size[1]],
+                             color=color, colorSpace='rgb')
+
+    rail_left.draw()
+    rail_right.draw()
+
+
 def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
                       start_pos: tuple, stop_pos: tuple, radius: int, obstacle: tuple = None):
     """
@@ -50,15 +70,11 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
         trajectory: the trajectory up until now
         mouse_pos: the current mouse position
         start_pos: the start position
-        target_pos: the target position
+        stop_pos: the target position
         radius: the radius of the circle representing the start, target, stop positions
+        obstacle: the position of the obstacle
     """
-    tablet_size = 31.1
     my_cursor = visual.Circle(win, pos=mouse_pos, radius=10, fillColor='red', lineColor='red', colorSpace='rgb')
-
-    # Only runs correctly with the monitor
-    rail_left = visual.Rect(win, width=0.5/tablet_size * win.size[1], height=28/tablet_size * win.size[1] , units="pix", pos=[-1/tablet_size * win.size[1] , 0.5/tablet_size * win.size[1]], colorSpace='rgb')
-    rail_right = visual.Rect(win, width=0.5/tablet_size * win.size[1], height=28/tablet_size * win.size[1], units="pix", pos=[1/tablet_size * win.size[1], 0.5/tablet_size * win.size[1]], colorSpace='rgb')
 
     start = visual.Circle(win, radius=radius, pos=start_pos, fillColor='black', colorSpace='rgb')
     stop = visual.Circle(win, radius=radius, pos=stop_pos, fillColor='black', colorSpace='rgb')
@@ -67,9 +83,7 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
         obstacle = visual.Circle(win, radius=radius, pos=obstacle, fillColor='yellow', colorSpace='rgb')
         obstacle.draw()
 
-    rail_left.draw()
-    rail_right.draw()
-
+    draw_rails(win, 'white')
     start.draw()
     stop.draw()
 
