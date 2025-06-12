@@ -95,13 +95,14 @@ def main(dev_mode = False):
     #     win_config=win_config,
     #     experiment_config=experiment_config,
     #     participant=participant,
-    #     debug = params['debug']
+    #     debug = params['debug'],
+    #     slides=explanation_slides.getSlides(params['slides_dir'])
     # )
 
     logging.console.setLevel(logging.ERROR)  # Only show errors, not warnings
 
     experiment.run()
-    #vibration_controller.close()
+    vibration_controller.close()
 
 if __name__ == '__main__':
     # use the -d flag to 
