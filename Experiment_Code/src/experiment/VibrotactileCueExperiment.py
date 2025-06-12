@@ -527,6 +527,8 @@ class VibrotactileCueExperiment(Experiment):
 
             if self.debug:
                 self.draw_debug()
+            else:
+                gui.draw_rails(self.window, "white")
 
             self.window.flip()
         
@@ -540,6 +542,8 @@ class VibrotactileCueExperiment(Experiment):
             if self.debug:
                 self.draw_debug()
                 self.window.flip()
+            else:
+                gui.draw_rails(self.window, "green")
 
             delta_time = self.config.get_scan_time() - abs(self.clock.getTime() - last_scan)
             if delta_time > 0:
