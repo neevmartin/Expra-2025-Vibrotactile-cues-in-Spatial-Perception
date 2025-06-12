@@ -10,8 +10,8 @@ def getSlides(resource_dir: str) -> dict:
         "TUTORIAL_REACHING": [src("tutorial_reaching.JPG")],
         "TUTORIAL_AVOIDING": [src("tutorial_avoiding.JPG")],
 
-        "PRETEST_REACHING1": [src("pre_reaching1.JPG")],
-        "PRETEST_REACHING2": [src("pre_reaching2.JPG")],
+        "PRETEST_REACHING1": [src("pre_reaching1.JPG"), src("tutorial_avoiding.JPG")],
+        "PRETEST_REACHING2": [src("pre_reaching2.JPG"), src("tutorial_reaching.JPG")],
 
         "TRAINING_REACHING": [src("train_reaching.JPG")],
 
@@ -19,8 +19,8 @@ def getSlides(resource_dir: str) -> dict:
         "RECAP_REACHING": [src("recap_reaching.png")],
         "POSTTEST_REACHING2": ["post_reaching2.png"],
 
-        "PRETEST_AVOIDING1": [src("pre_avoiding1.JPG")],
-        "PRETEST_AVOIDING2": [src("pre_avoiding2.JPG")],
+        "PRETEST_AVOIDING1": [src("pre_avoiding1.JPG"), src("tutorial_reaching.JPG")],
+        "PRETEST_AVOIDING2": [src("pre_avoiding2.JPG"), src("tutorial_avoiding.JPG")],
 
         "TRAINING_AVOIDING": [src("train_avoiding.JPG")],
 
