@@ -904,21 +904,21 @@ class VibrotactileCueExperiment(Experiment):
         """
         if self.config.mode == 'avoiding':
             if phase == 'Pre-Test':
-                phase_slide_path = self.slides["PRETEST_AVOIDING2"] if task == 'avoiding' else self.slides["PRETEST_REACHING1"]
+                phase_slide_path = self.slides["PRETEST_AVOIDING2"] if task == 'avoiding' else self.slides["PRETEST_AVOIDING1"]
             elif phase == 'Training':
                 phase_slide_path = self.slides["TRAINING_AVOIDING"]
             elif phase == 'Post-Test':
-                phase_slide_path = self.slides["POSTTEST_AVOIDING1"] if task == 'avoiding' else self.slides["POSTTEST_REACHING1"]
+                phase_slide_path = self.slides["POSTTEST_AVOIDING1"] if task == 'avoiding' else self.slides["POSTTEST_AVOIDING2"]
             elif phase == 'Recap':
                 phase_slide_path = self.slides["RECAP_AVOIDING"]
         # Difference between Group1 & Group2 is the sequence of the tasks which makes the difference here
         elif self.config.mode == 'reaching':
             if phase == 'Pre-Test':
-                phase_slide_path = self.slides["PRETEST_AVOIDING1"] if task == 'avoiding' else self.slides["PRETEST_REACHING2"]
+                phase_slide_path = self.slides["PRETEST_REACHING1"] if task == 'avoiding' else self.slides["PRETEST_REACHING2"]
             elif phase == 'Training':
                 phase_slide_path = self.slides["TRAINING_REACHING"]
             elif phase == 'Post-Test':
-                phase_slide_path = self.slides["POSTTEST_AVOIDING1"] if task == 'avoiding' else self.slides["POSTTEST_REACHING1"]
+                phase_slide_path = self.slides["POSTTEST_REACHING2"] if task == 'avoiding' else self.slides["POSTTEST_REACHING1"]
             elif phase == 'Recap':
                 phase_slide_path = self.slides["RECAP_REACHING"]
 
