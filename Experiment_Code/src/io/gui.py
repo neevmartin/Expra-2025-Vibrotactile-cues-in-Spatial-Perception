@@ -79,11 +79,12 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
     start = visual.Circle(win, radius=radius, pos=start_pos, fillColor='black', colorSpace='rgb')
     stop = visual.Circle(win, radius=radius, pos=stop_pos, fillColor='black', colorSpace='rgb')
 
+    draw_rails(win, 'white')
+
     if obstacle:
         obstacle = visual.Circle(win, radius=radius, pos=obstacle, fillColor='yellow', colorSpace='rgb')
         obstacle.draw()
 
-    draw_rails(win, 'white')
     start.draw()
     stop.draw()
 
