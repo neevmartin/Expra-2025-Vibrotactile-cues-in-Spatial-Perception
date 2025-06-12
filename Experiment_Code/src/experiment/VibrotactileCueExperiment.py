@@ -574,12 +574,14 @@ class VibrotactileCueExperiment(Experiment):
 
         self.vibrotactile_cue(intensity_percentage=intensity_percentage) # CUE
 
+        self.trial_confirmed = False
         while not self.trial_confirmed: # CONFIRMATION
             self.handle_keys()
 
             if self.tutorial_trial_confirmation():
                 self.trial_confirmed = True
 
+            gui.draw_rails(self.window, "white")
             self.window.flip()
         
         self.trial_running = True
@@ -587,9 +589,12 @@ class VibrotactileCueExperiment(Experiment):
         while self.trial_running: # TASK
             self.handle_keys()
 
+            
+
             if self.tutorial_trial_confirmation(): # We do not collect any data in this
                 self.trial_running = False
 
+            gui.draw_rails(self.window, "green")
             self.window.flip()
 
         self.inter_trial_interval() # ITI
@@ -877,7 +882,7 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             float: The x-coordinate that meets the condition or STOPPOS if none found.
         """
-        mouse_position = self.STOPPOS # returns end position if no point is found
+        mouse_position = (trajectory[-1][1], trajectory[-1][2]) # returns last recorded mouse position if not exceeding thresh
         for mouse_info in trajectory:
             x = mouse_info[1]
             current_distance = abs(self.STARTPOS[0] - x)
