@@ -17,7 +17,7 @@ def getSlides(resource_dir: str) -> dict:
 
         "POSTTEST_REACHING1": [src("post_reaching1.png")],
         "RECAP_REACHING": [src("recap_reaching.png")],
-        "POSTTEST_REACHING2": ["post_reaching2.png"],
+        "POSTTEST_REACHING2": [src("post_reaching2.png")],
 
         "PRETEST_AVOIDING1": [src("pre_avoiding1.JPG"), src("tutorial_reaching.JPG")],
         "PRETEST_AVOIDING2": [src("pre_avoiding2.JPG"), src("tutorial_avoiding.JPG")],
