@@ -53,11 +53,12 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
         target_pos: the target position
         radius: the radius of the circle representing the start, target, stop positions
     """
+    tablet_size = 31.1
     my_cursor = visual.Circle(win, pos=mouse_pos, radius=10, fillColor='red', lineColor='red', colorSpace='rgb')
 
     # Only runs correctly with the monitor
-    rail_left = visual.Rect(win, width=0.5/31.1 * win.size[1], height=28/31.1 * win.size[1] , units="pix", pos=[-1/31.1 * win.size[1] , 0.5/31.1 * win.size[1]], colorSpace='rgb')
-    rail_right = visual.Rect(win, width=0.5/31.1 * win.size[1], height=28/31.1 * win.size[1], units="pix", pos=[1/31.1 * win.size[1], 0.5/31.1 * win.size[1]], colorSpace='rgb')
+    rail_left = visual.Rect(win, width=0.5/tablet_size * win.size[1], height=28/tablet_size * win.size[1] , units="pix", pos=[-1/tablet_size * win.size[1] , 0.5/tablet_size * win.size[1]], colorSpace='rgb')
+    rail_right = visual.Rect(win, width=0.5/tablet_size * win.size[1], height=28/tablet_size * win.size[1], units="pix", pos=[1/tablet_size * win.size[1], 0.5/tablet_size * win.size[1]], colorSpace='rgb')
 
     start = visual.Circle(win, radius=radius, pos=start_pos, fillColor='black', colorSpace='rgb')
     stop = visual.Circle(win, radius=radius, pos=stop_pos, fillColor='black', colorSpace='rgb')
@@ -89,21 +90,24 @@ def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple, t
         task: the current task, avoiding or reaching
     """
     off_point = np.abs(target_pos[1] - stop_pos[1])
+    delta = target_pos[1] - stop_pos[1]
 
     # Only runs correctly with the monitor
-    threshold_green = 0.5/31.1 * win.size[1]
-    threshold_yellow = 4/31.1 * win.size[1]
+    tablet_size = 31.1
+    threshold_green = 0.5/tablet_size * win.size[1]
+    threshold_yellow = 4/tablet_size * win.size[1]
 
     if task == "reaching":
         if off_point < threshold_green:
             text = "You hit the target!"
             color = (-1, 1, -1)
-        elif off_point < threshold_yellow and target_pos[1] > stop_pos[1]:
-            text = "You slightly undershot the target!"
-            color = (1, 1, -1)
-        elif off_point < threshold_yellow and target_pos[1] < stop_pos[1]:
-            text = "You slightly overshot the target!"
-            color = (1, 1, -1)
+        elif off_point < threshold_yellow:
+            if delta > 0:
+                text = "You slightly overshot the target!"
+                color = (1, 1, -1)
+            else:
+                text = "You slightly undershot the target!"
+                color = (1, 1, -1)
         else:
             text = "You completely missed the target!"
             color = (1, -1, -1)
@@ -112,18 +116,19 @@ def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple, t
         if off_point < threshold_green:
             text = "You avoided the obstacle successfully!"
             color = (-1, 1, -1)
-        elif off_point < threshold_yellow and target_pos[1] > stop_pos[1]:
-            text = "You avoided the obstacle too early!"
-            color = (1, 1, -1)
-        elif off_point > threshold_yellow and target_pos[1] < stop_pos[1]:
-            text = "You hit the obstacle real bad!"
-            color = (1, -1, -1)
-        elif off_point > threshold_green and target_pos[1] < stop_pos[1]:
-            text = "You hit the obstacle!"
-            color = (1, 1, -1)
+        elif off_point < threshold_yellow:
+            if delta < 0:
+                text = "You avoided the obstacle too early!"
+                color = (1, 1, -1)
+            else:
+                text = "You hit the obstacle!"
+                color = (1, 1, -1)
         else:
-            text = "You avoided the obstacle way too early!"
-            color = (1, -1, -1)
-            
+            if delta < 0:
+                text = "You avoided the obstacle way too early!"
+                color = (1, -1, -1)
+            else:
+                text = "You hit the obstacle real bad!"
+                color = (1, -1, -1)
 
     draw_centered_text(win, text, color)
