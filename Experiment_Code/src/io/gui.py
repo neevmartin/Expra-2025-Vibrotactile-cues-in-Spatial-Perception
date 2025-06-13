@@ -79,7 +79,7 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
     start = visual.Circle(win, radius=radius, pos=start_pos, fillColor='black', colorSpace='rgb')
     stop = visual.Circle(win, radius=radius, pos=stop_pos, fillColor='black', colorSpace='rgb')
 
-    draw_rails(win, 'white')
+    # draw_rails(win, 'white')
 
     if obstacle:
         obstacle = visual.Circle(win, radius=radius, pos=obstacle, fillColor='yellow', colorSpace='rgb')
@@ -88,14 +88,14 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
     start.draw()
     stop.draw()
 
-    if len(trajectory) > 0:
-        drawn_line = [(x, y) for (_, x, y, _, _, _) in trajectory]
-        line = visual.ShapeStim(win, vertices=drawn_line, closeShape=False, lineColor='black', lineWidth=10, colorSpace='rgb')
-        line.draw()
+    # if len(trajectory) > 0:
+    #     drawn_line = [(x, y) for (_, x, y, _, _, _) in trajectory]
+    #     line = visual.ShapeStim(win, vertices=drawn_line, closeShape=False, lineColor='black', lineWidth=10, colorSpace='rgb')
+    #     line.draw()
 
-    my_cursor.draw()
+    # my_cursor.draw()
 
-def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple, task: str):
+def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple, task: str, avoiding_done_wrong: bool = False):
     """
     Calculates the distance to the expected target and displays this as a feedback
     Args:
@@ -124,8 +124,12 @@ def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple, t
                 text = "You slightly undershot the target!"
                 color = (1, 1, -1)
         else:
-            text = "You completely missed the target!"
-            color = (1, -1, -1)
+            if delta > 0:
+                text = "You completely undershot the target"
+                color = (1, -1, -1)
+            else:
+                text = "You completely overshot the target!"
+                color = (1, -1, -1)
             
     else:
         if off_point < threshold_green:
@@ -143,7 +147,11 @@ def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple, t
                 text = "You avoided the obstacle way too early!"
                 color = (1, -1, -1)
             else:
-                text = "You hit the obstacle real bad!"
+                text = "You hit the obstacle long ago!"
                 color = (1, -1, -1)
+
+    if avoiding_done_wrong:
+        text = "You didn't avoid the obstacle."
+        color = (1, -1, -1)
 
     draw_centered_text(win, text, color)
