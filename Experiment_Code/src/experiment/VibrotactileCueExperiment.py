@@ -236,7 +236,7 @@ class VibrotactileCueExperiment(Experiment):
         self.break_index = 0
 
         self.AVOID_CONFIRM_RATIO = 0.8
-        self.MAX_CONFIRM_DISTANCE = 10
+        self.MAX_CONFIRM_DISTANCE = 20
 
         self.state = {
             'explanation': False,
@@ -365,7 +365,7 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        self.run_tutorial()
+        # self.run_tutorial()
         # Init
         self.clock.reset()
         # Trial sequence
@@ -540,8 +540,8 @@ class VibrotactileCueExperiment(Experiment):
 
             if self.debug:
                 self.draw_debug()
-            else:
-                gui.draw_rails(self.window, "white")
+            
+            gui.draw_rails(self.window, "white")
 
             self.window.flip()
         
@@ -554,15 +554,17 @@ class VibrotactileCueExperiment(Experiment):
 
             if self.debug:
                 self.draw_debug()
-                self.window.flip()
-            else:
-                gui.draw_rails(self.window, "green")
+                
+            
+            gui.draw_rails(self.window, "green")
+            self.window.flip()
 
             delta_time = self.config.get_scan_time() - abs(self.clock.getTime() - last_scan)
             if delta_time > 0:
                 time.sleep(delta_time)
 
             last_scan = self.clock.getTime() # use this for output intervals every 10 ms
+
 
         if self.state['feedback'] == True: # FEEDBACK
             self.give_feedback()
@@ -853,7 +855,12 @@ class VibrotactileCueExperiment(Experiment):
         confirm_mouse_info = last_mouse_pos if self.current_trial.get('task') == 'reaching' else self.find_exceed_thresh_pos(trajectory)
         confirm_mouse_pos  = [confirm_mouse_info[0], confirm_mouse_info[1]]
 
-        gui.draw_text_feedback(self.window, self.target_pos, confirm_mouse_pos, self.current_trial.get("task"))
+        if self.current_trial.get("task") == "avoiding":
+            # Seperated because we check for whether they avoided in find_exceed_tresh_pos()
+            # and pass that as an argument to draw_text_feedback()
+            gui.draw_text_feedback(self.window, self.target_pos, confirm_mouse_pos, self.current_trial.get("task"), confirm_mouse_info[2])    
+        else:
+            gui.draw_text_feedback(self.window, self.target_pos, confirm_mouse_pos, self.current_trial.get("task"))
         self.window.flip()
 
         self.wait_time(self.FEEDBACK_INTERVAL)
@@ -878,9 +885,10 @@ class VibrotactileCueExperiment(Experiment):
             current_distance = abs(self.STARTPOS[0] - x)
             threshold = abs(self.STARTPOS[0] - self.STOPPOS[0]) * self.AVOID_CONFIRM_RATIO
             if current_distance > threshold:
-                mouse_position = (mouse_info[1], mouse_info[2])
-                break
-        return mouse_position 
+                return (mouse_info[1], mouse_info[2], False)
+        
+        
+        return (mouse_position[0], mouse_position[1], True) # Return whether they switched lanes
 
     def give_explanation(
             self, 
@@ -1027,7 +1035,7 @@ class VibrotactileCueExperiment(Experiment):
 
         self.RADIUS = 10
 
-        self.STARTPOS = [-0.75/self.TABLET_SIZE*self.window.size[0], -13.5/self.TABLET_SIZE*self.window.size[1]]
+        self.STARTPOS = [-0.75/self.TABLET_SIZE*self.window.size[0], -13.15/self.TABLET_SIZE*self.window.size[1]]
         self.STOPPOS   = [0, 0] # Won´t be used
 
         self.MIN_TARGETDIST = self.STARTPOS[1] + self.TARGET_PADDING
@@ -1051,7 +1059,7 @@ class VibrotactileCueExperiment(Experiment):
 
         self.RADIUS = 10
 
-        self.STARTPOS = [-0.75/self.TABLET_SIZE*self.window.size[0], -13.5/self.TABLET_SIZE*self.window.size[1]]
+        self.STARTPOS = [-0.75/self.TABLET_SIZE*self.window.size[0], -13.15/self.TABLET_SIZE*self.window.size[1]]
         self.STOPPOS   = [0.75/self.TABLET_SIZE*self.window.size[0], 14.5/self.TABLET_SIZE*self.window.size[1]]
 
         self.MIN_TARGETDIST = self.STARTPOS[1] + self.TARGET_PADDING
