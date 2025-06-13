@@ -565,7 +565,6 @@ class VibrotactileCueExperiment(Experiment):
 
             last_scan = self.clock.getTime() # use this for output intervals every 10 ms
 
-
         if self.state['feedback'] == True: # FEEDBACK
             self.give_feedback()
 
@@ -742,7 +741,7 @@ class VibrotactileCueExperiment(Experiment):
             'participant_id': self.participant.get('participantID'),
             'trial_index': self.current_trial.get('trial_index') if self.current_trial.get('trial_index') is not None else -1,
             'task': self.current_trial.get('task'),
-            'mapping': self.current_trial.get('mapping'),
+            'mapping': self.config.get_mapping_type(),
             'phase': self.current_trial.get('phase'),
             'block': self.current_trial.get('block'),
             'target_pos_x': round(self.target_pos[0], 2), # probably won't deviate from 0
@@ -809,7 +808,7 @@ class VibrotactileCueExperiment(Experiment):
                     self.participant.get('participantID'),
                     self.config.get_trial_index(),
                     self.current_trial.get('task'),
-                    self.current_trial.get('mapping'),
+                    self.config.get_mapping_type(),
                     self.current_trial.get('phase'),
                     self.current_trial.get('block'),
                     round(self.target_pos[0], 2),
