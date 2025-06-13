@@ -61,6 +61,8 @@ def main(dev_mode = False):
     params = get_input_params(setup_params, dev_mode)
     window.close()
 
+    params["mapping"] = setup_params.get("mapping")
+
     win_config = {key : params.get(key) for key in [
         'windowed',
         'resolution',
