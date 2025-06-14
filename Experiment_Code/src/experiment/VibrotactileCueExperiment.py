@@ -712,62 +712,9 @@ class VibrotactileCueExperiment(Experiment):
         """
         tablet.update_stream(self.window)
         if self.trial_confirmation():
-            #self.export_trial_data_last_only() # Export only the last data point of the trial.
             self.export_trial_data_all() # Export all data points of the trial.
                 
             self.trial_running = False
-
-    def export_trial_data_last_only(self) -> None:
-        """
-        Exports the most recent data point from the current trial's trajectory to a CSV file.
-        This method retrieves the latest position and button press data from the tablet trajectory,
-        combines it with relevant trial and participant information, and appends it as a new row
-        to a CSV file named 'trial_results.csv' in the participant's directory. If the file does not
-        exist, it is created and a header row is written first.
-        The exported data includes:
-            - Participant ID
-            - Trial index, task, phase, and block
-            - Target position (x, y)
-            - Timestamp of the last trajectory point
-            - Current position (x, y) at the last trajectory point
-            - Button press states (left, middle, right) at the last trajectory point
-        Assumes that the output directory exists and that the trajectory data is available.
-        """
-        
-        # Save trajectory and trial info to csv
-        trajectory = tablet.get_trajectory()
-
-        trial_data = {
-            'participant_id': self.participant.get('participantID'),
-            'trial_index': self.current_trial.get('trial_index') if self.current_trial.get('trial_index') is not None else -1,
-            'task': self.current_trial.get('task'),
-            'mapping': self.config.get_mapping_type(),
-            'phase': self.current_trial.get('phase'),
-            'block': self.current_trial.get('block'),
-            'target_pos_x': round(self.target_pos[0], 2), # probably won't deviate from 0
-            'target_pos_y': round(self.target_pos[1], 2),
-            'timestamp': round(trajectory[-1][0], 2),
-            'current_pos_x': trajectory[-1][1],
-            'current_pos_y': trajectory[-1][2],
-            'left_button_pressed': trajectory[-1][3],
-            'middle_button_pressed': trajectory[-1][4], #probably not used
-            'right_button_pressed': trajectory[-1][5], #probably not used
-        }
-        
-        # Save to CSV
-
-        # Assumes output folder already exists
-        output_path = os.path.join(self.participant.get('participant_dir', '.'), self.__get_filename())
-        # Create the output file if it does not exist yet and write the header.
-        if not hasattr(self, '_output_initialized'):
-            with open(output_path, 'w') as f:
-                row = ','.join(trial_data.keys())
-                f.write(row + '\n')
-            self._output_initialized = True
-        # Append the trial data to the output file.
-        with open(output_path, 'a') as f:
-            row = ','.join(str(value) for value in trial_data.values())
-            f.write(row + '\n')
             
     def export_trial_data_all(self) -> None:
         """
