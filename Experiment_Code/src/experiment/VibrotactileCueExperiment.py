@@ -734,7 +734,7 @@ class VibrotactileCueExperiment(Experiment):
             'participant_id',
             'trial_index',
             'task',
-            'mapping'
+            'mapping',
             'phase',
             'block',
             'target_pos_x',
@@ -961,7 +961,7 @@ class VibrotactileCueExperiment(Experiment):
         target_posX = self.STARTPOS[0]
         target_posY = distance / self.TABLET_SIZE * self.window.size[1] - self.window.size[1]/2
 
-        self.target_pos = [target_posX, target_posY]
+        self.target_pos = (target_posX, target_posY)
 
     def init_reaching_task(self) -> None:
         """
