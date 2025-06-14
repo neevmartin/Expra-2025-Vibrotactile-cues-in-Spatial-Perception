@@ -214,6 +214,6 @@ class Experimental_Setup:
                 if key == "left":
                     self.mapping = "direct"
                 elif key == "right":
-                    self.mapping = "inverse"
+                    self.mapping = "reversed"
                 elif key in ["escape", "q"]:
                     core.quit()
