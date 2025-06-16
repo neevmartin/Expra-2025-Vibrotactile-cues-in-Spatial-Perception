@@ -697,18 +697,22 @@ class VibrotactileCueExperiment(Experiment):
         if tablet.get_mouse() is not None:
             mouse_info = tablet.get_mouse()
             mouse_pressed = mouse_info.getPressed()[0]
+            mouse_pos = mouse_info.getPos()
         else:
             mouse_info = event.Mouse()
             mouse_pressed = mouse_info.getPressed()[0]
+            mouse_pos = mouse_info.getPos()
 
         confirmed = False
 
         # If trial not confirmed yet: any new click starts the trial
         if not self.trial_confirmed:
-            confirmed = mouse_pressed and not self.mouse_pressed_last_frame
+            distance_from_start = abs(mouse_pos[1] - self.STARTPOS[1])
+            confirmed = mouse_pressed and not self.mouse_pressed_last_frame and distance_from_start < self.MAX_CONFIRM_DISTANCE
         # If trial is running: any new click ends the trial
         else:
             confirmed = mouse_pressed and not self.mouse_pressed_last_frame
+
 
         self.mouse_pressed_last_frame = mouse_pressed
 
