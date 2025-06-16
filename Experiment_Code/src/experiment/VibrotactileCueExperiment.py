@@ -606,8 +606,6 @@ class VibrotactileCueExperiment(Experiment):
         while self.trial_running: # TASK
             self.handle_keys()
 
-            
-
             if self.trial_confirmation(): # We do not collect any data in this
                 self.trial_running = False
 

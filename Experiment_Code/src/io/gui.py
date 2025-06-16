@@ -87,6 +87,7 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
 
     start.draw()
     stop.draw()
+    my_cursor.draw()
 
     # if len(trajectory) > 0:
     #     drawn_line = [(x, y) for (_, x, y, _, _, _) in trajectory]
@@ -124,45 +125,63 @@ def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple, t
     threshold_yellow = 4/tablet_size * win.size[1]
 
     if task == "reaching":
-        if off_point < threshold_green:
-            text = "You hit the target!"
-            color = (-1, 1, -1)
-        elif off_point < threshold_yellow:
-            if delta < 0:
-                text = "You slightly overshot the target!"
-                color = (1, 1, -1)
-            else:
-                text = "You slightly undershot the target!"
-                color = (1, 1, -1)
-        else:
-            if delta > 0:
-                text = "You completely undershot the target"
-                color = (1, -1, -1)
-            else:
-                text = "You completely overshot the target!"
-                color = (1, -1, -1)
+        text, color = __get_reaching_feedback(off_point, delta, threshold_green, threshold_yellow)
             
     else:
-        if off_point < threshold_green:
-            text = "You avoided the obstacle successfully!"
-            color = (-1, 1, -1)
-        elif off_point < threshold_yellow:
-            if delta > 0:
-                text = "You avoided the obstacle too early!"
-                color = (1, 1, -1)
-            else:
-                text = "You hit the obstacle!"
-                color = (1, 1, -1)
-        else:
-            if delta > 0:
-                text = "You avoided the obstacle way too early!"
-                color = (1, -1, -1)
-            else:
-                text = "You hit the obstacle long ago!"
-                color = (1, -1, -1)
-
+        text, color = __get_avoiding_feedback(off_point, delta, threshold_green, threshold_yellow)
+        
     if avoiding_done_wrong:
         text = "You didn't avoid the obstacle."
         color = (1, -1, -1)
 
     draw_centered_text(win, text, color)
+
+
+def __get_reaching_feedback(off_point, delta, threshold_green, threshold_yellow, ):
+    
+    if off_point < threshold_green:
+        text = "You hit the target!"
+        color = (-1, 1, -1)
+    elif off_point < threshold_yellow:
+        if delta < 0:
+            text = "You slightly overshot the target!"
+            color = (1, 1, -1)
+        else:
+            text = "You slightly undershot the target!"
+            color = (1, 1, -1)
+    else:
+        if delta > 0:
+            text = "You completely undershot the target"
+            color = (1, -1, -1)
+        else:
+            text = "You completely overshot the target!"
+            color = (1, -1, -1)
+
+    return text, color
+
+
+def __get_avoiding_feedback(off_point, delta, threshold_green, threshold_yellow, ):
+    
+    #print(off_point, delta, threshold_green, threshold_yellow,)
+    
+    if delta > 0:
+        if off_point < threshold_green:
+            text = "You avoided the obstacle successfully!"
+            color = (-1, 1, -1)
+        elif off_point < threshold_yellow:
+            text = "You avoided the obstacle too early!"
+            color = (1, 1, -1)
+        else:
+            text = "You avoided the obstacle way too early!"
+            color = (1, -1, -1)
+    else:
+        if off_point < threshold_green:
+            text = "You hit the obstacle!"
+            color = (1, -1, -1)
+        elif off_point < threshold_yellow:
+            text = "You avoided the obstacle a bit too late!"
+            color = (1, -1, -1)
+        else:
+            text = "You avoided the obstacle way too late!"
+            color = (1, -1, -1)
+    return text, color, 
