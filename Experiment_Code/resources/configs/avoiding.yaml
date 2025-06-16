@@ -24,38 +24,38 @@ subgroups:
       - name: "Pre-Test" # Phase name shown in trial metadata
         task: "reaching" # Task type: "reaching" or "avoiding"
         blocks: 1        # Number of blocks in this phase
-        repetitions: 1   # Number of repetitions per target
+        repetitions: 8   # Number of repetitions per target
         # Optional: override default target values (not used here)
 
       - name: "Pre-Test"
         task: "avoiding"
         blocks: 1
-        repetitions: 1
+        repetitions: 8
 
       - name: "Training"
         task: "avoiding"
-        blocks: 1
+        blocks: 5
         # Overriding default target and intensity values for the training phase
         target_distances: [6.4, 13.6, 20.8, 28]
         intensity_levels: [28, 52, 76, 100]
-        repetitions: 2
+        repetitions: 10
 
       - name: "Post-Test"
         task: "avoiding"
         blocks: 1
-        repetitions: 1
+        repetitions: 8
 
       - name: "Recap"
         task: "avoiding"
         blocks: 1
         target_distances: [6.4, 13.6, 20.8, 28]
         intensity_levels: [28, 52, 76, 100]
-        repetitions: 1
+        repetitions: 10
 
       - name: "Post-Test"
         task: "reaching"
         blocks: 1
-        repetitions: 1
+        repetitions: 8
 
   # ---- Reversed Mapping ----
   reversed:
@@ -66,34 +66,34 @@ subgroups:
       - name: "Pre-Test"
         task: "reaching"
         blocks: 1
-        repetitions: 1
+        repetitions: 8
 
       - name: "Pre-Test"
         task: "avoiding"
         blocks: 1
-        repetitions: 1
+        repetitions: 8
 
       - name: "Training"
         task: "avoiding"
-        blocks: 1
+        blocks: 5
         # Overriding default target and intensity values for the training phase
         target_distances: [6.4, 13.6, 20.8, 28]
         intensity_levels: [100, 76, 52, 28] #Reversed
-        repetitions: 2
+        repetitions: 10
 
       - name: "Post-Test"
         task: "avoiding"
         blocks: 1
-        repetitions: 1
+        repetitions: 8
 
       - name: "Recap"
         task: "avoiding"
         blocks: 1
         target_distances: [6.4, 13.6, 20.8, 28]
         intensity_levels: [100, 76, 52, 28] #Reversed
-        repetitions: 1
+        repetitions: 10
 
       - name: "Post-Test"
         task: "reaching"
         blocks: 1
-        repetitions: 1
+        repetitions: 8
