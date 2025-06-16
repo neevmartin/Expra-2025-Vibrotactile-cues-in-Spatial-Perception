@@ -81,8 +81,8 @@ def main(dev_mode = False):
 
     # Use when Arduino board is connected. 
     
-    vibration_controller = VibrationController(testing=dev_mode)
-    
+    #vibration_controller = VibrationController(testing=dev_mode)
+    vibration_controller = VibrationController()    
 
     experiment = VibrotactileCueExperiment(
         win_config=win_config,
