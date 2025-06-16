@@ -557,7 +557,6 @@ class VibrotactileCueExperiment(Experiment):
             if self.debug:
                 self.draw_debug()
                 
-            
             gui.draw_rails(self.window, "green")
             self.window.flip()
 
@@ -569,8 +568,6 @@ class VibrotactileCueExperiment(Experiment):
 
         if self.state['feedback'] == True: # FEEDBACK
             self.give_feedback()
-
-        self.inter_trial_interval() # ITI
 
     def run_tutorial_trial(self, intensity_percentage: int):
         """
@@ -611,8 +608,6 @@ class VibrotactileCueExperiment(Experiment):
 
             gui.draw_rails(self.window, "green")
             self.window.flip()
-
-        self.inter_trial_interval() # ITI
         
     def wait_until_participant_returns_to_start(self) -> None:
         """
@@ -661,15 +656,6 @@ class VibrotactileCueExperiment(Experiment):
             RuntimeWarning: If no Arduino board is detected and the cue cannot be given.
         """
         
-        # Cue message (optional)
-        gui.draw_centered_text(win=self.window, text='Trial starts.')
-
-        self.window.flip()
-        self.wait_time(self.TRIAL_START_TEXT_INTERVAL)
-
-        self.window.flip() # time without text
-        self.wait_time(self.PTI)
-
         # Vibration should succeed before drawing so timing lines up
         if intensity_percentage == None:
             intensity_proportion = 0.01 * self.current_trial.get('intensity')
@@ -799,18 +785,6 @@ class VibrotactileCueExperiment(Experiment):
                     entry[5],             # right_button_pressed
                 ]
                 f.write(','.join(str(value) for value in row) + '\n')
-
-    def inter_trial_interval(self) -> None:
-        """
-        Waits for the duration of the inter-trial interval (ITI), updating the display
-        and handling keypresses during the wait. Window gets flipped one time.
-
-        Returns:
-            None
-
-        """
-        self.window.flip()
-        self.wait_time(self.ITI)
 
     # ------------------------------------------------------------------------------
     # Interruption control methods
