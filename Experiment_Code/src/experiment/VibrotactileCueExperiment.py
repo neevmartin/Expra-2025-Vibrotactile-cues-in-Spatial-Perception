@@ -666,22 +666,21 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             bool: True if the trial is confirmed, False otherwise.
         """
-        if tablet.get_mouse() != None: # if used before init trial
+        if tablet.get_mouse() is not None:
             mouse_info = tablet.get_mouse()
-            mouse_pos = mouse_info.getPos()
             mouse_pressed = mouse_info.getPressed()[0]
         else:
             mouse_info = event.Mouse()
-            mouse_pos = mouse_info.getPos()
             mouse_pressed = mouse_info.getPressed()[0]
 
-        if self.trial_confirmed:
-            # Trial is running and participant must release the mouse button.
-            confirmed = self.mouse_pressed_last_frame and not mouse_pressed
+        confirmed = False
+
+        # If trial not confirmed yet: any new click starts the trial
+        if not self.trial_confirmed:
+            confirmed = mouse_pressed and not self.mouse_pressed_last_frame
+        # If trial is running: any new click ends the trial
         else:
-            # Trial needs to be confirmed with a button press by the participant.
-            distance_from_start = abs(mouse_pos[1] - self.STARTPOS[1])
-            confirmed = mouse_pressed and not self.mouse_pressed_last_frame and distance_from_start < self.MAX_CONFIRM_DISTANCE
+            confirmed = mouse_pressed and not self.mouse_pressed_last_frame
 
         self.mouse_pressed_last_frame = mouse_pressed
 
