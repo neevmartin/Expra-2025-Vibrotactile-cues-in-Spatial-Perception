@@ -530,6 +530,8 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
+        # Wait for participant to return to starting position before proceeding
+        self.wait_until_participant_returns_to_start()
         self.vibrotactile_cue() # CUE
 
         while not self.trial_confirmed: # CONFIRMATION
@@ -585,7 +587,8 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-
+        # Wait for participant to return to starting position before proceeding
+        self.wait_until_participant_returns_to_start()
         self.vibrotactile_cue(intensity_percentage=intensity_percentage) # CUE
 
         self.trial_confirmed = False
@@ -612,6 +615,33 @@ class VibrotactileCueExperiment(Experiment):
             self.window.flip()
 
         self.inter_trial_interval() # ITI
+        
+    def wait_until_participant_returns_to_start(self) -> None:
+        """
+        Waits until the participant returns to the starting position before proceeding.
+
+        Continuously checks the mouse position and distance from the start position.
+        If the distance is less than `MAX_CONFIRM_DISTANCE`, it breaks the loop.
+        In debug mode, it draws the start position and rails on the window.
+
+        Returns:
+            None
+        """
+        tablet.start_stream(self.window)
+        while True:
+            self.handle_keys()
+            mouse_info = tablet.get_mouse()
+            if mouse_info is not None:
+                mouse_pos = mouse_info.getPos()
+                distance_from_start = abs(mouse_pos[1] - self.STARTPOS[1])
+                if distance_from_start < self.MAX_CONFIRM_DISTANCE:
+                    break
+            if self.debug:
+                # TODO: Maybe we should also draw the start position if we're not in debug mode, to show the participant where to return to?
+                gui.draw_start(self.window, self.STARTPOS, self.RADIUS)
+            gui.draw_rails(self.window, "white")
+            # TODO: Maybe add some text here that tells the participant to return to the start position?
+            self.window.flip()
 
     def vibrotactile_cue(self, intensity_percentage: float = None) -> None:
         """

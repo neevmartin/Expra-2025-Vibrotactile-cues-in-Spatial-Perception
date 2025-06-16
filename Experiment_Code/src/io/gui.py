@@ -94,6 +94,17 @@ def draw_debug_screen(win: visual.Window, trajectory: list, mouse_pos: tuple,
     #     line.draw()
 
     # my_cursor.draw()
+    
+def draw_start(win: visual.Window, start_pos: tuple, radius: int) -> None:
+    """
+    Draws the start position
+    Args:
+        win: the window we are working on
+        start_pos: the start position
+        radius: the radius of the circle representing the start position
+    """
+    start = visual.Circle(win, radius=radius, pos=start_pos, fillColor='red', colorSpace='rgb')
+    start.draw()
 
 def draw_text_feedback(win: visual.Window, target_pos: tuple, stop_pos: tuple, task: str, avoiding_done_wrong: bool = False):
     """
