@@ -702,7 +702,7 @@ class VibrotactileCueExperiment(Experiment):
                          and self.STARTPOS[0] <= mouse_pos[0] <= self.STARTPOS + self.RAIL_WIDTH )
         # If trial is running: any new click ends the trial
         else:
-            confirmed = mouse_pressed and not self.mouse_pressed_last_frame
+            confirmed = (not mouse_pressed) and self.mouse_pressed_last_frame
 
 
         self.mouse_pressed_last_frame = mouse_pressed
