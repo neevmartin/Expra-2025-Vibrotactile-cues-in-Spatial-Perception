@@ -53,6 +53,9 @@ class VibrotactileCueExperiment(Experiment):
         STARTPOS (list[int, int]): 
             Starting point of movement in screen coordinates.
 
+        STARTPOS_R (list[int, int]):
+            Starting point of movement in screen coordinates.
+
         STOPPOS (list[int, int]): 
             Endpoint of movement in screen coordinates.
 
@@ -140,8 +143,9 @@ class VibrotactileCueExperiment(Experiment):
 
     RADIUS: int # TODO: Should the circles be sized differently?
 
-    # Startpoint
+    # Startpoints
     STARTPOS: list[int, int]
+    STARTPOS_R: list[int, int]
 
     # Endpoint
     STOPPOS: list[int, int]
@@ -367,7 +371,7 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        # self.run_tutorial()
+        self.run_tutorial()
         # Init
         self.clock.reset()
         # Trial sequence
@@ -696,10 +700,16 @@ class VibrotactileCueExperiment(Experiment):
 
         # If trial not confirmed yet: any new click starts the trial
         if not self.trial_confirmed:
-            distance_from_startY = abs(mouse_pos[1] - self.STARTPOS[1])
-            confirmed = ( mouse_pressed and not self.mouse_pressed_last_frame 
-                         and distance_from_startY < self.MAX_CONFIRM_DISTANCE
-                         and self.STARTPOS[0] <= mouse_pos[0] <= self.STARTPOS + self.RAIL_WIDTH )
+            distance_from_start_X_L = abs(mouse_pos[0] - self.STARTPOS[0])
+            distance_from_start_X_R = abs(mouse_pos[0] - self.STARTPOS_R[0])
+            distance_from_start_Y = abs(mouse_pos[1] - self.STARTPOS[1])
+
+            confirmed = ((
+                            not mouse_pressed) and self.mouse_pressed_last_frame and
+                         distance_from_start_Y < self.MAX_CONFIRM_DISTANCE
+                         and (distance_from_start_X_L<self.MAX_CONFIRM_DISTANCE or distance_from_start_X_R<self.MAX_CONFIRM_DISTANCE)
+                         )
+
         # If trial is running: any new click ends the trial
         else:
             confirmed = (not mouse_pressed) and self.mouse_pressed_last_frame
@@ -836,14 +846,18 @@ class VibrotactileCueExperiment(Experiment):
             float: The x-coordinate that meets the condition or STOPPOS if none found.
         """
         mouse_position = (trajectory[-1][1], trajectory[-1][2]) # returns last recorded mouse position if not exceeding thresh
+        start_mouse_x = trajectory[0][1]
         for mouse_info in trajectory:
             x = mouse_info[1]
-            current_distance = abs(self.STARTPOS[0] - x)
+            current_distance_L_to_R = abs(self.STARTPOS[0] - x)
+            current_distance_R_to_L = abs(self.STARTPOS_R[0] - x)
             threshold = abs(self.STARTPOS[0] - self.STOPPOS[0]) * self.AVOID_CONFIRM_RATIO
-            if current_distance > threshold:
-                return (mouse_info[1], mouse_info[2], False)
-        
-        
+            if ((start_mouse_x <0 and threshold < current_distance_L_to_R) or
+                    (start_mouse_x >0 and threshold < current_distance_R_to_L)):
+
+                return mouse_info[1], mouse_info[2], False
+
+
         return (mouse_position[0], mouse_position[1], True) # Return whether they switched lanes
 
     def give_explanation(
@@ -992,7 +1006,8 @@ class VibrotactileCueExperiment(Experiment):
         self.RADIUS = 10
 
         self.STARTPOS = [-0.75/self.TABLET_SIZE*self.window.size[0], -13.15/self.TABLET_SIZE*self.window.size[1]]
-        self.STOPPOS   = [0, 0] # Won´t be used
+        self.STARTPOS_R = [0.75 / self.TABLET_SIZE * self.window.size[0],-13.15 / self.TABLET_SIZE * self.window.size[1]]
+        self.STOPPOS   = [0.75/self.TABLET_SIZE*self.window.size[0], 14.5/self.TABLET_SIZE*self.window.size[1]] # Won´t be used
 
         self.MIN_TARGETDIST = self.STARTPOS[1] + self.TARGET_PADDING
         self.MAX_TARGETDIST = self.STOPPOS[1] - self.STARTPOS[1] - self.TARGET_PADDING
@@ -1016,6 +1031,7 @@ class VibrotactileCueExperiment(Experiment):
         self.RADIUS = 10
 
         self.STARTPOS = [-0.75/self.TABLET_SIZE*self.window.size[0], -13.15/self.TABLET_SIZE*self.window.size[1]]
+        self.STARTPOS_R = [0.75 / self.TABLET_SIZE * self.window.size[0],-13.15 / self.TABLET_SIZE * self.window.size[1]]
         self.STOPPOS   = [0.75/self.TABLET_SIZE*self.window.size[0], 14.5/self.TABLET_SIZE*self.window.size[1]]
 
         self.MIN_TARGETDIST = self.STARTPOS[1] + self.TARGET_PADDING
