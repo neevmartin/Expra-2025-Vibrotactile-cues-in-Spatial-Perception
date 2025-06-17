@@ -446,11 +446,12 @@ class VibrotactileCueExperiment(Experiment):
         """
         self.run_explanation_sequence(self.slides["TUTORIAL"])
 
-        task1, task2 = ('avoiding', 'reaching') if self.config.mode == 'avoiding' else ('reaching', 'avoiding')
-        explanation_seq1, explanation_seq2 = ((self.slides["TUTORIAL_AVOIDING"], self.slides["TUTORIAL_REACHING"])
-                                              if task1 == 'avoiding' 
-                                              else (self.slides["TUTORIAL_REACHING"], self.slides["TUTORIAL_AVOIDING"]))
-
+        # task1, task2 = ('avoiding', 'reaching') if self.config.mode == 'avoiding' else ('reaching', 'avoiding')
+        # explanation_seq1, explanation_seq2 = ((self.slides["TUTORIAL_AVOIDING"], self.slides["TUTORIAL_REACHING"])
+        #                                       if task1 == 'avoiding' 
+        #                                       else (self.slides["TUTORIAL_REACHING"], self.slides["TUTORIAL_AVOIDING"]))
+        task1, task2 = ("reaching", "avoiding")
+        explanation_seq1, explanation_seq2 = (self.slides["TUTORIAL_REACHING"], self.slides["TUTORIAL_AVOIDING"])
         n = 6
         intensity_list = [30, 30, 30, 100, 100, 100] # in percentage
         assert len(intensity_list) == n
