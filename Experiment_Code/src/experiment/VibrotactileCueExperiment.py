@@ -183,6 +183,7 @@ class VibrotactileCueExperiment(Experiment):
     MAX_CONFIRM_DISTANCE: int
 
     TABLET_SIZE: float
+    RAIL_WIDTH: float
 
     slides: dict
 
@@ -210,6 +211,7 @@ class VibrotactileCueExperiment(Experiment):
 
         self.TABLET_SIZE    = 31.1
         self.TARGET_PADDING = int(2.5 / self.TABLET_SIZE * self.window.size[1])
+        self.RAIL_WIDTH     = 2 / self.TABLET_SIZE * self.window.size[0]
 
         self.current_trial = None
         self.previous_trial = None
@@ -365,7 +367,7 @@ class VibrotactileCueExperiment(Experiment):
         Returns:
             None
         """
-        self.run_tutorial()
+        # self.run_tutorial()
         # Init
         self.clock.reset()
         # Trial sequence
@@ -694,8 +696,10 @@ class VibrotactileCueExperiment(Experiment):
 
         # If trial not confirmed yet: any new click starts the trial
         if not self.trial_confirmed:
-            distance_from_start = abs(mouse_pos[1] - self.STARTPOS[1])
-            confirmed = mouse_pressed and not self.mouse_pressed_last_frame and distance_from_start < self.MAX_CONFIRM_DISTANCE
+            distance_from_startY = abs(mouse_pos[1] - self.STARTPOS[1])
+            confirmed = ( mouse_pressed and not self.mouse_pressed_last_frame 
+                         and distance_from_startY < self.MAX_CONFIRM_DISTANCE
+                         and self.STARTPOS[0] <= mouse_pos[0] <= self.STARTPOS + self.RAIL_WIDTH )
         # If trial is running: any new click ends the trial
         else:
             confirmed = mouse_pressed and not self.mouse_pressed_last_frame
