@@ -1,0 +1,9 @@
+participant_id,trial_index,task,mapping,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+4ai,138,avoiding,reversed,Training,1,-26.05,324.12,1.185,-36.0,-809.0,0,0,0
+4ai,138,avoiding,reversed,Training,1,-26.05,324.12,1.206,-36.0,-795.0,0,0,0
+4ai,138,avoiding,reversed,Training,1,-26.05,324.12,1.222,-36.0,-788.0,0,0,0
+4ai,138,avoiding,reversed,Training,1,-26.05,324.12,1.239,-36.0,-781.0,0,0,0
+4ai,138,avoiding,reversed,Training,1,-26.05,324.12,1.256,-36.0,-777.0,0,0,0
+4ai,138,avoiding,reversed,Training,1,-26.05,324.12,1.272,-36.0,-772.0,0,0,0
+4ai,138,avoiding,reversed,Training,1,-26.05,324.12,1.285,-36.0,-769.0,0,0,0
+4ai,138,avoiding,reversed,Training,1,-26.05,324.12,1.306,-36.0,-763.0,1,0,0
