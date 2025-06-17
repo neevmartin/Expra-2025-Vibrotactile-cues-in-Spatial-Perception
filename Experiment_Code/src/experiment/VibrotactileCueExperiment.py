@@ -695,10 +695,10 @@ class VibrotactileCueExperiment(Experiment):
         # If trial not confirmed yet: any new click starts the trial
         if not self.trial_confirmed:
             distance_from_start = abs(mouse_pos[1] - self.STARTPOS[1])
-            confirmed = mouse_pressed and not self.mouse_pressed_last_frame and distance_from_start < self.MAX_CONFIRM_DISTANCE
+            confirmed = (not mouse_pressed) and self.mouse_pressed_last_frame and distance_from_start < self.MAX_CONFIRM_DISTANCE
         # If trial is running: any new click ends the trial
         else:
-            confirmed = mouse_pressed and not self.mouse_pressed_last_frame
+            confirmed = (not mouse_pressed) and self.mouse_pressed_last_frame
 
 
         self.mouse_pressed_last_frame = mouse_pressed
