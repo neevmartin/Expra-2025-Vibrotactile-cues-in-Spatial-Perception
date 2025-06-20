@@ -1,18 +1,19 @@
 import os
 import glob
-from trial import Trial
 import pandas as pd
+from helpers.trial import Trial
 
 class Participant():
     """
     Represents a single participant with all data
     """
 
-    def __init__(self, trials: list[Trial]):
+    def __init__(self, particpant_id:str, trials: list[Trial]):
         self.__trials: Trial = trials
+        self.__participant_id: str = particpant_id
 
     def __iter__(self, ):
-        """@return iterator object to iterate over the trials of a participant"""
+        """@return iterator object to iterate over the trials of a participant with normal loops"""
         return PartipantIterator(self.__trials)
 
     def get_as_one_dataframe(self) -> Trial:
@@ -26,12 +27,16 @@ class Participant():
     def get_trial(self, i:int) -> Trial:
         """@return trial at index i"""
         return self.__trials[i]
-
+    
+    def get_participant_id(self, ):
+        """@return the participant id (e.g. 11ri)"""
+        return self.__participant_id
 
     @staticmethod    
     def load_participant(folder: str) -> object:
         """
         Loads all trials of a participant and retruns a participant object
+        Sets the participant id according to the folder name
 
         @param folder The folder containing the trials as csv files
         @retrun Participant object containing all data of participant
@@ -41,7 +46,7 @@ class Participant():
             raise FileNotFoundError(f"The given folder {folder} does not exist")
         
 
-        return Participant(list(map(lambda file: Trial(pd.read_csv(file)), glob.iglob(f'{folder}/*'))))
+        return Participant(folder.split("/")[-1], list(map(lambda file: Trial(pd.read_csv(file)), glob.iglob(f'{folder}/*'))))
     
 
 class PartipantIterator():
@@ -53,7 +58,7 @@ class PartipantIterator():
         self.__trials = trials
         self.__index = 0
 
-    def __next__(self,):
+    def __next__(self,) -> Trial:
         if self.__index == len(self.__trials):
             raise StopIteration
         

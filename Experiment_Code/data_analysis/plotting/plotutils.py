@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt 
 import pandas as pd
-from trial import Trial
+from helpers import Trial
 
 def plot_trajectory(trial: Trial) -> None:
     """
@@ -23,5 +23,6 @@ def plot_trajectory(trial: Trial) -> None:
     plt.xlabel("time in seconds")
     plt.ylabel("y position")
     plt.title(f"Trial {trial_index}")
+    plt.legend()
 
     plt.show()
