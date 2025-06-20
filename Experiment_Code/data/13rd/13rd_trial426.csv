@@ -1,0 +1,13 @@
+participant_id,trial_index,task,mapping,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+13rd,426,avoiding,direct,Post-Test,1,-26.05,101.86,3.0,-41.0,-816.0,0,0,0
+13rd,426,avoiding,direct,Post-Test,1,-26.05,101.86,3.017,-41.0,-816.0,0,0,0
+13rd,426,avoiding,direct,Post-Test,1,-26.05,101.86,3.034,-41.0,-816.0,0,0,0
+13rd,426,avoiding,direct,Post-Test,1,-26.05,101.86,3.05,-41.0,-816.0,0,0,0
+13rd,426,avoiding,direct,Post-Test,1,-26.05,101.86,3.067,-41.0,-816.0,0,0,0
+13rd,426,avoiding,direct,Post-Test,1,-26.05,101.86,3.084,-41.0,-816.0,1,0,0
+13rd,426,avoiding,direct,Post-Test,1,-26.05,101.86,3.1,-41.0,-816.0,1,0,0
+13rd,426,avoiding,direct,Post-Test,1,-26.05,101.86,3.117,-41.0,-816.0,1,0,0
+13rd,426,avoiding,direct,Post-Test,1,-26.05,101.86,3.134,-41.0,-816.0,1,0,0
+13rd,426,avoiding,direct,Post-Test,1,-26.05,101.86,3.15,-41.0,-816.0,1,0,0
+13rd,426,avoiding,direct,Post-Test,1,-26.05,101.86,3.167,-41.0,-816.0,1,0,0
+13rd,426,avoiding,direct,Post-Test,1,-26.05,101.86,3.184,-41.0,-816.0,0,0,0
