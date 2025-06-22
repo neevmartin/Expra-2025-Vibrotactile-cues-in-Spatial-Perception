@@ -1,5 +1,6 @@
 import os
 import glob
+import helpers.warnings as warnings
 from helpers.participant import Participant
 
 class Condition():
@@ -35,6 +36,12 @@ class Condition():
         condition_map = {'rd':[], 'ri':[], 'ad':[], 'ai': []}
         for folder in glob.iglob(f'{folder}/*'):
             condition = folder[-2:] #rd, ri, ad, ai
+
+            # Ignores suspicious participant folder endings.
+            if condition not in condition_map.keys():
+                warnings.condition_warning(condition)
+                continue
+
             condition_map[condition].append(Participant.load_participant(folder))
 
         return list(map(lambda k_v_pair: Condition(k_v_pair[0], k_v_pair[1]), condition_map.items()))
