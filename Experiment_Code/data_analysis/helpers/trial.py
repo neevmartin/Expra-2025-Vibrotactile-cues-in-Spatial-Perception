@@ -6,11 +6,14 @@ class Trial(pd.DataFrame):
     def __init__(self, df: pd.DataFrame):
         super().__init__(data = df)
 
+    def print_short(self, ):
+        return f"Trial: {self.get_trial_index()}, Task: {self.get_task()}, Mapping: {self.get_mapping()}"
+
     def get_participant_id(self, ) -> str:
         return str(self[["participant_id"]].iloc[0].iloc[0])
         
-    def get_trial_index(self, ) -> str:
-        return str(self[["trial_index"]].iloc[0].iloc[0])
+    def get_trial_index(self, ) -> int:
+        return int(self[["trial_index"]].iloc[0].iloc[0])
         
     def get_task(self, ) -> str: 
         return str(self[["task"]].iloc[0].iloc[0])

@@ -34,13 +34,13 @@ class Participant(dict):
             self[phase][block].append(trial)
             
         self.__participant_id: str = particpant_id
-        self.__trials = trials
 
     def __iter__(self, ):
         """@return iterator object to iterate over the trials of a participant with normal loops"""
-        return PartipantIterator(self.__trials)
+        return PartipantIterator(self.get_sorted_list_of_trials())
     
     def __repr__(self):
+        """__repr__ is called when you print an object directly"""
         out = "{\n"
         for key_p, item_p in self.items():
             out += f"    {key_p}:" + "{\n"
@@ -52,23 +52,35 @@ class Participant(dict):
 
     def get_as_one_dataframe(self) -> Trial:
         """@return all trials concatinated to a single data frame"""
-        return pd.concat(self.__trials)
+        return pd.concat(self.get_sorted_list_of_trials())
     
     def get_trial_count(self) -> int:
         """@return the ammount of trials"""
-        return len(self.__trials)
+        count = 0
+        for item_p in self.values():
+            for item_b in item_p.values():
+                count += len(item_b)
+        return count
 
     def get_trial(self, i:int) -> Trial:
         """@return trial at index i"""
-        return self.__trials[i]
+        return self.get_sorted_list_of_trials()[i]
     
     def get_participant_id(self, ):
         """@return the participant id (e.g. 11ri)"""
         return self.__participant_id
 
     def get_phases(self, ):
+        """@return get all phases the participant took blocks in"""
         return list(self.keys())
-   
+    
+    def get_sorted_list_of_trials(self, ):
+        """@return get a list of all trials of the participant sorted by the trial number"""
+        trials = []
+        for item_p in self.values():
+            for item_b in item_p.values():
+                trials += item_b
+        return sorted(trials, key=lambda trial: trial.get_trial_index())
 
     @staticmethod    
     def load_participant(folder: str) -> object:
