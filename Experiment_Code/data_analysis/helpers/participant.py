@@ -50,9 +50,28 @@ class Participant(dict):
         out += "}"
         return out
 
-    def get_as_one_dataframe(self) -> Trial:
-        """@return all trials concatinated to a single data frame"""
-        return pd.concat(self.get_sorted_list_of_trials())
+    def get_as_one_dataframe(self, phase=None, block=None) -> Trial:
+        """
+        Enables fetching data accumulated in a single dataframe for further analysis.
+        
+        @param phase Gets Data from the specified phase
+        @param block Gets Data from the block in the phase. Phase must be specified
+
+        @return All trials concatinated to a single data frame (From a given phase/block)
+        """
+        
+        if phase is None:
+            return pd.concat(self.get_sorted_list_of_trials())
+        
+        phase = self[phase]
+        if block is not None:
+           return phase[block]
+        
+        trials = []
+        for block in phase.values():
+            trials += block
+
+        return trials
     
     def get_trial_count(self) -> int:
         """@return the ammount of trials"""
