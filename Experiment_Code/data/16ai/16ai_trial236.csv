@@ -1,0 +1,12 @@
+participant_id,trial_index,task,mapping,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+16ai,236,avoiding,reversed,Training,4,-26.05,324.12,1.162,-41.0,-797.0,0,0,0
+16ai,236,avoiding,reversed,Training,4,-26.05,324.12,1.179,-41.0,-797.0,0,0,0
+16ai,236,avoiding,reversed,Training,4,-26.05,324.12,1.196,-41.0,-797.0,0,0,0
+16ai,236,avoiding,reversed,Training,4,-26.05,324.12,1.212,-41.0,-797.0,0,0,0
+16ai,236,avoiding,reversed,Training,4,-26.05,324.12,1.229,-41.0,-797.0,1,0,0
+16ai,236,avoiding,reversed,Training,4,-26.05,324.12,1.246,-41.0,-797.0,1,0,0
+16ai,236,avoiding,reversed,Training,4,-26.05,324.12,1.262,-41.0,-798.0,1,0,0
+16ai,236,avoiding,reversed,Training,4,-26.05,324.12,1.279,-41.0,-798.0,1,0,0
+16ai,236,avoiding,reversed,Training,4,-26.05,324.12,1.296,-41.0,-798.0,1,0,0
+16ai,236,avoiding,reversed,Training,4,-26.05,324.12,1.312,-41.0,-798.0,1,0,0
+16ai,236,avoiding,reversed,Training,4,-26.05,324.12,1.33,-41.0,-798.0,0,0,0
