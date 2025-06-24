@@ -1,0 +1,17 @@
+participant_id,trial_index,task,mapping,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.519,-41.0,-831.0,0,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.535,-41.0,-831.0,0,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.551,-41.0,-830.0,0,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.564,-41.0,-830.0,0,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.58,-41.0,-830.0,0,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.597,-41.0,-830.0,0,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.614,-41.0,-830.0,1,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.63,-41.0,-830.0,1,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.647,-41.0,-830.0,1,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.664,-41.0,-829.0,1,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.68,-41.0,-829.0,1,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.699,-42.0,-829.0,1,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.714,-42.0,-828.0,1,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.732,-42.0,-828.0,1,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.747,-42.0,-828.0,1,0,0
+15ad,30,reaching,direct,Pre-Test,1,-26.05,768.62,16.766,-42.0,-827.0,0,0,0
