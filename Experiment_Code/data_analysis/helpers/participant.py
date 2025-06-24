@@ -17,8 +17,10 @@ class Participant(dict):
     }
 
     Can be accessed as a dictionary or using the helper methods
-
     """
+
+    TRIAL_LIST_PARENT: object = None
+    TRIAL_LIST_CACHE: list[Trial] = []
 
     def __init__(self, particpant_id:str, trials: list[Trial]):
 
@@ -95,10 +97,18 @@ class Participant(dict):
     
     def get_sorted_list_of_trials(self, ):
         """@return get a list of all trials of the participant sorted by the trial number"""
+
+        if Participant.TRIAL_LIST_PARENT is self:
+            return Participant.TRIAL_LIST_CACHE
+
         trials = []
         for item_p in self.values():
             for item_b in item_p.values():
                 trials += item_b
+
+        Participant.TRIAL_LIST_CACHE = trials
+        Participant.TRIAL_LIST_PARENT = self
+
         return sorted(trials, key=lambda trial: trial.get_trial_index())
 
     @staticmethod    
