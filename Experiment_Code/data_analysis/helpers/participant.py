@@ -106,10 +106,11 @@ class Participant(dict):
             for item_b in item_p.values():
                 trials += item_b
 
+        trials = sorted(trials, key=lambda trial: trial.get_trial_index())
         Participant.TRIAL_LIST_CACHE = trials
         Participant.TRIAL_LIST_PARENT = self
 
-        return sorted(trials, key=lambda trial: trial.get_trial_index())
+        return trials
 
     @staticmethod    
     def load_participant(folder: str) -> object:
