@@ -1,1 +1,3 @@
-from plotting.plotutils import plot_trajectory
+from plotting.plotutils import plot_trajectory, plot_prepost_comparison
+import plotting.plotutils
+import plotting.preprocessor

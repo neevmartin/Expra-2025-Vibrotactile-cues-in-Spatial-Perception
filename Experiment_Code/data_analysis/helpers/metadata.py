@@ -17,10 +17,31 @@ which are the classes for each distance.
 
 PIXEL_RAIL_BOTTOM = -807
 """
-Start of the rail in pixels from where the participant could start to draw.
+Start of the rail in pixels from where the participant could start to draw. This is a y coordinate.
 """
 
 PIXEL_RAIL_TOP = 901
 """
-End of the rail in pixels where the participant must stop to draw.
+End of the rail in pixels where the participant must stop to draw. This is a y coordinate.
+"""
+
+PIXEL_RAIL_LEFT = -37
+"""
+Left rail edge in pixels. This is an x coordinate.
+"""
+
+PIXEL_RAIL_RIGHT = 44
+"""
+Right rail edge in pixels. This is an x coordinate.
+"""
+
+PIXEL_RAILWAY_WIDTH = abs(PIXEL_RAIL_LEFT - PIXEL_RAIL_RIGHT)
+"""
+Width of the railway in pixels.
+"""
+
+AVOIDING_THRESHOLD = 0.8
+"""
+Ratio of the rail width starting from the rail opposite to the participant's dominant hand.
+Decides in the avoiding task when the movement to the opposite rail counts as 'avoiding'. 
 """
