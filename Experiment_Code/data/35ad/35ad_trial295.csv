@@ -1,0 +1,15 @@
+participant_id,trial_index,task,mapping,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.155,-34.0,-819.0,0,0,0
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.172,-35.0,-819.0,0,0,0
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.188,-35.0,-819.0,0,0,0
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.205,-35.0,-819.0,0,0,0
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.223,-35.0,-819.0,1,0,0
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.238,-35.0,-819.0,1,0,0
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.251,-35.0,-819.0,1,0,0
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.272,-34.0,-819.0,1,0,0
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.288,-34.0,-819.0,1,0,0
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.305,-34.0,-819.0,1,0,0
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.322,-34.0,-818.0,1,0,0
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.338,-34.0,-818.0,1,0,0
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.355,-34.0,-818.0,1,0,0
+35ad,295,avoiding,direct,Training,5,-26.05,-120.39,1.373,-34.0,-817.0,0,0,0

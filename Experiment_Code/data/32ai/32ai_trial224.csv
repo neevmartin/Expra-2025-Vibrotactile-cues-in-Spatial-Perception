@@ -1,0 +1,5 @@
+participant_id,trial_index,task,mapping,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+32ai,224,avoiding,reversed,Training,3,-26.05,-120.39,0.818,-37.0,-817.0,1,0,0
+32ai,224,avoiding,reversed,Training,3,-26.05,-120.39,0.834,-37.0,-817.0,1,0,0
+32ai,224,avoiding,reversed,Training,3,-26.05,-120.39,0.85,-37.0,-817.0,1,0,0
+32ai,224,avoiding,reversed,Training,3,-26.05,-120.39,0.868,-37.0,-817.0,0,0,0
