@@ -1,0 +1,17 @@
+participant_id,trial_index,task,mapping,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,6.901,-34.0,-807.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,6.917,-34.0,-807.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,6.934,-34.0,-807.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,6.951,-34.0,-807.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,6.968,-34.0,-806.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,6.984,-34.0,-806.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,6.996,-34.0,-806.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,7.013,-34.0,-806.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,7.029,-34.0,-806.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,7.046,-34.0,-807.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,7.063,-34.0,-807.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,7.079,-34.0,-807.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,7.096,-34.0,-808.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,7.113,-34.0,-808.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,7.13,-33.0,-808.0,1,0,0
+28ai,251,avoiding,reversed,Training,4,-26.05,-564.89,7.147,-33.0,-808.0,0,0,0
