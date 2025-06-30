@@ -45,3 +45,13 @@ AVOIDING_THRESHOLD = 0.8
 Ratio of the rail width starting from the rail opposite to the participant's dominant hand.
 Decides in the avoiding task when the movement to the opposite rail counts as 'avoiding'. 
 """
+
+TABLET_SIZE = 31.1
+"""
+The size of the drawable space on the tablet
+"""
+
+WINDOW_SIZE = 1080, 1920
+"""
+The size of the psychopy window
+"""

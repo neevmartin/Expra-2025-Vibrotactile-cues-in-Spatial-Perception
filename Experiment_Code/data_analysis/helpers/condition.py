@@ -46,6 +46,22 @@ class Condition():
 
         return list(map(lambda k_v_pair: Condition(k_v_pair[0], k_v_pair[1]), condition_map.items()))
     
+    @staticmethod
+    def load_conditional_group(folder: str = "../data", condition: str = "rd") -> object:
+        """@return single condition"""
+
+        if not os.path.exists(folder):
+            raise FileNotFoundError(f"The given folder {folder} does not exist")
+     
+        if condition not in ["rd", "ri", "ad", "ai"]:
+            raise ValueError("Only condtitions of type ['rd', 'ri', 'ad', 'ai'] allowed")
+
+        participants = []
+        for folder in glob.iglob(f'{folder}/*{condition}'):
+            participants.append(Participant.load_participant(folder))
+
+        return Condition(condition, participants)
+
 class ConditionIterator():
     """
     This class represents a iterator object to iterate over the participant of a condition
