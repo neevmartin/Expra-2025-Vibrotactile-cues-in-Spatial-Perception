@@ -34,7 +34,7 @@ class Participant(dict):
                 self[phase][block] = []
 
             self[phase][block].append(trial)
-            
+
         self.__participant_id: str = particpant_id
 
     def __iter__(self, ):
@@ -62,19 +62,34 @@ class Participant(dict):
         @return All trials concatinated to a single data frame (From a given phase/block)
         """
         
+        return pd.concat(self.get_as_one_list(phase, block))
+    
+    def get_as_one_list(self, phase=None, block=None) -> Trial:
+        """
+        Enables fetching data accumulated in a single list.
+        
+        @param phase Gets Data from the specified phase
+        @param block Gets Data from the block in the phase. Phase must be specified
+
+        @return All trials concatinated in a single list (From a given phase/block)
+        """
+        
+        if phase is None and block is not None:
+            raise ValueError("If arg block is set, phase must also be set")
+
         if phase is None:
-            return pd.concat(self.get_sorted_list_of_trials())
+            return self.get_sorted_list_of_trials()
         
         phase = self[phase]
         if block is not None:
-           return phase[block]
+           return sorted(phase[block], key=lambda trial: trial.get_trial_index())
         
         trials = []
         for block in phase.values():
             trials += block
 
-        return trials
-    
+        return sorted(trials, key=lambda trial: trial.get_trial_index())
+
     def get_trial_count(self) -> int:
         """@return the ammount of trials"""
         count = 0

@@ -48,7 +48,7 @@ def plot_xy_trajectory(trial: Trial) -> None:
 
     # plot the figure
 
-    plt.figure(figsize=(1, 2))
+    plt.figure()
 
     plt.plot(pos[["current_pos_x"]], pos[["current_pos_y"]], label="trajectory")
     plt.axhline(y=target_pos_y, color="red", label="target y-pos", linestyle="--")
