@@ -26,7 +26,6 @@ _PLOT_CONFIG = {
 INTENSITIES = np.array(PERCENT_INTENSITIES)
 DISTANCES = np.array(PIXEL_DISTANCES)
 
-
 def plot_trajectory(trial: Trial) -> None:
     """
     Plots a simple trajectory from timestamp and position_x
