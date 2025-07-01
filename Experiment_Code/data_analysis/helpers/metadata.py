@@ -51,3 +51,13 @@ PIXEL_FROM_RAIL_CONFIRM_DISTANCE = PIXEL_RAILWAY_WIDTH * AVOIDING_THRESHOLD
 Length from rail opposite to the dominant hand of the participant. If exceeded
 the participant has confirmed their avoiding action.
 """
+
+TABLET_SIZE = 31.1
+"""
+The size of the drawable space on the tablet
+"""
+
+WINDOW_SIZE = 1080, 1920
+"""
+The size of the psychopy window
+"""

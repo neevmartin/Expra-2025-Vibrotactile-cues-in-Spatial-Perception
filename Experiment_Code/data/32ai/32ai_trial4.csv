@@ -1,0 +1,17 @@
+participant_id,trial_index,task,mapping,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.28,-37.0,-815.0,0,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.297,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.313,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.329,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.346,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.363,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.379,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.396,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.413,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.429,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.446,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.463,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.479,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.496,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.513,-37.0,-815.0,1,0,0
+32ai,4,reaching,reversed,Pre-Test,1,-26.05,324.12,3.53,-37.0,-815.0,0,0,0

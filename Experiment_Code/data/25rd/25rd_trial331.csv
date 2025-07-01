@@ -1,0 +1,3 @@
+participant_id,trial_index,task,mapping,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+25rd,331,reaching,direct,Post-Test,1,-26.05,324.12,1.169,-40.0,-822.0,1,0,0
+25rd,331,reaching,direct,Post-Test,1,-26.05,324.12,1.186,-40.0,-822.0,0,0,0

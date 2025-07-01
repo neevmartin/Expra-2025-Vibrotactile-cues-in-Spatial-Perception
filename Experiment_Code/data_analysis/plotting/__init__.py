@@ -1,3 +1,4 @@
-from plotting.plotutils import plot_trajectory, plot_prepost_comparison
+from plotting.plotutils import plot_prepost_comparison
+from plotting.trajectories import plot_xy_trajectory, plot_y_trajectory_over_time
 import plotting.plotutils
 import plotting.preprocessor

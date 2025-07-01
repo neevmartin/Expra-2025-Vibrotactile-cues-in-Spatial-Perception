@@ -1,0 +1,17 @@
+participant_id,trial_index,task,mapping,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.771,-39.0,-811.0,0,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.787,-39.0,-811.0,0,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.804,-39.0,-811.0,0,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.821,-38.0,-811.0,0,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.837,-38.0,-811.0,0,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.854,-38.0,-811.0,0,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.87,-38.0,-811.0,1,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.887,-38.0,-811.0,1,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.904,-38.0,-811.0,1,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.92,-38.0,-811.0,1,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.937,-38.0,-811.0,1,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.954,-38.0,-811.0,1,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.966,-38.0,-811.0,1,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,0.987,-38.0,-811.0,1,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,1.004,-38.0,-811.0,1,0,0
+32ai,400,avoiding,reversed,Recap,1,-26.05,-120.39,1.021,-38.0,-810.0,0,0,0
