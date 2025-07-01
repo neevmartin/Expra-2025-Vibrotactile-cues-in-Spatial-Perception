@@ -5,8 +5,8 @@ Please do only use immutable datatypes and document your additions.
 
 PIXEL_DISTANCES = (-564.89, -342.64, -120.39, 101.86, 324.12, 558.71, 768.62)
 """
-Pixel distances on the tablet from low to high 
-which are the classes for each intensity.
+Y coordinate distances on the tablet from low to high 
+in pixels which are the classes for each intensity.
 """
 
 PERCENT_INTENSITIES = (28, 40, 52, 64, 76, 88, 100)
@@ -44,4 +44,10 @@ AVOIDING_THRESHOLD = 0.8
 """
 Ratio of the rail width starting from the rail opposite to the participant's dominant hand.
 Decides in the avoiding task when the movement to the opposite rail counts as 'avoiding'. 
+"""
+
+PIXEL_FROM_RAIL_CONFIRM_DISTANCE = PIXEL_RAILWAY_WIDTH * AVOIDING_THRESHOLD
+"""
+Length from rail opposite to the dominant hand of the participant. If exceeded
+the participant has confirmed their avoiding action.
 """
