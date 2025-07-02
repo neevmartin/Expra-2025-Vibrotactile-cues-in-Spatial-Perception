@@ -1,0 +1,15 @@
+participant_id,trial_index,task,mapping,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.417,41.0,-810.0,0,0,0
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.434,41.0,-810.0,0,0,0
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.45,41.0,-810.0,0,0,0
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.467,41.0,-810.0,0,0,0
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.484,41.0,-810.0,0,0,0
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.5,41.0,-810.0,0,0,0
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.517,41.0,-810.0,0,0,0
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.534,41.0,-810.0,0,0,0
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.551,41.0,-810.0,1,0,0
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.567,41.0,-810.0,1,0,0
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.584,41.0,-810.0,1,0,0
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.6,41.0,-810.0,1,0,0
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.619,41.0,-810.0,1,0,0
+41rd,383,reaching,direct,Recap,1,-26.05,-120.39,3.634,41.0,-810.0,0,0,0
