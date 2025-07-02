@@ -36,14 +36,8 @@ def generate_prepost_comparison(
         'distance': []
     }
 
-    pre_allowed_states.update({
-        'phases':    ['Pre-Test'], 
-        'block_nrs': [1]
-    })
-    post_allowed_states.update({
-        'phases':    ['Post-Test'], 
-        'block_nrs': [1]
-    })
+    pre_allowed_states = {**pre_allowed_states, 'phases': ['Pre-Test'], 'block_nrs': [1]}
+    post_allowed_states = {**post_allowed_states, 'phases': ['Post-Test'], 'block_nrs': [1]}
 
     for participant in participants:
         df = participant.get_as_one_dataframe()
@@ -83,9 +77,9 @@ def calculate_intensity(mapping: Literal['direct', 'reversed'], target_pos_y: fl
     validate_oneof(target_pos_y, PIXEL_DISTANCES, check_type='distance class')
 
     distance_idx = PIXEL_DISTANCES.index(target_pos_y)
-    distance_idx = -(distance_idx + 1) if mapping == 'direct' else distance_idx
+    distance_idx = -(distance_idx + 1) if mapping == 'reversed' else distance_idx
     intensity = PERCENT_INTENSITIES[distance_idx]
-    
+
     return intensity
 
 def extract_intensity_to_distance_predictions(df, allowed_states: dict, dominant_hand: Literal['left', 'right']):
@@ -145,7 +139,7 @@ def _find_predicted_distance(
             dominant_hand
         )['current_pos_y']
 
-    predicted_distance = possible_distances.iloc[prediction_idx] 
+    predicted_distance = possible_distances.iloc[prediction_idx] if len(possible_distances) > 0 else np.nan
 
     return predicted_distance
 
