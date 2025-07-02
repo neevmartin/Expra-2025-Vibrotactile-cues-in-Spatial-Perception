@@ -1,0 +1,16 @@
+participant_id,trial_index,task,mapping,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.734,-31.0,-809.0,0,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.746,-31.0,-809.0,0,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.762,-31.0,-809.0,0,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.781,-31.0,-809.0,0,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.796,-31.0,-809.0,0,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.813,-31.0,-809.0,0,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.829,-31.0,-809.0,0,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.847,-31.0,-809.0,1,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.862,-31.0,-809.0,1,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.88,-31.0,-810.0,1,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.896,-31.0,-810.0,1,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.913,-31.0,-810.0,1,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.929,-31.0,-810.0,1,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.946,-32.0,-810.0,1,0,0
+39ad,402,avoiding,direct,Recap,1,-26.05,768.62,0.963,-32.0,-810.0,0,0,0
