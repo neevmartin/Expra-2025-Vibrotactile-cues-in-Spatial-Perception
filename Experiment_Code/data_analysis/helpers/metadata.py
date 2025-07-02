@@ -3,6 +3,21 @@ Metadatabase where we can store important information about our experiment.
 Please do only use immutable datatypes and document your additions.
 """
 
+HANDEDNESSES = ('left', 'right')
+"""
+Constant to check dominant hand inputs.
+"""
+
+TASKS = ('avoiding', 'reaching')
+"""
+Constant to check task inputs.
+"""
+
+MAPPINGS = ('direct', 'reversed')
+"""
+Constant to check mapping inputs.
+"""
+
 PIXEL_DISTANCES = (-564.89, -342.64, -120.39, 101.86, 324.12, 558.71, 768.62)
 """
 Y coordinate distances on the tablet from low to high 
@@ -50,6 +65,18 @@ PIXEL_FROM_RAIL_CONFIRM_DISTANCE = PIXEL_RAILWAY_WIDTH * AVOIDING_THRESHOLD
 """
 Length from rail opposite to the dominant hand of the participant. If exceeded
 the participant has confirmed their avoiding action.
+"""
+
+LEFT_HANDED_PIXEL_AVOIDING_BOUNDARY = PIXEL_RAIL_RIGHT - PIXEL_FROM_RAIL_CONFIRM_DISTANCE
+"""
+Marks the vertical boundary in pixels for confirming 
+the avoiding action in case of a *left* handed participant.
+"""
+
+RIGHT_HANDED_PIXEL_AVOIDING_BOUNDARY = PIXEL_RAIL_LEFT + PIXEL_FROM_RAIL_CONFIRM_DISTANCE
+"""
+Marks the vertical boundary in pixels for confirming 
+the avoiding action in case of a *right* handed participant.
 """
 
 TABLET_SIZE = 31.1
