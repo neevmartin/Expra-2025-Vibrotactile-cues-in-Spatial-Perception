@@ -80,7 +80,7 @@ def generate_prepost_comparison(
 # Calculate intensities with given mapping and distances
 def calculate_intensity(mapping: Literal['direct', 'reversed'], target_pos_y: float) -> float:
     validate_oneof(mapping, MAPPINGS, 'mapping')
-    validate_oneof(target_pos_y, PIXEL_DISTANCES, type='distance class')
+    validate_oneof(target_pos_y, PIXEL_DISTANCES, check_type='distance class')
 
     distance_idx = PIXEL_DISTANCES.index(target_pos_y)
     distance_idx = -(distance_idx + 1) if mapping == 'direct' else distance_idx
@@ -131,7 +131,7 @@ def _find_predicted_distance(
         task: Literal['avoiding', 'reaching'], 
         dominant_hand: Literal['left', 'right'] = None
     ) -> float:
-    validate_oneof(task, TASKS, type='task')
+    validate_oneof(task, TASKS, check_type='task')
     validate_hand_info_needed(dominant_hand, task)
 
     # Returns last recorded position for reaching.  Returns first position exceeding threshold for avoiding.
