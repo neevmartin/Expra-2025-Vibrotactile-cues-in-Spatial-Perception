@@ -2,7 +2,8 @@ from typing import (
     Any, 
     List, 
     Iterable, 
-    Dict
+    Dict,
+    Literal
 )
 
 ALLOWED_STATES = {
@@ -56,7 +57,11 @@ def validate_states(states: Dict[str, Iterable]):
         except ValueError as e:
             raise ValueError(f"Invalid values for '{key}': {e}")
     
-def validate_oneof(one: Any, of: Iterable[Any], check_type: str) -> Any:
+def validate_oneof(
+        one: Any, 
+        of: Iterable[Any], 
+        check_type: str
+    ) -> Any:
     """
     Validates that a given value exists within a list of allowed values.
 
@@ -82,7 +87,10 @@ def validate_oneof(one: Any, of: Iterable[Any], check_type: str) -> Any:
             return o
     raise ValueError(f"Invalid {check_type}: '{one}'.")
 
-def validate_hand_info_needed(dominant_hand: str, task: str):
+def validate_hand_info_needed(
+        dominant_hand: Literal['left', 'right'], 
+        task: Literal['avoiding', 'reaching']
+    ):
     """Validates that dominant handedness is provided for avoiding task.
 
     Args:
