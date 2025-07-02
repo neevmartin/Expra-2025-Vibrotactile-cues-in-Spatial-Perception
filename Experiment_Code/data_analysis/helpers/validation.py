@@ -49,9 +49,9 @@ def validate_states(states: Dict[str, Iterable]):
     Raises:
         ValueError: If any key is missing or contains invalid values.
     """
-    for key, states in ALLOWED_STATES.items():
+    for key, value in ALLOWED_STATES.items():
         try:
-            validate_subset(states[key], states)
+            validate_subset(states[key], value)
         except KeyError:
             raise ValueError(f"Missing required key in states: '{key}'")
         except ValueError as e:
