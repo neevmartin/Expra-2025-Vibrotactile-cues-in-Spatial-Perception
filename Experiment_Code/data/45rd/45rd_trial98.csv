@@ -1,0 +1,6 @@
+participant_id,trial_index,task,mapping,phase,block,target_pos_x,target_pos_y,timestamp,current_pos_x,current_pos_y,left_button_pressed,middle_button_pressed,right_button_pressed
+45rd,98,reaching,direct,Pre-Test,1,-26.05,558.71,1.389,-39.0,-803.0,1,0,0
+45rd,98,reaching,direct,Pre-Test,1,-26.05,558.71,1.405,-39.0,-803.0,1,0,0
+45rd,98,reaching,direct,Pre-Test,1,-26.05,558.71,1.418,-39.0,-803.0,1,0,0
+45rd,98,reaching,direct,Pre-Test,1,-26.05,558.71,1.438,-39.0,-803.0,1,0,0
+45rd,98,reaching,direct,Pre-Test,1,-26.05,558.71,1.455,-39.0,-803.0,0,0,0
