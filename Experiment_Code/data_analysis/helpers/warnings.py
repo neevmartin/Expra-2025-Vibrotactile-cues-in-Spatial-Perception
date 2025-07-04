@@ -1,3 +1,4 @@
+from typing import Any
 from warnings import warn
 
 def condition_warning(condition: str):
@@ -23,3 +24,13 @@ def not_yet_implemented_warning(to_be_implemented: str):
         to_be_implemented (str): A description or name of the feature that is pending implementation.
     """
     warn(f"TODO: '{to_be_implemented}' not yet implemented.", RuntimeWarning)
+
+def nan_occurrence_warning(**kwargs_conditions: Any):
+    """
+    Issues a warning about detected NaN-related condition(s), with descriptive variable names.
+    
+    Args:
+        kwargs_conditions: Keyword arguments representing context variables to include in the warning.
+    """
+    formatted_conditions = ', '.join(f"{k}={v}" for k, v in kwargs_conditions.items())
+    warn(f"NaN detected with conditions: {formatted_conditions}", RuntimeWarning)

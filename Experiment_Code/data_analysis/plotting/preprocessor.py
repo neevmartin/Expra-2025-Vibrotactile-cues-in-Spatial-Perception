@@ -10,9 +10,13 @@ import numpy as np
 import pandas as pd
 
 from helpers.validation import (
+    validate_subset,
     validate_states,
     validate_oneof,
     validate_hand_info_needed
+)
+from helpers.warnings import (
+    nan_occurrence_warning
 )
 from helpers.metadata import (
     HANDEDNESSES, TASKS, MAPPINGS, # String checks
@@ -188,28 +192,37 @@ def _find_predicted_distance(
     For 'avoiding', returns the first Y-position where the X-coordinate exceeds the threshold boundary which is based on the dominant hand.
 
     Args:
-        trial (pd.DataFrame): Trial data containing at least 'current_pos_x' and 'current_pos_y' columns.
+        trial (pd.DataFrame): Trial data containing at least 'current_pos_x' and 'current_pos_y' as well as 'trial_index' columns.
         task (Literal['avoiding', 'reaching']): The task type to determine prediction logic.
         dominant_hand (Literal['left', 'right'], optional): Required for the 'avoiding' task to select associated threshold boundary.
 
     Returns:
         float: Predicted Y-coordinate distance, or NaN if the participant did not avoid in the avoiding task.
     """
+    validate_subset(('current_pos_x', 'current_pos_y', 'trial_index'), trial.columns)
     validate_oneof(task, TASKS, check_type='task')
     validate_hand_info_needed(dominant_hand, task)
 
-    # Returns last recorded position for reaching.  Returns first position exceeding threshold for avoiding.
     if task == 'reaching':
-        prediction_idx = -1
+        # Returns last recorded position for reaching.
         possible_distances = trial['current_pos_y']
+        prediction_idx = -1
     else:
-        prediction_idx = 0
+        # Returns first position exceeding threshold for avoiding.
         possible_distances = _find_exceeding_threshold_positions(
             trial[['current_pos_x', 'current_pos_y']], 
             dominant_hand
         )['current_pos_y']
+        prediction_idx = 0
 
-    predicted_distance = possible_distances.iloc[prediction_idx] if len(possible_distances) > 0 else np.nan
+    predicted_distance = possible_distances.iat[prediction_idx] if not possible_distances.empty else np.nan
+
+    if np.isnan(predicted_distance):
+        nan_occurrence_warning(
+            task=task,
+            context='participant did not avoid' if task == 'avoiding' else "no data was recorded", 
+            trial_index=trial['trial_index'].iat[0]
+        )
 
     return predicted_distance
 
@@ -224,6 +237,8 @@ def compute_distances_meanstds(data: dict | pd.DataFrame) -> Tuple[List[float], 
         Tuple[List[float], List[float]]: Two lists containing the means and standard deviations for each intensity level.
     """
     data = pd.DataFrame(data) # Ensures loc method is available
+    validate_subset(sub=('intensity', 'distance'), super=data.columns)
+
     means, stds = [], []
 
     for intensity in PERCENT_INTENSITIES:
