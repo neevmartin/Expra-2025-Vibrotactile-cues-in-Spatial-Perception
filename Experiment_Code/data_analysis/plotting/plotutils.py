@@ -1,13 +1,20 @@
-from typing import Literal, Tuple, List
+# Standard
+from typing import (
+    Literal, 
+    Tuple, 
+    List
+)
+from collections.abc import Sized
 
+# Third party
 import matplotlib.pyplot as plt 
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.container import ErrorbarContainer
-
 import pandas as pd
 import numpy as np
 
+# Intern
 from helpers import Trial
 from helpers.validation import validate_oneof
 from helpers.metadata import (
@@ -16,6 +23,7 @@ from helpers.metadata import (
     PIXEL_RAIL_TOP
 )
 
+# Constants
 _PLOT_CONFIG = {
     'errorbar_offset': 1.5,
     'y_padding': {'predictions': 50, 'prepost_comparison': 0, 'regress_prediction': 100},
@@ -26,6 +34,7 @@ _PLOT_CONFIG = {
 INTENSITIES = np.array(PERCENT_INTENSITIES)
 DISTANCES = np.array(PIXEL_DISTANCES)
 
+# Plot functions
 def plot_predictions(
         intensities: List[float], 
         distances: List[float]
@@ -45,7 +54,6 @@ def plot_predictions(
                              NOTE: You can change the design to your liking with these.
     """
     # Config
-    Y_PADDING = 50
     fig, ax = _setup_plot()
     _configure_tablet_axes(ax, INTENSITIES, DISTANCES, padding=_PLOT_CONFIG['y_padding']['predictions'])
 
@@ -122,9 +130,9 @@ def plot_poly_regress_prediction(
     predict_coeffs             = np.polyfit(intensities, distances, order)
     true_slope, true_intercept = np.polyfit(INTENSITIES, DISTANCES, 1)
 
-    x = np.linspace(INTENSITIES.min(), INTENSITIES.max(), num=100)
-    y1 = np.poly1d(predict_coeffs)
-    y2 = true_slope * x + true_intercept
+    intensities = np.linspace(INTENSITIES.min(), INTENSITIES.max(), num=100)
+    y_predict = np.poly1d(predict_coeffs)
+    y_true = true_slope * intensities + true_intercept
 
     # Config
     fig, ax = _setup_plot()
@@ -132,13 +140,13 @@ def plot_poly_regress_prediction(
                            padding=_PLOT_CONFIG['y_padding']['regress_prediction'])
     
     # Plots
-    ax.plot(x, y1(x), label='Predicted Mapping')
-    ax.plot(x, y2, label='True Mapping')
+    ax.plot(intensities, y_predict(x), label='Predicted Mapping')
+    ax.plot(intensities, y_true, label='True Mapping')
 
     # Styling
     ax.set_xlabel('Intensity')
     ax.set_ylabel('Predicted Distance')
-    ax.set_title('Linear Regression Findings of Predicted Mapping')
+    ax.set_title('Polynomial Regression Findings of Predicted Mapping')
     ax.legend(loc='upper left')
     fig.tight_layout()
     
@@ -154,16 +162,15 @@ def _setup_plot() -> Tuple[Figure, Axes]:
         Tuple[Figure, Axes]: The main figure and axes object for further plotting.
     """
     fig, ax = plt.subplots(figsize=(5, 3.5), dpi=300)
-    rail_top_ax = ax.twiny()
-    rail_top_ax.set_xticks([])
-    for spine in [ax.spines, rail_top_ax.spines]:
-        spine['left'].set_visible(False)
-        spine['right'].set_visible(False)
+
+    ax.spines['left'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
     return fig, ax
 
 def _configure_tablet_axes(
         ax: Axes, 
-        intensities, 
+        intensities: List | np.ndarray, 
         distances, 
         padding : float = 0.
     ) -> None:
@@ -176,11 +183,14 @@ def _configure_tablet_axes(
         distances: List of predicted distances to mark on the y-axis.
         padding (float, optional): Extra vertical padding added to the top and bottom of the rail area.
     """
-    ax.set_xlim(intensities.min()-5, intensities.max()+5) # NOTE: hard coded x-padding
+    if len(intensities) == 0 or len(distances) == 0:
+        raise ValueError("There are no ")
+    ax.set_xlim(min(intensities)-5, max(intensities)+5) # NOTE: hard coded x-padding
     ax.set_ylim(PIXEL_RAIL_BOTTOM-padding, PIXEL_RAIL_TOP+padding)
     ax.set_xticks(intensities)
     ax.set_yticks([PIXEL_RAIL_BOTTOM, *distances, PIXEL_RAIL_TOP])
     ax.set_yticklabels(['Rail Bot', *[f"{d:.1f}" for d in distances], 'Rail Top'])
+    ax.tick_params(axis='y', length=0)
     ax.set_xlabel('Intensity (%)', fontsize=_PLOT_CONFIG['font_sizes']['label'])
     ax.set_ylabel('Predicted Distance (Pixels)', fontsize=_PLOT_CONFIG['font_sizes']['label'])
 
