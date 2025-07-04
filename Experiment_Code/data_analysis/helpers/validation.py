@@ -1,3 +1,4 @@
+# Standard
 from typing import (
     Any, 
     List, 
@@ -5,6 +6,10 @@ from typing import (
     Dict,
     Literal
 )
+from collections.abc import Sized
+
+# Intern
+from .messages import ErrorMessages as errmsg
 
 ALLOWED_STATES = {
     'tasks': {'avoiding', 'reaching'},
@@ -30,7 +35,7 @@ def validate_subset(sub: Iterable, super: Iterable):
         ValueError: If `subset` is not a subset of `superset`.
     """
     if not set(sub).issubset(set(super)):
-        raise ValueError(f"Set {sub} is not a subset of {super}.")
+        raise ValueError(errmsg.NO_SUBSET_OF_SUPERSET.format(sub=sub, super=super))
     
 def validate_states(states: Dict[str, Iterable]):
     """
@@ -53,9 +58,9 @@ def validate_states(states: Dict[str, Iterable]):
         try:
             validate_subset(states[key], value)
         except KeyError:
-            raise ValueError(f"Missing required key in states: '{key}'")
-        except ValueError as e:
-            raise ValueError(f"Invalid values for '{key}': {e}")
+            raise ValueError(errmsg.MISSING_KEY.format(key=key))
+        except ValueError:
+            raise ValueError(errmsg.INVALID_TYPE_VALUE.format(check_type=key, value=states[key]))
     
 def validate_oneof(
         one: Any, 
@@ -85,7 +90,7 @@ def validate_oneof(
     for o in of:
         if one == o:
             return o
-    raise ValueError(f"Invalid {check_type}: '{one}'.")
+    raise ValueError(errmsg.INVALID_TYPE_VALUE.format(check_type=check_type, value=one))
 
 def validate_hand_info_needed(
         dominant_hand: Literal['left', 'right'], 
@@ -102,7 +107,20 @@ def validate_hand_info_needed(
     """
     task = _make_comparable(task)
     if task == 'avoiding' and not dominant_hand:
-        raise ValueError("Avoiding performance cannot be evaluated when no dominant hand was assigned.")
+        raise ValueError(errmsg.NO_DOMINANT_HAND_AVOIDING)
+    
+def validate_nonempty(sized: Sized, msg: str) -> None:
+    """
+    Raises an error if the provided object is empty.
+
+    Args:
+        sized (Sized): Any object that implements __len__().
+        msg (str): Error message to raise if the object is empty.
+
+    Raises:
+        ValueError: If the object is empty.
+    """
+    if len(sized) == 0: raise ValueError(msg)
     
 ### Private helpers
     

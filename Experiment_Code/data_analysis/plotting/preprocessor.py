@@ -1,6 +1,5 @@
 # Standard
 from typing import (
-    TypedDict,
     Literal, 
     Tuple, 
     List,
@@ -30,6 +29,7 @@ from helpers.metadata import (
     LEFT_HANDED_PIXEL_AVOIDING_BOUNDARY,
     RIGHT_HANDED_PIXEL_AVOIDING_BOUNDARY
 )
+from helpers import ErrorMessages as errmsg
 
 def generate_prepost_comparison(
         participants: list, 
@@ -168,7 +168,7 @@ def extract_intensity_to_distance_predictions(
         Tuple[List[float], List[float]]: Lists of intensities and their corresponding predicted distances.
 
     Raises:
-        ValueError: If allowed states do not follow structure or include contradicting states. 
+        ValueError: If allowed states do not follow structure or include contradicting states e.g. mapping = ['direct', 'reversed']. 
                     If for the avoiding task there was no dominant hand assigned.
     """
     validate_states(allowed_states)   
@@ -182,12 +182,8 @@ def extract_intensity_to_distance_predictions(
         & df['phase'].isin(allowed_states.get('phases'))
         & df['block'].isin(allowed_states.get('block_nrs'))
     ]
-
-    if len(df) == 0:
-        raise ValueError(
-            'Dataframe is empty. It is very likely an impossible state was given leading to disjunct sets in the query.' \
-            'Check your queries for such impossible states: e.g. \'Participant mapping is inverse but we select direct\'.'
-        )
+    # Check for impossible states
+    validate_nonempty(df, msg=errmsg.EMPTY_FILTERING)
 
     # Compute intesity with the given information -> it is not part of the output data!
     df['intensity'] = df[['mapping', 'target_pos_y']].apply(
