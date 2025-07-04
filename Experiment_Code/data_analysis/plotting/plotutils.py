@@ -140,7 +140,7 @@ def plot_poly_regress_prediction(
                            padding=_PLOT_CONFIG['y_padding']['regress_prediction'])
     
     # Plots
-    ax.plot(intensities, y_predict(x), label='Predicted Mapping')
+    ax.plot(intensities, y_predict(intensities), label='Predicted Mapping')
     ax.plot(intensities, y_true, label='True Mapping')
 
     # Styling
