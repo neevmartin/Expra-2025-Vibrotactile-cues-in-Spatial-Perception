@@ -69,7 +69,25 @@ class Trial(pd.DataFrame):
 
         return relevant
     
-    def __transform_px_to_cm(self, px: int, axis: int):
+    def get_trajectory_data_normalized(self, ): 
+        """@return the normalized distance relative to target distance"""
+        # TODO: Target : 1 , starte = 0, dann können wir die trials besser zusammenfassen
+        sx, sy = self.get_start()
+        tx, ty = self.get_target()
+
+        relevant = self[[
+            "timestamp",
+            "current_pos_x",
+            "current_pos_y"
+        ]]
+
+        relevant.loc[:,"current_pos_x"] = relevant.loc[:,"current_pos_x"].transform(lambda px: (px - sx) / (np.abs(tx) - sx))
+        relevant.loc[:,"current_pos_y"] = relevant.loc[:,"current_pos_y"].transform(lambda px: (px - sy) / (np.abs(ty) - sy))
+
+        return relevant
+    
+    @classmethod
+    def _transform_px_to_cm(self, px: int, axis: int):
         """Reverses the cm to pixel calculation from the experiment"""
 
         return (px / WINDOW_SIZE[axis]) * TABLET_SIZE 
