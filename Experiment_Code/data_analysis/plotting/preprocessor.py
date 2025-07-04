@@ -17,7 +17,8 @@ from helpers.validation import (
     validate_subset,
     validate_states,
     validate_oneof,
-    validate_hand_info_needed
+    validate_hand_info_needed,
+    validate_nonempty
 )
 from helpers.warnings import (
     nan_occurrence_warning
@@ -165,6 +166,10 @@ def extract_intensity_to_distance_predictions(
 
     Returns:
         Tuple[List[float], List[float]]: Lists of intensities and their corresponding predicted distances.
+
+    Raises:
+        ValueError: If allowed states do not follow structure or include contradicting states. 
+                    If for the avoiding task there was no dominant hand assigned.
     """
     validate_states(allowed_states)   
     validate_oneof(dominant_hand, HANDEDNESSES, 'handedness') 
@@ -221,6 +226,10 @@ def _find_predicted_distance(
 
     Returns:
         float: Predicted Y-coordinate distance, or NaN if the participant did not avoid in the avoiding task.
+
+    Raises:
+        ValueError: If trial does not include columns 'current_pos_x', 'current_pos_y', 'trial_index'. 
+                    If the task does not exist. If for the avoiding task there was no dominant hand assigned.
     """
     validate_subset(('current_pos_x', 'current_pos_y', 'trial_index'), trial.columns)
     validate_oneof(task, TASKS, check_type='task')
@@ -258,6 +267,9 @@ def compute_distances_meanstds(data: dict | pd.DataFrame) -> Tuple[List[float], 
 
     Returns:
         Tuple[List[float], List[float]]: Two lists containing the means and standard deviations for each intensity level.
+
+    Raises:
+        ValueError: If data does not contain 'intensity' and 'distance' columns.
     """
     data = pd.DataFrame(data) # Ensures loc method is available
     validate_subset(sub=('intensity', 'distance'), super=data.columns)
@@ -285,6 +297,9 @@ def _find_exceeding_threshold_positions(
     Returns:
         pd.DataFrame: Filtered DataFrame with rows exceeding the threshold boundary for the specified hand.
                       You can call a position by selecting 'current_pos_x' and 'current_pos_y' columns.
+
+    Raises:
+        ValueError: If handedness does not exist.
     """
     validate_oneof(dominant_hand, HANDEDNESSES, 'handedness')
 
