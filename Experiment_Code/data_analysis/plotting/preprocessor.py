@@ -1,4 +1,6 @@
+# Standard
 from typing import (
+    TypedDict,
     Literal, 
     Tuple, 
     List,
@@ -6,9 +8,11 @@ from typing import (
 )
 from itertools import chain
 
+# Third Party
 import numpy as np
 import pandas as pd
 
+# Intern
 from helpers.validation import (
     validate_subset,
     validate_states,
@@ -48,39 +52,21 @@ def generate_prepost_comparison(
         Tuple[dict, dict]: Two dictionaries containing mean and standard deviation of distances for
                            pre-test and post-test phases, respectively.
     """
-    pre_global_predictions = {
-        'intensity': [],
-        'distance': []
-    }
-    post_global_predictions = {
-        'intensity': [],
-        'distance': []
-    }
-
+    # Add necessary metadata
     pre_allowed_states = {**pre_allowed_states, 'phases': ['Pre-Test'], 'block_nrs': [1]}
     post_allowed_states = {**post_allowed_states, 'phases': ['Post-Test'], 'block_nrs': [1]}
+    
+    # Played intensity to predicted distance pairs 
+    # NOTE: This might be considerably slower than iterating through 
+    #       all participants once but I decided to keep it more readable for everyone.
+    pre_predictions = collect_prediction_pairs(participants, pre_allowed_states, dominant_hands)
+    post_predictions = collect_prediction_pairs(participants, post_allowed_states, dominant_hands)
 
-    for participant in participants:
-        df = participant.get_as_one_dataframe()
+    # Compute summary statistics
+    pre_means, pre_stds = compute_distances_meanstds(pre_predictions)
+    post_means, post_stds = compute_distances_meanstds(post_predictions)
 
-        # TODO: later dominant hands are changed for each participant
-        pre_intensities, pre_distances = extract_intensity_to_distance_predictions(df, pre_allowed_states, dominant_hand='right')
-        post_intensities, post_distances = extract_intensity_to_distance_predictions(df, post_allowed_states, dominant_hand='right')
-
-        pre_global_predictions['intensity'].append(pre_intensities)
-        pre_global_predictions['distance'].append(pre_distances)
-        post_global_predictions['intensity'].append(post_intensities)
-        post_global_predictions['distance'].append(post_distances)
-
-    # Extract inner nestings
-    pre_global_predictions['intensity'] = list(chain(*pre_global_predictions['intensity']))
-    pre_global_predictions['distance'] = list(chain(*pre_global_predictions['distance']))
-    post_global_predictions['intensity'] = list(chain(*post_global_predictions['intensity']))
-    post_global_predictions['distance'] = list(chain(*post_global_predictions['distance']))
-
-    pre_means, pre_stds = compute_distances_meanstds(pre_global_predictions)
-    post_means, post_stds = compute_distances_meanstds(post_global_predictions)
-
+    # Wrap results for comprehensibility
     pre_data_meanstds = {
         'means': pre_means,
         'stds' : pre_stds
@@ -91,6 +77,43 @@ def generate_prepost_comparison(
     }
 
     return pre_data_meanstds, post_data_meanstds
+
+def collect_prediction_pairs(
+        participants: list, 
+        allowed_states: dict, 
+        dominant_hands: list # TODO: dominant hand should be in participant object
+    ) -> Dict[str, List[float]]:
+    """
+    Collects intensity-distance prediction pairs from multiple participants.
+
+    Each participant's data is filtered based on allowed states and processed
+    to extract predicted distances. NOTE: Dominant hand is currently hardcoded.
+
+    Args:
+        participants (list): List of participant objects, each with `get_as_one_dataframe()`.
+        allowed_states (dict): Dictionary defining valid states to filter trials.
+        dominant_hands (list): Placeholder for per-participant dominant hand info (currently unused).
+
+    Returns:
+        Dict[str, list]: Dictionary with two keys: 'intensity' and 'distance', each mapping to a flat list of floats.
+    """
+    predictions = {
+        'intensity': [],
+        'distance': []
+    }
+
+    for participant in participants:
+        df = participant.get_as_one_dataframe()
+        pre_intensities, pre_distances = extract_intensity_to_distance_predictions(df, allowed_states, dominant_hand='right')
+
+        predictions['intensity'].append(pre_intensities)
+        predictions['distance'].append(pre_distances)
+
+    # Extract inner nestings
+    predictions['intensity'] = list(chain(*predictions['intensity']))
+    predictions['distance'] = list(chain(*predictions['distance']))
+
+    return predictions
 
 # Calculate intensities with given mapping and distances
 def calculate_intensity(
