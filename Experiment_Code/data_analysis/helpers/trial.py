@@ -42,8 +42,8 @@ class Trial(pd.DataFrame):
         x, y = self.get_target()
 
         return (
-            self.__transform_px_to_cm(x + np.abs(sx), 0), 
-            self.__transform_px_to_cm(y + np.abs(sy), 1)
+            Trial._transform_px_to_cm(x + np.abs(sx), 0), 
+            Trial._transform_px_to_cm(y + np.abs(sy), 1)
         )
    
     def get_trajectory_data(self, ): 
@@ -64,8 +64,8 @@ class Trial(pd.DataFrame):
             "current_pos_y"
         ]]
 
-        relevant[["current_pos_x"]] = relevant[["current_pos_x"]].transform(lambda px: self.__transform_px_to_cm(px + np.abs(sx), 0))
-        relevant[["current_pos_y"]] = relevant[["current_pos_y"]].transform(lambda px: self.__transform_px_to_cm(px + np.abs(sy), 1))
+        relevant.loc[:,"current_pos_x"] = relevant.loc[:,"current_pos_x"].transform(lambda px: Trial._transform_px_to_cm(px + np.abs(sx), 0))
+        relevant.loc[:,"current_pos_y"] = relevant.loc[:,"current_pos_y"].transform(lambda px: Trial._transform_px_to_cm(px + np.abs(sy), 1))
 
         return relevant
     
