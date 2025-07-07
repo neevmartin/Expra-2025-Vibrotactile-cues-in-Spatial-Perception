@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from helpers.metadata import TABLET_SIZE, WINDOW_SIZE
+from helpers.metadata import TABLET_SIZE, WINDOW_SIZE, PIXEL_RAIL_BOTTOM, PIXEL_RAIL_LEFT
 
 class Trial(pd.DataFrame):
     """This class serves as a wrapper for dataframes to hide the uggliness of data access"""
@@ -38,12 +38,11 @@ class Trial(pd.DataFrame):
  
     def get_target_in_cm(self, ):
         """@return the normalized distance in cm"""
-        sx, sy = self.get_start()
         x, y = self.get_target()
 
         return (
-            Trial._transform_px_to_cm(x + np.abs(sx), 0), 
-            Trial._transform_px_to_cm(y + np.abs(sy), 1)
+            Trial._transform_px_to_cm(x - PIXEL_RAIL_LEFT, 0), 
+            Trial._transform_px_to_cm(y - PIXEL_RAIL_BOTTOM, 1)
         )
    
     def get_trajectory_data(self, ): 
@@ -58,33 +57,24 @@ class Trial(pd.DataFrame):
 
         sx, sy = self.get_start()
 
-        relevant = self[[
-            "timestamp",
-            "current_pos_x",
-            "current_pos_y"
-        ]]
-
-        relevant.loc[:,"current_pos_x"] = relevant.loc[:,"current_pos_x"].transform(lambda px: Trial._transform_px_to_cm(px + np.abs(sx), 0))
-        relevant.loc[:,"current_pos_y"] = relevant.loc[:,"current_pos_y"].transform(lambda px: Trial._transform_px_to_cm(px + np.abs(sy), 1))
-
-        return relevant
+        return pd.DataFrame({
+            "timestamp": self[["timestamp"]].values.flatten(),
+            "current_pos_x": list(map(lambda px: Trial._transform_px_to_cm(px - PIXEL_RAIL_LEFT, 0), self[["current_pos_x"]].values.flatten())),
+            "current_pos_y": list(map(lambda px: Trial._transform_px_to_cm(px - PIXEL_RAIL_BOTTOM, 1), self[["current_pos_y"]].values.flatten()))
+        })
     
     def get_trajectory_data_normalized(self, ): 
         """@return the normalized distance relative to target distance"""
         # TODO: Target : 1 , starte = 0, dann können wir die trials besser zusammenfassen
+
         sx, sy = self.get_start()
         tx, ty = self.get_target()
 
-        relevant = self[[
-            "timestamp",
-            "current_pos_x",
-            "current_pos_y"
-        ]]
-
-        relevant.loc[:,"current_pos_x"] = relevant.loc[:,"current_pos_x"].transform(lambda px: (px - sx) / (np.abs(tx) - sx))
-        relevant.loc[:,"current_pos_y"] = relevant.loc[:,"current_pos_y"].transform(lambda px: (px - sy) / (np.abs(ty) - sy))
-
-        return relevant
+        return pd.DataFrame({
+            "timestamp": self["timestamp"].values.flatten(),
+            "current_pos_x": list(map(lambda px: (px - sx) / (np.abs(tx) - PIXEL_RAIL_LEFT), self[["current_pos_x"]].values.flatten())),
+            "current_pos_y": list(map(lambda px: (px - sy) / (np.abs(ty) - PIXEL_RAIL_BOTTOM), self[["current_pos_y"]].values.flatten()))
+        })
     
     @classmethod
     def _transform_px_to_cm(self, px: int, axis: int):
