@@ -1,66 +1,73 @@
-import numpy as np
-import pandas as pd
-from typing import Literal
+# Standard
+from typing import (
+    Literal, 
+    Tuple, 
+    List,
+    Dict
+)
 from itertools import chain
 
+# Third Party
+import numpy as np
+import pandas as pd
+
+# Intern
 from helpers.validation import (
+    validate_subset,
     validate_states,
     validate_oneof,
-    validate_hand_info_needed
+    validate_hand_info_needed,
+    validate_nonempty
+)
+from helpers.warnings import (
+    nan_occurrence_warning
 )
 from helpers.metadata import (
+    HANDEDNESSES, TASKS, MAPPINGS, # String checks
     PIXEL_DISTANCES, 
     PERCENT_INTENSITIES, 
-    PIXEL_RAIL_LEFT, 
-    PIXEL_RAIL_RIGHT, 
-    PIXEL_FROM_RAIL_CONFIRM_DISTANCE
+    LEFT_HANDED_PIXEL_AVOIDING_BOUNDARY,
+    RIGHT_HANDED_PIXEL_AVOIDING_BOUNDARY
 )
+from helpers import ErrorMessages as errmsg
 
 def generate_prepost_comparison(
         participants: list, 
         pre_allowed_states: dict, 
         post_allowed_states: dict,
         dominant_hands = [] # TODO: dominant hand should be in participant object
-):
-    pre_global_predictions = {
-        'intensity': [],
-        'distance': []
-    }
-    post_global_predictions = {
-        'intensity': [],
-        'distance': []
-    }
+) -> Tuple[dict, dict]:
+    """
+    Generates pre/post comparison statistics (mean, std) of predicted distances across participants.
 
-    pre_allowed_states.update({
-        'phases':    ['Pre-Test'], 
-        'block_nrs': [1]
-    })
-    post_allowed_states.update({
-        'phases':    ['Post-Test'], 
-        'block_nrs': [1]
-    })
+    Filters each participant's data based on allowed pre- and post-test states,
+    extracts intensity-distance prediction pairs, and computes summary statistics.
 
-    for participant in participants:
-        df = participant.get_as_one_dataframe()
+    Args:
+        participants (list): List of `Participant` objects.
+        pre_allowed_states (dict): Allowed filtering states for the pre-test condition.
+        post_allowed_states (dict): Allowed filtering states for the post-test condition.
+        dominant_hands (list, optional): Placeholder for future support of per-participant handedness.
 
-        # TODO: later dominant hands are changed for each participant
-        pre_intensities, pre_distances = extract_intensity_to_distance_predictions(df, pre_allowed_states, dominant_hand='right')
-        post_intensities, post_distances = extract_intensity_to_distance_predictions(df, post_allowed_states, dominant_hand='right')
+    Returns:
+        Tuple[dict, dict]: Two dictionaries containing mean and standard deviation of distances for
+                           pre-test and post-test phases, respectively.
+    """
+    # Add necessary metadata
+    pre_allowed_states = {**pre_allowed_states, 'phases': ['Pre-Test'], 'block_nrs': [1]}
+    post_allowed_states = {**post_allowed_states, 'phases': ['Post-Test'], 'block_nrs': [1]}
+    
+    # Played intensity to predicted distance pairs 
+    # NOTE: This might be considerably slower than iterating through 
+    #       all participants once but I decided to keep it more readable for everyone.
+    pre_predictions = collect_prediction_pairs(participants, pre_allowed_states, dominant_hands)
+    post_predictions = collect_prediction_pairs(participants, post_allowed_states, dominant_hands)
 
-        pre_global_predictions['intensity'].append(pre_intensities)
-        pre_global_predictions['distance'].append(pre_distances)
-        post_global_predictions['intensity'].append(post_intensities)
-        post_global_predictions['distance'].append(post_distances)
+    # Compute summary statistics
+    pre_means, pre_stds = compute_distances_meanstds(pre_predictions)
+    post_means, post_stds = compute_distances_meanstds(post_predictions)
 
-    # Extract inner nestings
-    pre_global_predictions['intensity'] = list(chain(*pre_global_predictions['intensity']))
-    pre_global_predictions['distance'] = list(chain(*pre_global_predictions['distance']))
-    post_global_predictions['intensity'] = list(chain(*post_global_predictions['intensity']))
-    post_global_predictions['distance'] = list(chain(*post_global_predictions['distance']))
-
-    pre_means, pre_stds = compute_distances_meanstds(pre_global_predictions)
-    post_means, post_stds = compute_distances_meanstds(post_global_predictions)
-
+    # Wrap results for comprehensibility
     pre_data_meanstds = {
         'means': pre_means,
         'stds' : pre_stds
@@ -72,21 +79,100 @@ def generate_prepost_comparison(
 
     return pre_data_meanstds, post_data_meanstds
 
+def collect_prediction_pairs(
+        participants: list, 
+        allowed_states: dict, 
+        dominant_hands: list # TODO: dominant hand should be in participant object
+    ) -> Dict[str, List[float]]:
+    """
+    Collects intensity-distance prediction pairs from multiple participants.
+
+    Each participant's data is filtered based on allowed states and processed
+    to extract predicted distances. NOTE: Dominant hand is currently hardcoded.
+
+    Args:
+        participants (list): List of participant objects, each with `get_as_one_dataframe()`.
+        allowed_states (dict): Dictionary defining valid states to filter trials.
+        dominant_hands (list): Placeholder for per-participant dominant hand info (currently unused).
+
+    Returns:
+        Dict[str, list]: Dictionary with two keys: 'intensity' and 'distance', each mapping to a flat list of floats.
+    """
+    predictions = {
+        'intensity': [],
+        'distance': []
+    }
+
+    for participant in participants:
+        df = participant.get_as_one_dataframe()
+        pre_intensities, pre_distances = extract_intensity_to_distance_predictions(df, allowed_states, dominant_hand='right')
+
+        predictions['intensity'].append(pre_intensities)
+        predictions['distance'].append(pre_distances)
+
+    # Extract inner nestings
+    predictions['intensity'] = list(chain(*predictions['intensity']))
+    predictions['distance'] = list(chain(*predictions['distance']))
+
+    return predictions
+
 # Calculate intensities with given mapping and distances
-def calculate_intensity(mapping, target_pos_y):
-    validate_oneof(mapping, ['direct', 'reversed'], 'mapping')
-    validate_oneof(target_pos_y, PIXEL_DISTANCES, type='distance class')
+def calculate_intensity(
+        mapping: Literal['direct', 'reversed'], 
+        target_pos_y: float
+    ) -> float:
+    """
+    Returns the intensity for a given Y-position and mapping.
+    
+    This info is not in our output csv and thus needs to be computed in this function.
+
+    Args:
+        mapping (Literal['direct', 'reversed']): Mapping direction.
+        target_pos_y (float): Target distance of distance classes.
+
+    Returns:
+        float: Corresponding intensity.
+
+    Raises:
+        ValueError: If mapping does not exist or target position is not part of a class.
+    """
+
+    validate_oneof(mapping, MAPPINGS, 'mapping')
+    validate_oneof(target_pos_y, PIXEL_DISTANCES, check_type='distance class')
 
     distance_idx = PIXEL_DISTANCES.index(target_pos_y)
-    match mapping:
-        case 'direct'  : intensity = PERCENT_INTENSITIES[distance_idx]
-        case 'reversed': intensity = PERCENT_INTENSITIES[-(distance_idx+1)]
-    
+    distance_idx = -(distance_idx + 1) if mapping == 'reversed' else distance_idx
+    intensity = PERCENT_INTENSITIES[distance_idx]
+
     return intensity
 
-def extract_intensity_to_distance_predictions(df, allowed_states: dict, dominant_hand: Literal['left', 'right']):
+def extract_intensity_to_distance_predictions(
+        df: pd.DataFrame, 
+        allowed_states: dict | pd.DataFrame, 
+        dominant_hand: Literal['left', 'right']
+    ) -> Tuple[List[float], List[float]] :
+    """
+    Extracts predicted distances for trials, grouped by intensity.
+
+    Filters the input DataFrame based on allowed state parameters (e.g., tasks, mappings, phases, blocks) to reduce computational costs.
+    Then computes intensity per trial distance since it is not part of our output data. Then we collect all predictions of the participants
+    for each trial. Then we produce a mapping from the played cue intensities to the predicted distances.
+
+
+    Args:
+        df (pd.DataFrame): Input DataFrame containing trial data.
+        allowed_states (dict): Dictionary specifying allowed values for 'tasks', 'mappings', 'phases', and 'block_nrs'.
+        dominant_hand (Literal['left', 'right']): Dominant hand used to determine avoiding boundary in the avoiding task.
+
+    Returns:
+        Tuple[List[float], List[float]]: Lists of intensities and their corresponding predicted distances.
+
+    Raises:
+        ValueError: If allowed states do not follow structure or include contradicting states e.g. mapping = ['direct', 'reversed']. 
+                    If for the avoiding task there was no dominant hand assigned.
+    """
     validate_states(allowed_states)   
-    validate_oneof(dominant_hand, ['left', 'right'], 'handedness') 
+    validate_oneof(dominant_hand, HANDEDNESSES, 'handedness') 
 
     # Minimize df size by only selecting allowed states and necessary columns
     df = df[['trial_index','task','mapping','phase','block','current_pos_x','target_pos_y','current_pos_y']]
@@ -96,12 +182,8 @@ def extract_intensity_to_distance_predictions(df, allowed_states: dict, dominant
         & df['phase'].isin(allowed_states.get('phases'))
         & df['block'].isin(allowed_states.get('block_nrs'))
     ]
-
-    if len(df) == 0:
-        raise ValueError(
-            'Dataframe is empty. It is very likely an impossible state was given leading to disjunct sets in the query.' \
-            'Check your queries for such impossible states: e.g. \'Participant mapping is inverse but we select direct\'.'
-        )
+    # Check for impossible states
+    validate_nonempty(df, msg=errmsg.EMPTY_FILTERING)
 
     # Compute intesity with the given information -> it is not part of the output data!
     df['intensity'] = df[['mapping', 'target_pos_y']].apply(
@@ -122,23 +204,72 @@ def extract_intensity_to_distance_predictions(df, allowed_states: dict, dominant
 
     return intensities, distances
 
-def _find_predicted_distance(trial, task, dominant_hand = None):
-    validate_oneof(task, ['reaching', 'avoiding'], type='Task')
+def _find_predicted_distance(
+        trial: pd.DataFrame, 
+        task: Literal['avoiding', 'reaching'], 
+        dominant_hand: Literal['left', 'right'] = None
+    ) -> float:
+    """
+    Predicts the Y-coordinate distance based on task type and handedness.
+
+    For 'reaching', returns the last Y-position in the trial.  
+    For 'avoiding', returns the first Y-position where the X-coordinate exceeds the threshold boundary which is based on the dominant hand.
+
+    Args:
+        trial (pd.DataFrame): Trial data containing at least 'current_pos_x' and 'current_pos_y' as well as 'trial_index' columns.
+        task (Literal['avoiding', 'reaching']): The task type to determine prediction logic.
+        dominant_hand (Literal['left', 'right'], optional): Required for the 'avoiding' task to select associated threshold boundary.
+
+    Returns:
+        float: Predicted Y-coordinate distance, or NaN if the participant did not avoid in the avoiding task.
+
+    Raises:
+        ValueError: If trial does not include columns 'current_pos_x', 'current_pos_y', 'trial_index'. 
+                    If the task does not exist. If for the avoiding task there was no dominant hand assigned.
+    """
+    validate_subset(('current_pos_x', 'current_pos_y', 'trial_index'), trial.columns)
+    validate_oneof(task, TASKS, check_type='task')
     validate_hand_info_needed(dominant_hand, task)
 
-    match task:
-        case 'reaching':
-            predicted_distance = trial['current_pos_y'].iloc[-1]
-        case'avoiding':
-            predicted_distance = find_avoiding_position(
-                trial[['current_pos_x', 'current_pos_y']], 
-                dominant_hand
-            )['current_pos_y']
+    if task == 'reaching':
+        # Returns last recorded position for reaching.
+        possible_distances = trial['current_pos_y']
+        prediction_idx = -1
+    else:
+        # Returns first position exceeding threshold for avoiding.
+        possible_distances = _find_exceeding_threshold_positions(
+            trial[['current_pos_x', 'current_pos_y']], 
+            dominant_hand
+        )['current_pos_y']
+        prediction_idx = 0
+
+    predicted_distance = possible_distances.iat[prediction_idx] if not possible_distances.empty else np.nan
+
+    if np.isnan(predicted_distance):
+        nan_occurrence_warning(
+            task=task,
+            context='participant did not avoid' if task == 'avoiding' else "no data was recorded", 
+            trial_index=trial['trial_index'].iat[0]
+        )
 
     return predicted_distance
 
-def compute_distances_meanstds(data: dict | pd.DataFrame):
+def compute_distances_meanstds(data: dict | pd.DataFrame) -> Tuple[List[float], List[float]]:
+    """
+    Computes the mean and standard deviation of 'distance' values grouped by predefined intensity levels.
+
+    Args:
+        data (dict | pd.DataFrame): Input data containing 'intensity' and 'distance' fields.
+
+    Returns:
+        Tuple[List[float], List[float]]: Two lists containing the means and standard deviations for each intensity level.
+
+    Raises:
+        ValueError: If data does not contain 'intensity' and 'distance' columns.
+    """
     data = pd.DataFrame(data) # Ensures loc method is available
+    validate_subset(sub=('intensity', 'distance'), super=data.columns)
+
     means, stds = [], []
 
     for intensity in PERCENT_INTENSITIES:
@@ -148,23 +279,33 @@ def compute_distances_meanstds(data: dict | pd.DataFrame):
 
     return means, stds
 
-def find_avoiding_position(positions: pd.DataFrame, dominant_hand: Literal['left', 'right']):
-    validate_oneof(dominant_hand, ['left', 'right'], 'handedness')
+def _find_exceeding_threshold_positions(
+        positions: pd.DataFrame, 
+        dominant_hand: Literal['left', 'right']
+    ) -> pd.DataFrame:
+    """
+    Filters positions where the X-coordinate exceeds the avoidance threshold for the dominant hand.
+
+    Args:
+        positions (pd.DataFrame): DataFrame containing at least a 'current_pos_x' and 'current_pos_y' column.
+        dominant_hand (Literal['left', 'right']): Dominant hand used to determine the threshold boundary.
+
+    Returns:
+        pd.DataFrame: Filtered DataFrame with rows exceeding the threshold boundary for the specified hand.
+                      You can call a position by selecting 'current_pos_x' and 'current_pos_y' columns.
+
+    Raises:
+        ValueError: If handedness does not exist.
+    """
+    validate_oneof(dominant_hand, HANDEDNESSES, 'handedness')
 
     # Select avoid position for dominant hand / trace rail
-    match dominant_hand:
-        case 'left': avoid_position = PIXEL_RAIL_RIGHT - PIXEL_FROM_RAIL_CONFIRM_DISTANCE
-        case 'right': avoid_position = PIXEL_RAIL_LEFT + PIXEL_FROM_RAIL_CONFIRM_DISTANCE
+    avoiding_boundary = {
+        'left': LEFT_HANDED_PIXEL_AVOIDING_BOUNDARY,
+        'right': RIGHT_HANDED_PIXEL_AVOIDING_BOUNDARY
+    }[dominant_hand]
 
-    # Chose valid avoid positions that exceed the found avoid position
-    valid_positions = positions.loc[positions['current_pos_x'] >= avoid_position].reset_index(drop=True)
-
-    if len(valid_positions) == 0:
-        # Set marker for when the participant did not avoid
-        valid_positions = pd.DataFrame({
-            'current_pos_x': np.nan,
-            'current_pos_y': np.nan
-        }, index=[0])
+    # Chose positions exceeding the boundary marking the point as "avoided".
+    exceeding_positions = positions.loc[positions['current_pos_x'] >= avoiding_boundary].reset_index(drop=True)
     
-    first_avoiding_position = valid_positions.iloc[0]
-    return first_avoiding_position
+    return exceeding_positions
