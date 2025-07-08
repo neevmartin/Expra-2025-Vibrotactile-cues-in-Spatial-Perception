@@ -89,6 +89,16 @@ participant_id,phase,block,task,,diff_mean,diff_variance,mapping,natural_mapping
 44ai,Training,3,avoiding,0,1.5761999999999996,45.88820303589743,reversed,reversed
 44ai,Training,4,avoiding,0,2.788149999999999,53.638284028205106,reversed,reversed
 44ai,Training,5,avoiding,0,-6.069674999999999,86.9622928403846,reversed,reversed
+48a1,Post-Test,1,avoiding,0,-1.4441250000000003,71.3960394931818,reversed,direct
+48a1,Post-Test,1,reaching,0,-7.068303571428572,65.48531297889608,reversed,direct
+48a1,Pre-Test,1,avoiding,0,-4.899178571428571,71.35388516753245,reversed,direct
+48a1,Pre-Test,1,reaching,0,-0.9102678571428575,95.39639034512987,reversed,direct
+48a1,Recap,1,avoiding,0,3.8247999999999998,86.13145334358973,reversed,direct
+48a1,Training,1,avoiding,0,-1.2341500000000005,103.01730300256409,reversed,direct
+48a1,Training,2,avoiding,0,-0.2680250000000006,92.6527629480769,reversed,direct
+48a1,Training,3,avoiding,0,-2.4782000000000006,95.3327587282051,reversed,direct
+48a1,Training,4,avoiding,0,4.081175,98.5625058403846,reversed,direct
+48a1,Training,5,avoiding,0,0.012649999999999518,85.4523609,reversed,direct
 4ai,Post-Test,1,avoiding,0,2.6313928571428566,41.67128947922079,reversed,direct
 4ai,Post-Test,1,reaching,0,4.486357142857143,57.27298630649349,reversed,direct
 4ai,Pre-Test,1,avoiding,0,4.686678571428571,42.59489374935063,reversed,direct
