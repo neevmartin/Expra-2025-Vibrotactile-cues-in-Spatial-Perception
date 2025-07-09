@@ -37,12 +37,11 @@ INTENSITIES = np.array(PERCENT_INTENSITIES)
 DISTANCES = np.array(PIXEL_DISTANCES)
 
 
-def plot_trajectory(trial: Trial) -> None:
+def plot_predictions(
+        intensities: List[float], 
+        distances: List[float]
+    ) -> Tuple[Figure, Axes]:
     """
-    Plots a simple trajectory from timestamp and position_x
-    
-    @param df A trial dataframe
-
     Plots participant prediction (intensity to distance) data points as a scatter plot.
 
     Each point represents either the last recorded position (reaching)
