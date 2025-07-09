@@ -143,14 +143,19 @@ def plot_individual_prepost_comparisons(
         if x > 0: 
             participant_ax.set_ylabel('')
             participant_ax.set_yticklabels([])
-        if y < 4: 
+
+        last_row = nrows - 1
+        if y < last_row: 
             participant_ax.set_xlabel('')
             participant_ax.set_xticklabels([])
 
         # Add participant title
         if is_participant:
-            participant_id = participant.get_participant_id().split(OS_SEPARATOR)[1] # get_participant_id gets the directory as well
-            participant_ax.set_title(participant_id)
+            try:
+                participant_id = participant.get_participant_id().split(OS_SEPARATOR)[-1] # get_participant_id gets the directory as well
+                participant_ax.set_title(participant_id)
+            except IndexError as e:
+                print(f'Invalid participant id. Exception was: {e.with_traceback()}')
         else:
             participant_ax.set_title('')
     
