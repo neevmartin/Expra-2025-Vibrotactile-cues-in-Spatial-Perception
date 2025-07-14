@@ -31,7 +31,7 @@ class Trial(pd.DataFrame):
         return int(self[["block"]].iloc[0].iloc[0])
     
     def get_start(self, ) -> int:
-        return tuple(self[["current_pos_x","current_pos_y"]].min())
+        return tuple(self[["current_pos_x","current_pos_y"]].iloc[0])
 
     def get_target(self, ) -> str:
         return tuple(self[["target_pos_x", "target_pos_y"]].iloc[0])
