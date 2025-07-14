@@ -4,7 +4,7 @@ from typing import (
     Tuple, 
     List
 )
-from collections.abc import Sized
+from os.path import sep as OS_SEPARATOR
 
 # Third party
 import matplotlib.pyplot as plt 
@@ -15,6 +15,8 @@ import pandas as pd
 import numpy as np
 
 # Intern
+from plotting.preprocessor import generate_prepost_comparison
+from helpers import Condition
 from helpers import Trial
 from helpers.validation import validate_oneof
 from helpers.metadata import (
@@ -35,12 +37,11 @@ INTENSITIES = np.array(PERCENT_INTENSITIES)
 DISTANCES = np.array(PIXEL_DISTANCES)
 
 
-def plot_trajectory(trial: Trial) -> None:
+def plot_predictions(
+        intensities: List[float], 
+        distances: List[float]
+    ) -> Tuple[Figure, Axes]:
     """
-    Plots a simple trajectory from timestamp and position_x
-    
-    @param df A trial dataframe
-
     Plots participant prediction (intensity to distance) data points as a scatter plot.
 
     Each point represents either the last recorded position (reaching)
@@ -66,10 +67,108 @@ def plot_trajectory(trial: Trial) -> None:
     
     return fig, ax
 
+def plot_individual_prepost_comparisons(
+        participants: Condition, 
+        pre_allowed_states: dict, 
+        post_allowed_states: dict, 
+        mapping: Literal['direct', 'reversed', None], 
+        title: str = ''
+    ) -> Tuple[Figure, Axes]:
+    """
+    Plots individual pre- and post-condition comparisons for each participant in a grid of subplots.
+
+    Each subplot corresponds to a single participant and shows the prepost-plot you all know about. 
+    The layout is automatically determined based on the number of participants, arranged in a 3-column grid. 
+    A shared title is added to the figure, and the last subplot retains the legend for reference.
+
+    Args:
+        participants (Condition): Condition object that provides access to participant data and metadata like (rd) in the notebook.
+                                  This can be loaded with `Condition.load_conditional_group(path, condition)`.
+        pre_allowed_states (list): A list of states to be included in the pre condition analysis.
+        post_allowed_states (list): A list of states to be included in the post condition analysis.
+        mapping (Literal['direct', 'reversed', None]): A mapping used for plotting i.e. 'direct', 'reversed' or None.
+        title (str, optional): The title for the entire figure. Default is no title.
+
+    Returns:
+        Tuple[Figure, Axes]: The matplotlib figure and axes containing the plot.
+                             NOTE: You can change the design to your liking with these.
+
+    Notes:
+        - Legends are only shown on the last subplot for visual clarity.
+        - X and Y axis labels are selectively hidden to avoid clutter.
+        - If the number of participants is not a multiple of 3, empty subplots are created but left blank.
+
+    Example:
+        plot_individual_prepost_comparisons(
+            participants=rd, 
+            allowed_states={'tasks': ['reaching'], 'mappings': ['direct']}, 
+            mapping='direct', 
+            title='Reaching Direct Distance Predictions per Participant'
+        )
+    """
+    n_participants = participants.get_participant_count()
+    ncols = 3
+    nrows = int(np.ceil(n_participants / ncols))
+    n_subfigs = nrows * ncols
+    
+    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(14, 14))
+    
+    for i in range(n_subfigs):
+        # Collect participant
+        is_participant = i < n_participants
+        participant_wrapper = [participants.get_participant_by_index(i)] if is_participant else [] # empty if all participants plotted
+        if is_participant: participant = participant_wrapper[0]
+
+        # Compute statistics per participant
+        pre_data_meanstds, post_data_meanstds = generate_prepost_comparison(
+            participant_wrapper, 
+            pre_allowed_states, 
+            post_allowed_states
+        )
+
+        # Plot plot into axis
+        x, y = i % 3, i // 3
+        cur_ax = axs[y, x]
+        _, participant_ax = plot_prepost_comparison(
+            pre_data_meanstds, 
+            post_data_meanstds, 
+            mapping if is_participant else None, 
+            (fig, cur_ax)
+        )
+
+        # Add legend to last subfig
+        last_subfig = n_subfigs - 1
+        if i < last_subfig: participant_ax.legend().remove()
+        # Remove unecessary axis labels
+        if x > 0: 
+            participant_ax.set_ylabel('')
+            participant_ax.set_yticklabels([])
+
+        last_row = nrows - 1
+        if y < last_row: 
+            participant_ax.set_xlabel('')
+            participant_ax.set_xticklabels([])
+
+        # Add participant title
+        if is_participant:
+            try:
+                participant_id = participant.get_participant_id().split(OS_SEPARATOR)[-1] # get_participant_id gets the directory as well
+                participant_ax.set_title(participant_id)
+            except IndexError as e:
+                print(f'Invalid participant id. Exception was: {e.with_traceback()}')
+        else:
+            participant_ax.set_title('')
+    
+    fig.suptitle(title, fontsize=20, y=1)
+    plt.tight_layout()
+
+    return fig, axs
+
 def plot_prepost_comparison(
         pre_data: dict | pd.DataFrame, 
         post_data: dict | pd.DataFrame, 
-        mapping: Literal['direct', 'reversed']
+        mapping: Literal['direct', 'reversed', None],
+        figax: Tuple[Figure, Axes] = []
     ) -> Tuple[Figure, Axes]:
     """
     Plots a comparison of pre- and post-test predicted distances with true distances.
@@ -88,7 +187,11 @@ def plot_prepost_comparison(
     """
     # Config
     config = _PLOT_CONFIG
-    fig, ax = _setup_plot()
+    if len(figax) == 0:
+        fig, ax = _setup_plot()
+    else:
+        fig, ax = figax
+    
     _configure_tablet_axes(ax, INTENSITIES, DISTANCES, 
                            padding=_PLOT_CONFIG['y_padding']['prepost_comparison'])
     
@@ -228,18 +331,20 @@ def _plot_errorbars(
 
 def _plot_true_distances(
         ax: Axes, 
-        mapping: Literal['direct', 'reversed']
+        mapping: Literal['direct', 'reversed', None]
     ) -> None:
     """
     Plots the true intensity-to-distance mapping as scatter points.
 
     Args:
         ax (Axes): Matplotlib axes on which to plot.
-        mapping (Literal['direct', 'reversed']): Either 'direct' or 'reversed', determining the y-value order.
+        mapping (Literal['direct', 'reversed', None]): Either 'direct' or 'reversed', determining the y-value order.
+                                                       If None is given no distances will be plotted.
 
     Raises:
-        ValueError: If the mapping is not 'direct' or 'reversed'.
+        ValueError: If the mapping is not 'direct', 'reversed' or None.
     """
+    if mapping == None: return
     validate_oneof(mapping, ['direct', 'reversed'], 'mapping')
 
     x = INTENSITIES
