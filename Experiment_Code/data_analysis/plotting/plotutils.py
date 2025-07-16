@@ -20,6 +20,7 @@ from helpers import Condition
 from helpers import Trial
 from helpers.validation import validate_oneof
 from helpers.metadata import (
+    CENTIMETER_DISTANCES,
     PERCENT_INTENSITIES, PIXEL_DISTANCES, 
     PIXEL_RAIL_BOTTOM, 
     PIXEL_RAIL_TOP
@@ -35,6 +36,7 @@ _PLOT_CONFIG = {
 
 INTENSITIES = np.array(PERCENT_INTENSITIES)
 DISTANCES = np.array(PIXEL_DISTANCES)
+CM_DISTANCES_LABELS = [str(d) for d in CENTIMETER_DISTANCES]
 
 
 def plot_predictions(
@@ -164,6 +166,51 @@ def plot_individual_prepost_comparisons(
 
     return fig, axs
 
+def plot_prepost_mean_comparison(
+        pre_data: dict | pd.DataFrame, 
+        post_data: dict | pd.DataFrame, 
+        mapping: Literal['direct', 'reversed', None],
+        figax: Tuple[Figure, Axes] = []
+    ) -> Tuple[Figure, Axes]:
+    """
+    Plots a comparison of pre- and post-test predicted distances with true distances.
+
+    Displays error bars for means and standard deviations across intensity levels,
+    and overlays the true distances based on the given mapping.
+
+    Args:
+        pre_data (dict): Dictionary with 'means' and 'stds' from the pre-test condition.
+        post_data (dict): Dictionary with 'means' and 'stds' from the post-test condition.
+        mapping (Literal['direct', 'reversed']): The mapping type to determine true distances.
+
+    Returns:
+        Tuple[Figure, Axes]: The matplotlib figure and axes containing the plot.
+                             NOTE: You can change the design to your liking with these.
+    """
+    # Config
+    config = _PLOT_CONFIG
+    if len(figax) == 0:
+        fig, ax = _setup_plot()
+    else:
+        fig, ax = figax
+    
+    _configure_tablet_axes(ax, INTENSITIES, DISTANCES, 
+                           padding=_PLOT_CONFIG['y_padding']['prepost_comparison'])
+    
+    # Plots
+    ax.plot(INTENSITIES, pre_data['means'], marker='o', alpha=0.5, c=config['colors']['pre'], label='Pre-Test')
+    ax.plot(INTENSITIES, post_data['means'], marker='o', alpha=0.5, c=config['colors']['post'], label='Post-Test')
+    _plot_true_distances(ax, mapping)
+    
+    # Styling
+    ax.grid(True, axis='y', linestyle=':', alpha=0.7)
+    ax.set_title('Mean ± SD of Predicted Distance by Intensity', 
+                fontsize=config['font_sizes']['title'], pad=10)
+    ax.legend(loc='best', fontsize=7)
+    fig.tight_layout()
+
+    return fig, ax
+
 def plot_prepost_comparison(
         pre_data: dict | pd.DataFrame, 
         post_data: dict | pd.DataFrame, 
@@ -292,11 +339,13 @@ def _configure_tablet_axes(
     ax.set_xlim(min(intensities)-5, max(intensities)+5) # NOTE: hard coded x-padding
     ax.set_ylim(PIXEL_RAIL_BOTTOM-padding, PIXEL_RAIL_TOP+padding)
     ax.set_xticks(intensities)
-    ax.set_yticks([PIXEL_RAIL_BOTTOM, *distances, PIXEL_RAIL_TOP])
-    ax.set_yticklabels(['Rail Bot', *[f"{d:.1f}" for d in distances], 'Rail Top'])
+    ax.set_yticks(distances)
+    # ax.set_yticks([PIXEL_RAIL_BOTTOM, *distances, PIXEL_RAIL_TOP])
+    ax.set_yticklabels(CM_DISTANCES_LABELS)
+    # ax.set_yticklabels(['Rail Bot', *CM_DISTANCES_LABELS, 'Rail Top'])
     ax.tick_params(axis='y', length=0)
     ax.set_xlabel('Intensity (%)', fontsize=_PLOT_CONFIG['font_sizes']['label'])
-    ax.set_ylabel('Predicted Distance (Pixels)', fontsize=_PLOT_CONFIG['font_sizes']['label'])
+    ax.set_ylabel('Predicted Distance (Centimeters)', fontsize=_PLOT_CONFIG['font_sizes']['label'])
 
 def _plot_errorbars(
         ax: Axes, 
