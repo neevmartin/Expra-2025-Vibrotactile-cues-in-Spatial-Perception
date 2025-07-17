@@ -245,10 +245,9 @@ def _find_predicted_distance(
          # NOTE: HALF TRIAL HEURISTIC
         # We take the halved trial so we do not analyse the first frames 
         # where the confirmation button is still pressed.
-        half_trial = trial.iloc[len(trial) // 2:] 
-        possible_distances = _find_button_press_positions(
-            half_trial[['current_pos_x', 'current_pos_y', CONFIRM_BUTTON_COLUMN_NAME]]
-        )['current_pos_y']
+        possible_distances = _find_predicted_y_position_reaching_task(
+            trial,
+            dominant_hand)
     else:
         # Returns first position exceeding threshold for avoiding.
         possible_distances = _find_exceeding_threshold_positions(
@@ -312,16 +311,38 @@ def _find_exceeding_threshold_positions(
     """
     validate_oneof(dominant_hand, HANDEDNESS_LITERALS, 'handedness')
 
-    # Select avoid position for dominant hand / trace rail
-    avoiding_boundary = {
-        'left': LEFT_HANDED_PIXEL_AVOIDING_BOUNDARY,
-        'right': RIGHT_HANDED_PIXEL_AVOIDING_BOUNDARY
+    # Filter positions based on the dominant hand's threshold boundary
+    exceeds_threshold = {
+        'left': positions['current_pos_x'] <= LEFT_HANDED_PIXEL_AVOIDING_BOUNDARY,
+        'right': positions['current_pos_x'] >= RIGHT_HANDED_PIXEL_AVOIDING_BOUNDARY
     }[dominant_hand]
 
     # Chose positions exceeding the boundary marking the point as "avoided".
-    exceeding_positions = positions.loc[positions['current_pos_x'] >= avoiding_boundary].reset_index(drop=True)
+    exceeding_positions = positions.loc[exceeds_threshold].reset_index(drop=True)
     
     return exceeding_positions
+
+def _find_predicted_y_position_reaching_task(
+        trial: pd.DataFrame,
+        dominant_hand: Literal['left', 'right']
+    ):
+    half_trial = trial.iloc[len(trial) // 2:]
+    possible_distances = _find_button_press_positions(
+        half_trial[['current_pos_x', 'current_pos_y', CONFIRM_BUTTON_COLUMN_NAME]]
+    )
+
+    if possible_distances.empty:
+        return pd.Series([], dtype=float)
+
+    predicted_position_x = possible_distances.iloc[0]['current_pos_x']
+    predicted_position_y = possible_distances.iloc[0]['current_pos_y']
+
+    if dominant_hand == 'left' and predicted_position_x < LEFT_HANDED_PIXEL_AVOIDING_BOUNDARY:
+        return pd.Series([], dtype=float)
+    if dominant_hand == 'right' and predicted_position_x > RIGHT_HANDED_PIXEL_AVOIDING_BOUNDARY:
+        return pd.Series([], dtype=float)
+
+    return pd.Series([predicted_position_y])
 
 def _find_button_press_positions(
         press_and_positions: pd.DataFrame, 
