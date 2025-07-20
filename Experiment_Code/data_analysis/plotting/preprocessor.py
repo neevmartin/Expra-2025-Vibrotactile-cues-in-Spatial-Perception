@@ -23,11 +23,13 @@ from helpers.warnings import (
     nan_occurrence_warning
 )
 from helpers.metadata import (
-    HANDEDNESSES, TASKS, MAPPINGS, # String checks
+    HANDEDNESS_LITERALS, TASKS, MAPPINGS, # String checks
     PIXEL_DISTANCES, 
     PERCENT_INTENSITIES, 
     LEFT_HANDED_PIXEL_AVOIDING_BOUNDARY,
-    RIGHT_HANDED_PIXEL_AVOIDING_BOUNDARY
+    RIGHT_HANDED_PIXEL_AVOIDING_BOUNDARY,
+    CONFIRM_BUTTON_COLUMN_NAME,
+    HANDEDNESS
 )
 from helpers import ErrorMessages as errmsg
 
@@ -35,7 +37,6 @@ def generate_prepost_comparison(
         participants: list, 
         pre_allowed_states: dict, 
         post_allowed_states: dict,
-        dominant_hands = [] # TODO: dominant hand should be in participant object
 ) -> Tuple[dict, dict]:
     """
     Generates pre/post comparison statistics (mean, std) of predicted distances across participants.
@@ -47,8 +48,7 @@ def generate_prepost_comparison(
         participants (list): List of `Participant` objects.
         pre_allowed_states (dict): Allowed filtering states for the pre-test condition.
         post_allowed_states (dict): Allowed filtering states for the post-test condition.
-        dominant_hands (list, optional): Placeholder for future support of per-participant handedness.
-
+        
     Returns:
         Tuple[dict, dict]: Two dictionaries containing mean and standard deviation of distances for
                            pre-test and post-test phases, respectively.
@@ -60,8 +60,8 @@ def generate_prepost_comparison(
     # Played intensity to predicted distance pairs 
     # NOTE: This might be considerably slower than iterating through 
     #       all participants once but I decided to keep it more readable for everyone.
-    pre_predictions = collect_prediction_pairs(participants, pre_allowed_states, dominant_hands)
-    post_predictions = collect_prediction_pairs(participants, post_allowed_states, dominant_hands)
+    pre_predictions = collect_prediction_pairs(participants, pre_allowed_states)
+    post_predictions = collect_prediction_pairs(participants, post_allowed_states)
 
     # Compute summary statistics
     pre_means, pre_stds = compute_distances_meanstds(pre_predictions)
@@ -82,18 +82,17 @@ def generate_prepost_comparison(
 def collect_prediction_pairs(
         participants: list, 
         allowed_states: dict, 
-        dominant_hands: list # TODO: dominant hand should be in participant object
     ) -> Dict[str, List[float]]:
     """
     Collects intensity-distance prediction pairs from multiple participants.
 
     Each participant's data is filtered based on allowed states and processed
-    to extract predicted distances. NOTE: Dominant hand is currently hardcoded.
+    to extract predicted distances. We retrieve the handedness of each participant
+    using an immutable dictionary `HANDEDNESS` defined in `metadata.py`
 
     Args:
         participants (list): List of participant objects, each with `get_as_one_dataframe()`.
         allowed_states (dict): Dictionary defining valid states to filter trials.
-        dominant_hands (list): Placeholder for per-participant dominant hand info (currently unused).
 
     Returns:
         Dict[str, list]: Dictionary with two keys: 'intensity' and 'distance', each mapping to a flat list of floats.
@@ -104,8 +103,9 @@ def collect_prediction_pairs(
     }
 
     for participant in participants:
+        p_id = participant.get_participant_id()
         df = participant.get_as_one_dataframe()
-        pre_intensities, pre_distances = extract_intensity_to_distance_predictions(df, allowed_states, dominant_hand='right')
+        pre_intensities, pre_distances = extract_intensity_to_distance_predictions(df, allowed_states, dominant_hand=HANDEDNESS.get(p_id, 'right'))
 
         predictions['intensity'].append(pre_intensities)
         predictions['distance'].append(pre_distances)
@@ -172,10 +172,19 @@ def extract_intensity_to_distance_predictions(
                     If for the avoiding task there was no dominant hand assigned.
     """
     validate_states(allowed_states)   
-    validate_oneof(dominant_hand, HANDEDNESSES, 'handedness') 
+    validate_oneof(dominant_hand, HANDEDNESS_LITERALS, 'handedness') 
 
     # Minimize df size by only selecting allowed states and necessary columns
-    df = df[['trial_index','task','mapping','phase','block','current_pos_x','target_pos_y','current_pos_y']]
+    df = df[[
+        'trial_index',
+        'task',
+        'mapping',
+        'phase','block',
+        'current_pos_x',
+        'target_pos_y',
+        'current_pos_y', 
+        'left_button_pressed'
+    ]]
     df = df.loc[  
           df['task'].isin(allowed_states.get('tasks')) 
         & df['mapping'].isin(allowed_states.get('mappings')) 
@@ -232,18 +241,21 @@ def _find_predicted_distance(
     validate_hand_info_needed(dominant_hand, task)
 
     if task == 'reaching':
-        # Returns last recorded position for reaching.
-        possible_distances = trial['current_pos_y']
-        prediction_idx = -1
+        # Returns first recorded position for reaching where confirmation button is pressed.
+         # NOTE: HALF TRIAL HEURISTIC
+        # We take the halved trial so we do not analyse the first frames 
+        # where the confirmation button is still pressed.
+        possible_distances = _find_predicted_y_position_reaching_task(
+            trial,
+            dominant_hand)
     else:
         # Returns first position exceeding threshold for avoiding.
         possible_distances = _find_exceeding_threshold_positions(
             trial[['current_pos_x', 'current_pos_y']], 
             dominant_hand
         )['current_pos_y']
-        prediction_idx = 0
 
-    predicted_distance = possible_distances.iat[prediction_idx] if not possible_distances.empty else np.nan
+    predicted_distance = possible_distances.iat[0] if not possible_distances.empty else np.nan
 
     if np.isnan(predicted_distance):
         nan_occurrence_warning(
@@ -297,15 +309,44 @@ def _find_exceeding_threshold_positions(
     Raises:
         ValueError: If handedness does not exist.
     """
-    validate_oneof(dominant_hand, HANDEDNESSES, 'handedness')
+    validate_oneof(dominant_hand, HANDEDNESS_LITERALS, 'handedness')
 
-    # Select avoid position for dominant hand / trace rail
-    avoiding_boundary = {
-        'left': LEFT_HANDED_PIXEL_AVOIDING_BOUNDARY,
-        'right': RIGHT_HANDED_PIXEL_AVOIDING_BOUNDARY
+    # Filter positions based on the dominant hand's threshold boundary
+    exceeds_threshold = {
+        'left': positions['current_pos_x'] <= LEFT_HANDED_PIXEL_AVOIDING_BOUNDARY,
+        'right': positions['current_pos_x'] >= RIGHT_HANDED_PIXEL_AVOIDING_BOUNDARY
     }[dominant_hand]
 
     # Chose positions exceeding the boundary marking the point as "avoided".
-    exceeding_positions = positions.loc[positions['current_pos_x'] >= avoiding_boundary].reset_index(drop=True)
+    exceeding_positions = positions.loc[exceeds_threshold].reset_index(drop=True)
     
     return exceeding_positions
+
+def _find_predicted_y_position_reaching_task(
+        trial: pd.DataFrame,
+        dominant_hand: Literal['left', 'right']
+    ):
+    half_trial = trial.iloc[len(trial) // 2:]
+    possible_distances = _find_button_press_positions(
+        half_trial[['current_pos_x', 'current_pos_y', CONFIRM_BUTTON_COLUMN_NAME]]
+    )
+
+    if possible_distances.empty:
+        return pd.Series([], dtype=float)
+
+    predicted_position_x = possible_distances.iloc[0]['current_pos_x']
+    predicted_position_y = possible_distances.iloc[0]['current_pos_y']
+
+    if dominant_hand == 'left' and predicted_position_x < LEFT_HANDED_PIXEL_AVOIDING_BOUNDARY:
+        return pd.Series([], dtype=float)
+    if dominant_hand == 'right' and predicted_position_x > RIGHT_HANDED_PIXEL_AVOIDING_BOUNDARY:
+        return pd.Series([], dtype=float)
+
+    return pd.Series([predicted_position_y])
+
+def _find_button_press_positions(
+        press_and_positions: pd.DataFrame, 
+    ):
+    button_pressed_frames = press_and_positions[press_and_positions[CONFIRM_BUTTON_COLUMN_NAME] == 1]
+    button_pressed_positions = button_pressed_frames[['current_pos_x', 'current_pos_y']]
+    return button_pressed_positions

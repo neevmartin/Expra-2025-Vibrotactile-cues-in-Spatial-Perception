@@ -1,9 +1,11 @@
+from types import MappingProxyType
+
 """
 Metadatabase where we can store important information about our experiment.
 Please do only use immutable datatypes and document your additions.
 """
 
-HANDEDNESSES = ('left', 'right')
+HANDEDNESS_LITERALS = ('left', 'right')
 """
 Constant to check dominant hand inputs.
 """
@@ -22,6 +24,12 @@ PIXEL_DISTANCES = (-564.89, -342.64, -120.39, 101.86, 324.12, 558.71, 768.62)
 """
 Y coordinate distances on the tablet from low to high 
 in pixels which are the classes for each intensity.
+"""
+
+CENTIMETER_DISTANCES = (6.4, 10, 13.6, 17.2, 20.8, 24.6, 28)
+"""
+Y coordinate distances on the tablet from low to high 
+in centimeters which are the classes for each intensity.
 """
 
 PERCENT_INTENSITIES = (28, 40, 52, 64, 76, 88, 100)
@@ -88,4 +96,66 @@ The size of the drawable space on the tablet
 WINDOW_SIZE = 1080, 1920
 """
 The size of the psychopy window
+"""
+
+CONFIRM_BUTTON_COLUMN_NAME = 'left_button_pressed'
+"""
+Column name in the data csvs which denotes 
+if the confirmation button has been pressed.
+"""
+
+HANDEDNESS = MappingProxyType({
+    '1rd': 'left', 
+    '2ri': 'right', 
+    '3ad': 'right', 
+    '4ai': 'right', 
+    '5rd': 'right', 
+    '6ri': 'right', 
+    '7ad': 'right', 
+    '8ai': 'right', 
+    '9rd': 'right', 
+    '10ri': 'right', 
+    '11ad': 'right', 
+    '12ai': 'right', 
+    '13rd': 'right', 
+    '14ri': 'right', 
+    '15ad': 'right', 
+    '16ai': 'right', 
+    '17rd': 'right', 
+    '18ri': 'right', 
+    '19ad': 'right', 
+    '20ai': 'right', 
+    '21rd': 'right', 
+    '22ri': 'right', 
+    '23ad': 'right', 
+    '24ai': 'right', 
+    '25rd': 'right', 
+    '26ri': 'right', 
+    '27ad': 'right', 
+    '28ai': 'right', 
+    '29rd': 'right', 
+    '30ri': 'right', 
+    '31ad': 'right', 
+    '32ai': 'right', 
+    '33rd': 'right', 
+    '34ri': 'right', 
+    '35ad': 'right', 
+    '36ai': 'right', 
+    '37rd': 'right', 
+    '38ri': 'right', 
+    '39ad': 'right', 
+    '40ai': 'right', 
+    '41rd': 'left', 
+    '42ri': 'right', 
+    '43ad': 'right', 
+    '44ai': 'right', 
+    '45rd': 'right', 
+    '46ri': 'right', 
+    '47ad': 'right', 
+    '48ai': 'right', 
+    '49rd': 'right', 
+})
+"""
+Immutable dictionary which contains the handedness for each participant.
+The participant ids are the keys for each dominant hand.
 """
