@@ -40,9 +40,9 @@ class Trial(pd.DataFrame):
         """@return the normalized distance in cm"""
         x, y = self.get_target()
 
-        return (
-            Trial._transform_px_to_cm(x, 0), 
-            Trial._transform_px_to_cm(y, 1)
+        return (            
+            Trial._transform_px_to_cm(x - PIXEL_RAIL_LEFT, 0), 
+            Trial._transform_px_to_cm(y - PIXEL_RAIL_BOTTOM, 1)
         )
    
     def get_trajectory_data(self, ): 
@@ -58,9 +58,9 @@ class Trial(pd.DataFrame):
         sx, sy = self.get_start()
 
         return pd.DataFrame({
-            "timestamp": self[["timestamp"]].values.flatten(),
-            "current_pos_x": list(map(lambda px: Trial._transform_px_to_cm(px, 0), self[["current_pos_x"]].values.flatten())),
-            "current_pos_y": list(map(lambda px: Trial._transform_px_to_cm(px, 1), self[["current_pos_y"]].values.flatten()))
+            "timestamp": self[["timestamp"]].values.flatten(),            
+            "current_pos_x": list(map(lambda px: Trial._transform_px_to_cm(px - PIXEL_RAIL_LEFT, 0), self[["current_pos_x"]].values.flatten())),
+            "current_pos_y": list(map(lambda px: Trial._transform_px_to_cm(px - PIXEL_RAIL_BOTTOM, 1), self[["current_pos_y"]].values.flatten()))
         })
     
     def get_trajectory_data_normalized(self, ): 
@@ -78,6 +78,6 @@ class Trial(pd.DataFrame):
     
     @classmethod
     def _transform_px_to_cm(self, px: int, axis: int):
-        """Reverses the cm to pixel calculation from the experiment"""
+        """Reverses the cm to pixel calculation from the experiment"""        
+        return (px / WINDOW_SIZE[axis]) * TABLET_SIZE 
 
-        return ((px + (WINDOW_SIZE[axis] / 2)) / WINDOW_SIZE[axis]) * TABLET_SIZE 
