@@ -26,7 +26,7 @@ Y coordinate distances on the tablet from low to high
 in pixels which are the classes for each intensity.
 """
 
-CENTIMETER_DISTANCES = (6.4, 10, 13.6, 17.2, 20.8, 24.6, 28)
+CENTIMETER_DISTANCES = (3.92, 7.52, 11.52, 14.72, 18.32, 22.12, 25.52)
 """
 Y coordinate distances on the tablet from low to high 
 in centimeters which are the classes for each intensity.
