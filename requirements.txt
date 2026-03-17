@@ -1,0 +1,10 @@
+# Core Experiment
+psychopy>=2024.2.0
+pyfirmata2>=2.5.0
+PyYAML>=6.0.1
+numpy>=1.26.0
+
+# Data Analysis
+pandas>=2.2.0
+matplotlib>=3.9.0
+ipykernel>=6.29.0
